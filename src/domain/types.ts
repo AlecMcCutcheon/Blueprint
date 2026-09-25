@@ -197,7 +197,6 @@ export interface Blueprint {
   /** Dimension readouts for the visual band chart. */
   bands: { id: DimensionId; label: string; score: number; tierLabel?: string; unmeasured?: boolean }[];
   tensions: { title: string; body: string }[];
-  closing: string[];
 }
 
 export const DIMENSION_LABELS: Record<DimensionId, string> = {

@@ -44,7 +44,6 @@ function run(label: string, pick: (qIndex: number, optionCount: number, isScale:
   console.log(`tensions: ${bp.tensions.length}`);
   console.log(`sections: ${bp.sections.map((s) => s.id).join(', ')}`);
   console.log(`markdown length: ${md.length}`);
-  console.log(`closing line: ${bp.closing[bp.closing.length - 1].replace(/\*\*/g, '"')}`);
   const empties = bp.sections.filter((s) => s.paragraphs.some((p) => p.trim() === ''));
   console.log(`empty paragraphs: ${empties.length}`);
   console.log(`state read: ${profile.state ? `calm=${profile.state.calm} stirred=${profile.state.stirred} touched=${profile.state.touched}` : '—'}`);

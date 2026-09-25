@@ -202,11 +202,6 @@ export default function BlueprintView({
           </section>
         )}
 
-        <section className="bp__section bp__section--closing">
-          {blueprint.closing.map((p, i) => (
-            <p key={i} dangerouslySetInnerHTML={{ __html: inlineBold(p) }} />
-          ))}
-        </section>
       </article>
 
       {!isVisitor && code === null && onStartUpgrade && (

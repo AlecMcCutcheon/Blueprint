@@ -63,12 +63,16 @@ function varyInterplayOpener(text: string, seed: number): string {
 }
 
 /** Narrative paragraph for one dimension at one score, 7-tier resolution. */
-function paragraphFor(dim: DimensionId, score: number): string {
+function paragraphFor(dim: DimensionId, score: number, runSeed: number): string {
   const def = DIMENSIONS.find((d) => d.id === dim);
   if (!def) return '';
   const tier = tierOf(score);
   const variants = def[tier];
-  const seed = hash(dim + String(Math.round(score / 7)));
+  // Per-run rotation: the run seed (derived from the answers themselves, so a
+  // restored session always regenerates identically) decorates the stable
+  // content seed — different runs at the same tier rotate their openers
+  // without the text ever being random across regenerations.
+  const seed = hash(dim + String(Math.round(score / 7))) + runSeed * 31;
   return calibrate(varyTierOpener(seededPick(variants, seed), seed));
 }
 
@@ -86,7 +90,7 @@ function noteFor(dim: DimensionId, score: number): string {
  * paragraph would contradict the card — replace it with a bridge that holds
  * both facts honestly.
  */
-function alignmentParagraphFor(p: ScoredProfile): string {
+function alignmentParagraphFor(p: ScoredProfile, runSeed: number): string {
   const { express, receive } = p.channels;
   if (express && !receive && (p.receiveBreadth ?? 0) >= 3) {
     const name = (c: string) => CHANNEL_LABELS[c] ?? c;
@@ -97,7 +101,7 @@ function alignmentParagraphFor(p: ScoredProfile): string {
     return `Your giving and receiving profiles overlap in breadth — you speak and hear several registers of care — but your flagship channels differ: you give most naturally through ${name(express)}, while what lands hardest arrives through ${name(receive)}. Breadth and emphasis are different measurements, and both are real; the single-channel asymmetry is named in the tensions below, because it is the one worth a dictionary exchange.`;
   }
   const s = p.dimensions.express_receive_alignment?.score;
-  return s === undefined ? '' : paragraphFor('express_receive_alignment', s);
+  return s === undefined ? '' : paragraphFor('express_receive_alignment', s, runSeed);
 }
 
 /**
@@ -193,8 +197,8 @@ const SECTION_SPECS: SectionSpec[] = [
     id: 'communication',
     heading: 'Communication Without Games',
     headings: [
-      { when: (p) => ti(p, 'direct_communication') >= 5, text: 'Plain Speech as a Policy' },
-      { when: (p) => ti(p, 'direct_communication') <= 1, text: 'How Truth Travels, Carefully' },
+      { when: (p) => ti(p, 'direct_communication') >= 4, text: 'Plain Speech as a Policy' },
+      { when: (p) => ti(p, 'direct_communication') <= 2, text: 'How Truth Travels, Carefully' },
     ],
     dims: ['direct_communication', 'curiosity_worlds'],
     intro: () =>
@@ -204,9 +208,9 @@ const SECTION_SPECS: SectionSpec[] = [
     id: 'safety',
     heading: 'Feeling Safe, Being Safe',
     headings: [
-      { when: (p) => ti(p, 'vulnerability_safety') >= 5, text: 'What It Takes to Be Seen' },
-      { when: (p) => ti(p, 'reassurance_security') >= 5, text: 'Being Safe, Being Steadied' },
-      { when: (p) => ti(p, 'vulnerability_safety') <= 1, text: 'The Vault and Its Keeper' },
+      { when: (p) => ti(p, 'vulnerability_safety') >= 4, text: 'What It Takes to Be Seen' },
+      { when: (p) => ti(p, 'reassurance_security') >= 4, text: 'Being Safe, Being Steadied' },
+      { when: (p) => ti(p, 'vulnerability_safety') <= 2, text: 'The Vault and Its Keeper' },
     ],
     dims: ['vulnerability_safety', 'reassurance_security'],
     intro: () =>
@@ -216,9 +220,9 @@ const SECTION_SPECS: SectionSpec[] = [
     id: 'reciprocity',
     heading: 'Love Going Both Ways',
     headings: [
-      { when: (p) => ti(p, 'scorekeeping') >= 5, text: 'Giving Without an Invoice (Almost)' },
-      { when: (p) => ti(p, 'scorekeeping') <= 1, text: 'The Ledger-Free Heart' },
-      { when: (p) => ti(p, 'receiving_comfort') <= 1, text: 'Better at Giving Than Taking' },
+      { when: (p) => ti(p, 'scorekeeping') >= 4, text: 'Giving Without an Invoice (Almost)' },
+      { when: (p) => ti(p, 'scorekeeping') <= 2, text: 'The Ledger-Free Heart' },
+      { when: (p) => ti(p, 'receiving_comfort') <= 2, text: 'Better at Giving Than Taking' },
     ],
     dims: ['care_initiation', 'receiving_comfort', 'scorekeeping'],
     intro: () =>
@@ -228,8 +232,8 @@ const SECTION_SPECS: SectionSpec[] = [
     id: 'hard_days',
     heading: 'The Days When Nobody Is at 100%',
     headings: [
-      { when: (p) => ti(p, 'repair_orientation') >= 5, text: 'Always Circling Back' },
-      { when: (p) => ti(p, 'conflict_engagement') <= 1, text: 'How You Fight: By Not Fighting' },
+      { when: (p) => ti(p, 'repair_orientation') >= 4, text: 'Always Circling Back' },
+      { when: (p) => ti(p, 'conflict_engagement') <= 2, text: 'How You Fight: By Not Fighting' },
     ],
     dims: ['same_side_problems', 'conflict_engagement', 'repair_orientation', 'shared_home_effort'],
     intro: () =>
@@ -239,8 +243,8 @@ const SECTION_SPECS: SectionSpec[] = [
     id: 'closeness',
     heading: 'Closeness and Being Wanted',
     headings: [
-      { when: (p) => ti(p, 'affection_daily') >= 5 && ti(p, 'desire') >= 5, text: 'Running Warm' },
-      { when: (p) => ti(p, 'affection_daily') <= 1, text: 'Closeness at a Chosen Temperature' },
+      { when: (p) => ti(p, 'affection_daily') >= 4 && ti(p, 'desire') >= 4, text: 'Running Warm' },
+      { when: (p) => ti(p, 'affection_daily') <= 2, text: 'Closeness at a Chosen Temperature' },
     ],
     dims: ['affection_daily', 'desire', 'desire_initiation', 'intimacy_attunement', 'sexual_communication', 'positivity_play', 'express_receive_alignment'],
     intro: () =>
@@ -250,8 +254,8 @@ const SECTION_SPECS: SectionSpec[] = [
     id: 'independence',
     heading: 'Two People, One Life',
     headings: [
-      { when: (p) => ti(p, 'autonomy_connection') >= 5, text: 'Two Whole People' },
-      { when: (p) => ti(p, 'autonomy_connection') <= 1, text: 'Where You End and They Begin' },
+      { when: (p) => ti(p, 'autonomy_connection') >= 4, text: 'Two Whole People' },
+      { when: (p) => ti(p, 'autonomy_connection') <= 2, text: 'Where You End and They Begin' },
     ],
     dims: ['autonomy_connection', 'commitment_sacrifice', 'money_coordination'],
     intro: () =>
@@ -262,7 +266,7 @@ const SECTION_SPECS: SectionSpec[] = [
     heading: 'What Belongs to the Two of You',
     headings: [
       { when: (p) => ti(p, 'relational_privacy') >= 4, text: 'A Room With Two Chairs' },
-      { when: (p) => ti(p, 'relational_privacy') <= 1, text: 'A Life Lived Out Loud' },
+      { when: (p) => ti(p, 'relational_privacy') <= 2, text: 'A Life Lived Out Loud' },
     ],
     dims: ['relational_privacy', 'external_processing'],
     intro: () =>
@@ -298,6 +302,16 @@ function channelProfileText(p: ScoredProfile): string | null {
 export function generateBlueprint(p: ScoredProfile): Blueprint {
   const sections: BlueprintSection[] = [];
 
+  // Run-level variation seed: derived from this profile's actual dimension
+  // scores, so two different people (or two different answer sets) never get
+  // the identical prose cadence, while re-scoring the same answers stays
+  // byte-stable.
+  const runSeed = hash(
+    (Object.keys(p.dimensions) as DimensionId[])
+      .map((d) => `${d}:${p.dimensions[d].score}`)
+      .join('|') + `#${p.answered}`,
+  );
+
   // Derived patterns: cross-dimension readings ranked by confidence × priority.
   // Synthesis patterns headline the Crosscurrents section; the rest render
   // inline where their placement says the reading belongs.
@@ -319,7 +333,7 @@ export function generateBlueprint(p: ScoredProfile): Blueprint {
         );
         continue;
       }
-      paragraphs.push(dim === 'express_receive_alignment' ? alignmentParagraphFor(p) : paragraphFor(dim, s));
+      paragraphs.push(dim === 'express_receive_alignment' ? alignmentParagraphFor(p, runSeed) : paragraphFor(dim, s, runSeed));
       // Thin-evidence honesty: a tier paragraph carried by one or two answers
       // reads as confident temperament it hasn't earned. Say so, gently,
       // instead of letting two data points speak in generalities.
@@ -440,37 +454,11 @@ export function generateBlueprint(p: ScoredProfile): Blueprint {
   ];
   sections.push({ id: '__synthesis', heading: 'A Relationship That May Feel Natural to You', paragraphs: synthesis });
 
-  // ── Closing ──
-  const metaAvg = p.metas.reduce((s, m) => s + m.score, 0) / p.metas.length;
-  // Consistency-aware bridge: the first closing line is keyed to how the run
-  // actually held together, so the summary line reflects THIS data.
-  const bridge = (() => {
-    const conflicted = p.consistency.filter((c) => c.agreement < 50 && c.dimension !== 'ambiguity_update').length;
-    if (p.consistencyIndex >= 78) return 'When everything here is put side by side, a consistent picture remains:';
-    if (conflicted >= 2) return `Putting everything side by side, a picture remains — drawn from answers that agreed ${p.consistencyIndex}% of the time, and disagreed exactly where two of your values are still negotiating the lead:`;
-    if (conflicted === 1) return 'Putting everything side by side, a picture remains — one your answers mostly confirmed, with a single honest dissension named above:';
-    return `Putting everything side by side, a picture remains — steady enough to trust, drawn from ${p.consistencyIndex}% self-agreement:`;
-  })();
-  let closing: string[];
-  if (metaAvg >= 62) {
-    closing = [
-      `${bridge} someone who wants mutuality at the core. Not perfectly equal every day, and not measured gesture for gesture — but mutual in the sense that both people genuinely want each other to feel loved, wanted, safe, and cared for.`,
-      'You want to give without an invoice and receive without an apology. You want the ordinary evenings to count. You want to be someone\'s person, visibly, and to have them be yours.',
-      '**I am loved here. I am wanted here. I matter here. And I want to make sure you feel the same way.**',
-    ];
-  } else if (metaAvg >= 45) {
-    closing = [
-      `${bridge.replace(':', ' —')} someone who wants mutuality and is still deciding how much of themselves to bet on it. The instincts toward care are there; the questions are about safety, debt, and who moves first.`,
-      'That\'s not a smaller want. It\'s often just a more guarded one — and naming the guard is how it becomes a door instead of a wall.',
-      '**I want to be loved here. I\'m still learning to believe I\'m wanted here. And I\'m working on making sure you feel the same way.**',
-    ];
-  } else {
-    closing = [
-      `${bridge.replace(':', ' —')} someone for whom self-protection is currently louder than mutuality — ledgers, deflection, and independence show up more often than reaching and receiving. That pattern usually has good reasons behind it.`,
-      'The useful question isn\'t whether it\'s right or wrong. It\'s whether it\'s still the shape you want, or just the shape you learned.',
-      '**I am careful here. I am safe here. And I\'m still deciding how much of me you get to hold.**',
-    ];
-  }
+  // (The closing/“Short Version” block was removed by design: its three
+  // meta-branch summaries read as boilerplate against the per-profile prose
+  // everywhere else, and its sign-off was a direct lift from the founding
+  // values document — a mirror shouldn't end by quoting the original it
+  // was built from. The document now ends on the synthesis section.)
 
   // ── Epigraph: keyed to the most distinctive signal in the profile ──
   const dimsArr = (Object.values(p.dimensions) as { id: DimensionId; score: number; unmeasured?: boolean }[]).filter(
@@ -540,9 +528,8 @@ export function generateBlueprint(p: ScoredProfile): Blueprint {
     paragraphs: s.paragraphs.map(calibrate),
   }));
   const calibratedTensions = tensions.map((t) => ({ title: t.title, body: calibrate(t.body) }));
-  const calibratedClosing = closing.map(calibrate);
 
-  return { epigraph, sections: calibratedSections, bands, tensions: calibratedTensions, closing: calibratedClosing };
+  return { epigraph, sections: calibratedSections, bands, tensions: calibratedTensions };
 }
 
 /** Render the blueprint as a downloadable Markdown document. */
@@ -594,12 +581,6 @@ export function blueprintToMarkdown(bp: Blueprint, p: ScoredProfile): string {
       lines.push(para);
       lines.push('');
     }
-  }
-  lines.push('## The Short Version');
-  lines.push('');
-  for (const para of bp.closing) {
-    lines.push(para);
-    lines.push('');
   }
   lines.push('---');
   lines.push('');
