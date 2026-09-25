@@ -67,12 +67,32 @@ const defectEcho: { where: string; hits: string[]; text: string }[] = [];
 const defectMech: { where: string; defect: string }[] = [];
 const openerFirst = new Map<string, Map<string, number>>(); // "sectionId" -> opener(3w) -> count
 const docParas: string[][] = [];
+const epigraphsBench = new Map<string, number>();
+const headingTexts = new Map<string, Map<string, number>>(); // "sectionId" -> heading -> count
+let headingPoolDocs = 0, headingStaticDocs = 0, headingComboSum = 0;
+const headingDupes: string[] = [];
 let totalParas = 0, lightlyHeld = 0;
 
 for (let run = 0; run < RUNS; run++) {
   const answers = randomAnswers();
   const profile = scoreProfile(answers);
   const bp = generateBlueprint(profile, answers);
+
+  // Title/epigraph variety: distinct epigraphs, per-section heading spread,
+  // and how often a content-aware pool heading (vs the static default) rendered.
+  epigraphsBench.set(bp.epigraph, (epigraphsBench.get(bp.epigraph) ?? 0) + 1);
+  const docHeadings = new Set<string>();
+  let poolPicked = false;
+  for (const sec of bp.sections) {
+    const m = headingTexts.get(sec.id) ?? new Map<string, number>();
+    m.set(sec.heading, (m.get(sec.heading) ?? 0) + 1);
+    headingTexts.set(sec.id, m);
+    docHeadings.add(sec.heading);
+    if (sec.headingAdaptive) poolPicked = true;
+  }
+  if (poolPicked) headingPoolDocs += 1; else headingStaticDocs += 1;
+  headingComboSum += docHeadings.size;
+  if (docHeadings.size < bp.sections.length) headingDupes.push([...docHeadings].length + '/' + bp.sections.length);
 
   for (const b of bp.bands) {
     if (b.tierLabel?.includes('lightly held')) lightlyHeld++;
@@ -171,4 +191,23 @@ for (const [sec, m] of openerFirst) {
   const [opener, n] = [...m.entries()].sort((x, y) => y[1] - x[1])[0];
   const total = [...m.values()].reduce((a, b) => a + b, 0);
   console.log(`  ${sec.padEnd(16)} "${opener}" leads ${(100 * n / total).toFixed(0)}% of ${total} paragraphs`);
+}
+
+console.log('\n═ F. Title & epigraph variety ═');
+console.log(`distinct epigraphs across ${RUNS} runs: ${epigraphsBench.size}`);
+{
+  const topEpi = [...epigraphsBench.entries()].sort((a, b) => b[1] - a[1])[0];
+  if (topEpi) console.log(`  most common epigraph: ${topEpi[1]}× "${topEpi[0].slice(0, 44)}"`);
+  console.log(`docs with ≥1 pool-picked heading: ${headingPoolDocs}/${RUNS} · fully static: ${headingStaticDocs}`);
+  const distinctTotal = [...headingTexts.values()].reduce((n, m) => n + m.size, 0);
+  console.log(`distinct heading texts across all sections: ${distinctTotal} · mean DISTINCT titles per doc: ${(headingComboSum / RUNS).toFixed(2)}`);
+  if (headingDupes.length > 0) console.log(`  docs with a repeated title inside one document: ${headingDupes.length} ${headingDupes.slice(0, 4).join(' ')}`);
+  for (const [id, m] of headingTexts) {
+    const [txt, n] = [...m.entries()].sort((a, b) => b[1] - a[1])[0];
+    console.log(`  ${id.padEnd(16)} ${String(m.size).padStart(2)} distinct · top "${txt.slice(0, 38)}" ${n}×`);
+  }
+  // Gates: titles must stay unique WITHIN a document (any repeat is a naming
+  // failure), and the epigraph pool must keep breathing (25+ tellings in use).
+  if (headingDupes.length > 0) fail(`${headingDupes.length} docs carry a repeated title`);
+  if (epigraphsBench.size < 25) fail(`epigraph variety ${epigraphsBench.size} < 25 distinct across ${RUNS} runs`);
 }

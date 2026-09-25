@@ -66,6 +66,8 @@ let crosscurrents = 0, headlineTotal = 0;
 let expressNull = 0, receiveNull = 0, receiveBreadth3 = 0, receiveAnswered = 0;
 let twoReadings = 0;
 const epigraphs = new Map<string, number>();
+const headingsBySection = new Map<string, Map<string, number>>();
+let poolKeyed = 0, staticDefault = 0;
 let docs = 0;
 
 function runSet(answers: Answers): void {
@@ -117,6 +119,12 @@ function runSet(answers: Answers): void {
   const cross = bp.sections.find((s) => s.id === '__crosscurrents');
   if (cross) { crosscurrents += 1; headlineTotal += cross.paragraphs.length; }
   epigraphs.set(bp.epigraph, (epigraphs.get(bp.epigraph) ?? 0) + 1);
+  for (const s of bp.sections) {
+    const m = headingsBySection.get(s.id) ?? new Map<string, number>();
+    m.set(s.heading, (m.get(s.heading) ?? 0) + 1);
+    headingsBySection.set(s.id, m);
+    if (s.headingAdaptive) poolKeyed += 1; else staticDefault += 1;
+  }
 }
 
 const rngU = mulberry32(1234);
@@ -147,3 +155,7 @@ console.log(`  tension cards/doc: two_readings avg ${(twoReadings / docs).toFixe
 for (const [k, n] of [...tensionKinds.entries()].sort((a, b) => b[1] - a[1])) console.log(`    ${k}: ${n} (${(100 * n / docs).toFixed(0)}% of docs)`);
 console.log(`  channels (raw-answer docs: ${receiveAnswered}): express null ${(100 * expressNull / Math.max(1, receiveAnswered)).toFixed(1)}% · receive null ${(100 * receiveNull / Math.max(1, receiveAnswered)).toFixed(1)}% · receive breadth≥3 ${(100 * receiveBreadth3 / Math.max(1, receiveAnswered)).toFixed(1)}%`);
 console.log(`  distinct epigraphs: ${epigraphs.size} · top: ${[...epigraphs.entries()].sort((a, b) => b[1] - a[1]).slice(0, 3).map(([e, n]) => `${n}× "${e.slice(0, 30)}"`).join(' · ')}`);
+console.log(`  headings: ${poolKeyed} pool-picked vs ${staticDefault} static · per-section distinct:`);
+for (const [id, m] of headingsBySection) {
+  console.log(`    ${id.padEnd(16)} ${String(m.size).padStart(2)} · top ${((100 * Math.max(...m.values())) / Math.max(1, [...m.values()].reduce((a, b) => a + b, 0))).toFixed(0)}%`);
+}

@@ -156,10 +156,18 @@ and the taker never sees dimension names during the quiz.
   interplay library; first applicable `Other:tierIndex` key wins) — now covering combinations
   the pattern library doesn't reach. Both layers implement the profile-interpretation
   principle (Furr; Lievens 2017).
-- **Adaptive section headings**: each section can carry score-keyed heading variants (e.g.
-  "Always Circling Back" when repair is very high, "How You Fight: By Not Fighting" when conflict
-  engagement is very low), with the static heading as fallback. `headingAdaptive` records which
-  were chosen.
+- **Adaptive section headings**: each section carries condition-keyed heading POOLS — the first
+  matching condition (a dimension's tier, or a combination like "capitalization low AND listening
+  high") selects a pool of 3–5 content-matched tellings, and a seeded pick rotates inside it, so
+  two profiles rarely share a full set of titles (97 distinct texts observed across 300 random
+  runs; titles never repeat within one document). A render-time echo guard drops any candidate
+  that shares too much vocabulary with what the section actually renders — tier paragraphs, fired
+  pattern frames, or the epigraph — falling back to the static title if everything collides.
+  `headingAdaptive` records which were chosen.
+- **Epigraph pools**: the opening line is keyed to the most distinctive dimension signal (score
+  ≤ 36 or ≥ 70), with 3–4 tellings per keyed dimension and a seeded fallback pool — seeds derive
+  only from profile content (dimension + score), never from owner-vs-share state, so BP5 share
+  codes render byte-identical documents.
 - **The blueprint** interpolates across bands: sentences are chosen per-dimension, then composed in
   the rhetorical structure of a personal values document ( Understanding → Communication → Safety → Reciprocity →
   Bad days → Affection/Intimacy → Home → Independence → Repair → closing lines), including a

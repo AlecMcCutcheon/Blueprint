@@ -226,11 +226,66 @@ const ti = (p: ScoredProfile, id: DimensionId): number => {
 interface SectionSpec {
   id: string;
   heading: string;
-  /** Score-keyed heading variants — first match wins; static heading is the fallback. */
-  headings?: { when: (p: ScoredProfile) => boolean; text: string }[];
+  /**
+   * Condition-keyed heading POOLS — first matching condition wins, then a
+   * seeded pick inside that pool; the static heading is the last candidate.
+   * Each pool carries several tellings of the same content-aware title, so
+   * two profiles with the same shape rarely share every heading.
+   */
+  headings?: { when: (p: ScoredProfile) => boolean; texts: string[] }[];
   dims: DimensionId[];
   /** Opening line woven before the dimension paragraphs. */
   intro?: (p: ScoredProfile) => string;
+}
+
+// ── Title echo guard ──
+// A heading must not re-say a line the section (or the document) is about to
+// say: a title like "Where Good News Gets a Hearing" directly above a pattern
+// paragraph that opens "Good news has a full room in your answers…" reads as
+// a stutter. Candidates sharing too much vocabulary with what actually
+// renders are skipped at pick time — render-time calibration, the same rule
+// the prose everywhere else follows. If every candidate collides, the first
+// (content-matched) one is used rather than rendering a broken heading.
+
+const TITLE_STOPWORDS = new Set(
+  ('the a an of to and in on for with at by is are it its as be or not no nor you your yours they them their ' +
+    'we us our ours i me my mine he she his her hers that this these those there here when where what who whom ' +
+    'how why than then so but if out up down over under one two').split(' '),
+);
+
+function contentWords(s: string): Set<string> {
+  const out = new Set<string>();
+  for (const w of s.toLowerCase().replace(/[’'"—–-]/g, ' ').replace(/[^a-z ]/g, ' ').split(/\s+/)) {
+    if (w.length >= 4 && !TITLE_STOPWORDS.has(w)) out.add(w);
+  }
+  return out;
+}
+
+function titlesCollide(title: string, blockers: Set<string>): boolean {
+  const words = [...contentWords(title)];
+  let shared = 0;
+  for (const w of words) if (blockers.has(w)) shared += 1;
+  // Two shared content words always collide; a one-word overlap only counts
+  // against one- and two-word titles, where it would dominate the whole line.
+  return shared >= 2 || (shared >= 1 && words.length <= 2);
+}
+
+function headingBlockers(paragraphs: string[], epigraph: string, frames: string[]): Set<string> {
+  const b = new Set<string>();
+  for (const src of [...paragraphs, epigraph, ...frames]) {
+    for (const w of contentWords(src)) b.add(w);
+  }
+  return b;
+}
+
+/** First non-echoing heading candidate; seeded rotation inside the matched pool. */
+function pickHeading(spec: SectionSpec, p: ScoredProfile, runSeed: number, blockers: Set<string>): string {
+  const pool = spec.headings?.find((h) => h.when(p));
+  const texts = pool?.texts ?? [];
+  const rot = texts.length > 0 ? Math.floor(Math.abs(Math.sin(hash(spec.id + '::heading') + runSeed) * 10000)) % texts.length : 0;
+  const candidates = [...texts.slice(rot), ...texts.slice(0, rot), spec.heading];
+  for (const c of candidates) if (!titlesCollide(c, blockers)) return c;
+  return candidates[0];
 }
 
 const SECTION_SPECS: SectionSpec[] = [
@@ -238,8 +293,11 @@ const SECTION_SPECS: SectionSpec[] = [
     id: 'understanding',
     heading: 'Being Understood',
     headings: [
-      { when: (p) => ti(p, 'listening_first') >= 5, text: 'The One They Talk To First' },
-      { when: (p) => ti(p, 'perspective_taking') <= 1, text: 'Where Interpretation Goes Wrong' },
+      { when: (p) => ti(p, 'listening_first') >= 5, texts: ['The One They Talk To First', 'Where the Story Gets to Finish', 'A Landing Place for What Matters', 'The Listener at the End of the Rope'] },
+      { when: (p) => ti(p, 'perspective_taking') <= 1, texts: ['Where Interpretation Goes Wrong', 'Fast Verdicts, Slow Charity', 'Reading Before the Facts Arrive'] },
+      { when: (p) => ti(p, 'capitalization') <= 2 && ti(p, 'listening_first') >= 4, texts: ['Wins Have Somewhere to Land', 'A Room for Good News', 'Where Good News Gets a Hearing'] },
+      { when: (p) => ti(p, 'perspective_taking') >= 4 && ti(p, 'listening_first') >= 4, texts: ['Attention, in Both Directions', 'Reading and Receiving', 'The Two Kinds of Attention'] },
+      { when: (p) => ti(p, 'perspective_taking') <= 3 && ti(p, 'listening_first') <= 3, texts: ['The Work of Interpretation', 'Reading and Being Read', 'Attention and Its Aims', 'The Bridge Between Two Minds'] },
     ],
     dims: ['perspective_taking', 'listening_first', 'logic_emotion_integration', 'capitalization', 'feedback_receiving'],
     intro: () =>
@@ -249,8 +307,10 @@ const SECTION_SPECS: SectionSpec[] = [
     id: 'communication',
     heading: 'Communication Without Games',
     headings: [
-      { when: (p) => ti(p, 'direct_communication') >= 4, text: 'Plain Speech as a Policy' },
-      { when: (p) => ti(p, 'direct_communication') <= 2, text: 'How Truth Travels, Carefully' },
+      { when: (p) => ti(p, 'direct_communication') >= 4 && ti(p, 'curiosity_worlds') >= 4, texts: ['Honesty Plus Appetite', 'The Question Behind the Question', 'Interested, and Blunt About It'] },
+      { when: (p) => ti(p, 'direct_communication') >= 4, texts: ['Plain Speech as a Policy', 'The Straight Version', 'Saying It Before It Spoils', 'Direct by Design'] },
+      { when: (p) => ti(p, 'direct_communication') <= 2, texts: ['How Truth Travels, Carefully', 'Truth, Routed Around Obstacles', 'The Softened Sentence', 'Circuits of Care'] },
+      { when: (p) => ti(p, 'direct_communication') <= 3, texts: ['Truth Without Tactics', 'How You Say the Real Thing', 'Words, Handled With Care', 'Between Nothing Held Back and Nothing Forced'] },
     ],
     dims: ['direct_communication', 'curiosity_worlds'],
     intro: () =>
@@ -260,9 +320,9 @@ const SECTION_SPECS: SectionSpec[] = [
     id: 'safety',
     heading: 'Feeling Safe, Being Safe',
     headings: [
-      { when: (p) => ti(p, 'vulnerability_safety') >= 4, text: 'What It Takes to Be Seen' },
-      { when: (p) => ti(p, 'reassurance_security') >= 4, text: 'Being Safe, Being Steadied' },
-      { when: (p) => ti(p, 'vulnerability_safety') <= 2, text: 'The Vault and Its Keeper' },
+      { when: (p) => ti(p, 'vulnerability_safety') >= 4, texts: ['The Vault, and Who It Opens For', 'Being Seen Without Bracing', 'Where the Armor Comes Off', 'What It Takes to Be Seen'] },
+      { when: (p) => ti(p, 'reassurance_security') >= 4, texts: ['Being Safe, Being Steadied', 'What Calm Is Made Of', 'The Information That Steadies You'] },
+      { when: (p) => ti(p, 'vulnerability_safety') <= 2, texts: ['The Vault and Its Keeper', 'Private by Default', 'What Stays Behind the Door'] },
     ],
     dims: ['vulnerability_safety', 'reassurance_security'],
     intro: () =>
@@ -272,9 +332,10 @@ const SECTION_SPECS: SectionSpec[] = [
     id: 'reciprocity',
     heading: 'Love Going Both Ways',
     headings: [
-      { when: (p) => ti(p, 'scorekeeping') >= 4, text: 'Giving Without an Invoice (Almost)' },
-      { when: (p) => ti(p, 'scorekeeping') <= 2, text: 'The Ledger-Free Heart' },
-      { when: (p) => ti(p, 'receiving_comfort') <= 2, text: 'Better at Giving Than Taking' },
+      { when: (p) => ti(p, 'scorekeeping') >= 4, texts: ['Giving Without an Invoice (Almost)', 'The Quiet Audit', 'Generous, With a Memory'] },
+      { when: (p) => ti(p, 'scorekeeping') <= 2, texts: ['The Ledger-Free Heart', 'Giving That Doesn’t Keep Score', 'Zero Invoices'] },
+      { when: (p) => ti(p, 'receiving_comfort') <= 2, texts: ['Better at Giving Than Taking', 'Where Receiving Gets Hard', 'The Return Trip Stalls'] },
+      { when: (p) => ti(p, 'care_initiation') >= 4 && ti(p, 'receiving_comfort') >= 4, texts: ['Care, Full Circle', 'Moving First, Landing Softly', 'Both Directions, Fully Open'] },
     ],
     dims: ['care_initiation', 'receiving_comfort', 'scorekeeping'],
     intro: () =>
@@ -284,8 +345,10 @@ const SECTION_SPECS: SectionSpec[] = [
     id: 'hard_days',
     heading: 'The Days When Nobody Is at 100%',
     headings: [
-      { when: (p) => ti(p, 'repair_orientation') >= 4, text: 'Always Circling Back' },
-      { when: (p) => ti(p, 'conflict_engagement') <= 2, text: 'How You Fight: By Not Fighting' },
+      { when: (p) => ti(p, 'repair_orientation') >= 4, texts: ['Coming Back as a Practice', 'Returns, Without Keeping Count', 'Always Circling Back'] },
+      { when: (p) => ti(p, 'conflict_engagement') <= 2, texts: ['The Quiet During the Storm', 'Where You Go Mid-Argument', 'How You Fight: By Not Fighting'] },
+      { when: (p) => ti(p, 'repair_orientation') <= 2, texts: ['When Things Set, They Set', 'Repair on a Delay', 'The Long Way Back'] },
+      { when: (p) => ti(p, 'shared_home_effort') >= 4, texts: ['Carrying More Than Gets Noticed', 'Load-Bearing', 'Who Notices the Carrier'] },
     ],
     dims: ['same_side_problems', 'conflict_engagement', 'repair_orientation', 'shared_home_effort'],
     intro: () =>
@@ -295,8 +358,11 @@ const SECTION_SPECS: SectionSpec[] = [
     id: 'closeness',
     heading: 'Closeness and Being Wanted',
     headings: [
-      { when: (p) => ti(p, 'affection_daily') >= 4 && ti(p, 'desire') >= 4, text: 'Running Warm' },
-      { when: (p) => ti(p, 'affection_daily') <= 2, text: 'Closeness at a Chosen Temperature' },
+      { when: (p) => ti(p, 'affection_daily') >= 4 && ti(p, 'desire') >= 4, texts: ['Warm Year-Round', 'High Ambient Warmth', 'Running Warm'] },
+      { when: (p) => ti(p, 'affection_daily') <= 2, texts: ['Closeness at a Chosen Temperature', 'Warmth by Design, Not Default', 'Contact as Occasion'] },
+      { when: (p) => ti(p, 'sexual_communication') >= 4, texts: ['An Open Script for Want', 'The Bedroom Speaks Plainly Too', 'Nothing Unsayable'] },
+      { when: (p) => ti(p, 'sexual_communication') <= 2, texts: ['The Unsaid Part of Want', 'Where Words Stay Out', 'Desire Off the Record'] },
+      { when: (p) => ti(p, 'positivity_play') >= 4, texts: ['Lightness, Tended', 'Fun as Infrastructure', 'The Recess Clause'] },
     ],
     dims: ['affection_daily', 'desire', 'desire_initiation', 'intimacy_attunement', 'sexual_communication', 'positivity_play', 'express_receive_alignment'],
     intro: () =>
@@ -306,8 +372,10 @@ const SECTION_SPECS: SectionSpec[] = [
     id: 'independence',
     heading: 'Two People, One Life',
     headings: [
-      { when: (p) => ti(p, 'autonomy_connection') >= 4, text: 'Two Whole People' },
-      { when: (p) => ti(p, 'autonomy_connection') <= 2, text: 'Where You End and They Begin' },
+      { when: (p) => ti(p, 'autonomy_connection') >= 4, texts: ['Two Whole People', 'Space as a Form of Respect', 'Close, With the Doors Unlocked'] },
+      { when: (p) => ti(p, 'autonomy_connection') <= 2, texts: ['Where You End and They Begin', 'The Borders Blur Here', 'One Life, Lightly Divided'] },
+      { when: (p) => ti(p, 'money_coordination') >= 4, texts: ['Money as a Team Sport', 'The Shared Books, Open', 'One Ledger, Two Signatures'] },
+      { when: (p) => ti(p, 'money_coordination') <= 2, texts: ['Money, Mostly Unmentioned', 'The Quiet Economy', 'Fairness Without a Meeting'] },
     ],
     dims: ['autonomy_connection', 'commitment_sacrifice', 'money_coordination'],
     intro: () =>
@@ -317,8 +385,10 @@ const SECTION_SPECS: SectionSpec[] = [
     id: 'privacy',
     heading: 'What Belongs to the Two of You',
     headings: [
-      { when: (p) => ti(p, 'relational_privacy') >= 4, text: 'A Room With Two Chairs' },
-      { when: (p) => ti(p, 'relational_privacy') <= 2, text: 'A Life Lived Out Loud' },
+      { when: (p) => ti(p, 'relational_privacy') >= 4, texts: ['A Room With Two Chairs', 'Sealed at the Walls, Open Inside', 'The Two-Person Rule'] },
+      { when: (p) => ti(p, 'relational_privacy') <= 2, texts: ['A Life Lived Out Loud', 'Porous by Design', 'Few Walls, Known Reasons'] },
+      { when: (p) => ti(p, 'external_processing') >= 4, texts: ['Thinking Out Loud, Together', 'Processed in Company', 'Drafts Shared Live'] },
+      { when: (p) => ti(p, 'external_processing') <= 2, texts: ['Finished Thoughts Only', 'The Inside Edit', 'Processed in Private'] },
     ],
     dims: ['relational_privacy', 'external_processing'],
     intro: () =>
@@ -364,14 +434,70 @@ export function generateBlueprint(p: ScoredProfile): Blueprint {
       .join('|') + `#${p.answered}`,
   );
 
+  // ── Epigraph: keyed to the most distinctive signal in the profile ──
+  // Computed BEFORE the sections so heading selection can avoid re-saying it.
+  const dimsArr = (Object.values(p.dimensions) as { id: DimensionId; score: number; unmeasured?: boolean }[]).filter(
+    (d) => d.id !== 'express_receive_alignment' && !d.unmeasured,
+  );
+  const topHigh = [...dimsArr].sort((a, b) => b.score - a.score)[0];
+  const topLow = [...dimsArr].sort((a, b) => a.score - b.score)[0];
+  const EPIGRAPH_BY_LOW: Partial<Record<DimensionId, string[]>> = {
+    receiving_comfort: ['Loves loudly, receives carefully.', 'Gives freely; receives like it costs.', 'Open hand out, closed hand in.', 'The door swings out more easily than in.'],
+    scorekeeping: ['Someone who loves in actions and counts in silences.', 'A quiet ledger behind open generosity.', 'Gives big; remembers quietly.', 'Generosity with a memory.'],
+    direct_communication: ['Careful where it counts, direct where it matters.', 'Says the true thing — except when it exposes.', 'Plain speech with a private wing.', 'Truth, selectively scheduled.'],
+    desire: ['A quiet interior that wants, without announcing it.', 'Wanting kept mostly private.', 'The wanting runs hot inside; outside, stillness.', 'Want, kept off the wire.'],
+    affection_daily: ['Closeness held at a chosen temperature.', 'Reach withheld; warmth rationed by design.', 'Contact as occasion, not current.', 'Warmth on a thermostat, not a tide.'],
+    perspective_taking: ['Reads fast, trusts slowly.', 'Interpretation with a gatekeeper.', 'Charity for some; verdicts for others.', 'Curious first, convinced after — usually.'],
+    relational_privacy: ['A life the two of you keep between you.', 'Walls high, doors selective.', 'A story told only when settled.', 'Few entries in the public record.'],
+    sexual_communication: ['Feels deeply, says less where it counts most.', 'The deepest wants stay offstage.', 'Desire legible only in clues.', 'Want, spoken in a lower register.'],
+    capitalization: ['Loves steadily; celebrates quietly.', 'Good news gets a receipt, not a room.', 'Marks the big ones; the small joys slip past.', 'Joy acknowledged; rarely amplified.'],
+    commitment_sacrifice: ['Carries an internal audit alongside the giving.', 'Gives with one hand, tallies with the other.', 'Sacrifice with a running tab.', 'Backs people; keeps the receipts.'],
+    money_coordination: ['Keeps the books; means well by it.', 'A fairness organ, turned all the way up.', 'Every purchase gets a quiet hearing.', 'The auditor never fully sleeps.'],
+  };
+  const EPIGRAPH_BY_HIGH: Partial<Record<DimensionId, string[]>> = {
+    care_initiation: ['Notices first, moves first — love as anticipation.', 'Love, in your answers, shows up early.', 'Anticipates the need; arrives before the ask.', 'The first responder of the people they love.'],
+    repair_orientation: ['Always circling back.', 'Returns, repairs, remains.', 'The one who comes back.', 'Nothing stays broken between you for long.'],
+    listening_first: ['A safe place to fall apart.', 'Heard all the way to the end.', 'Where the story gets to finish.', 'People bring you their unfinished sentences.'],
+    same_side_problems: ['Same side of everything.', 'Us versus it, every time.', 'Problems get externalized; people get embraced.', 'Takes the problem’s side, and yours.'],
+    affection_daily: ['Fluent in the small touches.', 'Touch as first language.', 'Ambient closeness, maintained daily.', 'Warmth as the background state.'],
+    vulnerability_safety: ['A vault people trust without checking.', 'Safe hands for fragile things.', 'Holds what is handed, hand steady.', 'Where confessions go to be safe.'],
+    autonomy_connection: ['Two whole people, choosing each other daily.', 'Separate orbits, shared gravity.', 'Close by choice, not by need.', 'Room to roam, reason to return.'],
+    curiosity_worlds: ['Interest as a form of love.', 'Asks the second question.', 'Finds every world worth entering.', 'Treats every enthusiasm as an invitation.'],
+    relational_privacy: ['Keeps what matters between you.', 'The two-person room, kept.', 'Protected, not hidden.', 'What happens between you, stays between you.'],
+    sexual_communication: ['Nothing unsayable, even there.', 'Speaks plainly, even about want.', 'Intimacy with an open script.', 'The bedroom gets the same honesty as the kitchen.'],
+    positivity_play: ['Gardens fun; plants the plan nobody knew they wanted.', 'Carries the spark; hands you the match.', 'Lightness, on purpose.', 'Builds the joke ahead of time.'],
+    capitalization: ['Where joy goes to land.', 'Stops the world for good news.', 'Wins grow when told to you.', 'Good news compounds at your place.'],
+    conflict_engagement: ['Curious even mid-argument.', 'Stays in the ring; hears while defending.', 'Heat does not cost you your hearing.', 'Argues to learn, not to win.'],
+    commitment_sacrifice: ['Backs people — visibly, without an invoice.', 'All the way in, books closed.', 'Gives like it settles the question.', 'Bets on people, and stays at the table.'],
+    money_coordination: ['Talks about money like a teammate.', 'One ledger, two signatures.', 'A team economy, no double standards.', 'Money as a shared project, never a weapon.'],
+  };
+
+  let epigraph: string;
+  // Seed = f(dimension, score) only — nothing that differs between the owner
+  // and a BP5 share-code profile (pairLeans presence would shift the seed and
+  // break the byte-parity invariant). Rotation comes from the exact score.
+  if (topLow && topLow.score <= 36 && EPIGRAPH_BY_LOW[topLow.id]) {
+    epigraph = seededPick(EPIGRAPH_BY_LOW[topLow.id]!, hash(topLow.id + String(topLow.score)));
+  } else if (topHigh && topHigh.score >= 70 && EPIGRAPH_BY_HIGH[topHigh.id]) {
+    epigraph = seededPick(EPIGRAPH_BY_HIGH[topHigh.id]!, hash(topHigh.id + String(topHigh.score)));
+  } else {
+    const fallbacks = [
+      'A steady presence that wants, quietly, to be chosen back.',
+      'Direct where it matters, careful where it counts.',
+      'Loves specifically, not generally.',
+      'Built for the ordinary evenings.',
+      'Attention, given like it costs something.',
+      'Steady hands, particular heart.',
+    ];
+    epigraph = seededPick(fallbacks, hash((topHigh?.id ?? 'x') + String(p.consistencyIndex)) + runSeed);
+  }
+
   // Derived patterns: cross-dimension readings ranked by confidence × priority.
   // Synthesis patterns headline the Crosscurrents section; the rest render
   // inline where their placement says the reading belongs.
   const plan = buildPatternPlan(p);
 
   for (const spec of SECTION_SPECS) {
-    // Score-keyed heading: the first matching variant wins; static is fallback.
-    const heading = spec.headings?.find((h) => h.when(p))?.text ?? spec.heading;
     const paragraphs: string[] = [];
     if (spec.intro) paragraphs.push(spec.intro(p));
     for (const dim of spec.dims) {
@@ -415,6 +541,11 @@ export function generateBlueprint(p: ScoredProfile): Blueprint {
         'Taken together, your directness and your curiosity suggest something specific: you don\'t just want honesty about problems — you want the relationship to be a place where enthusiasm is also spoken out loud. Not only "this bothered me," but "look at this thing I love."',
       );
     }
+    // Content-aware heading, picked from the matched pool with seeded rotation,
+    // skipping candidates that would re-say what this section (or the epigraph
+    // or the inline pattern frames) is about to say.
+    const frames = spec.dims.flatMap((d) => (plan.sections.get(`${spec.id}:${d}`) ?? []).map((h) => h.pattern.frame));
+    const heading = pickHeading(spec, p, runSeed, headingBlockers(paragraphs, epigraph, frames));
     sections.push({ id: spec.id, heading, paragraphs, headingAdaptive: heading !== spec.heading });
   }
 
@@ -423,9 +554,12 @@ export function generateBlueprint(p: ScoredProfile): Blueprint {
   // at three so the section reads as "the interactions that matter most in
   // your profile", not every qualifying combination.
   if (plan.headline.length > 0) {
+    // The interaction section's title rotates like every other heading, while
+    // keeping the "water in motion" register the frame lines were written for.
+    const CROSSCURRENT_HEADINGS = ['Crosscurrents', 'Where the Signals Cross', 'Undercurrents', 'The Interactions That Matter'];
     sections.push({
       id: '__crosscurrents',
-      heading: 'Crosscurrents',
+      heading: seededPick(CROSSCURRENT_HEADINGS, hash('crosscurrents') + runSeed),
       paragraphs: plan.headline.flatMap((h) => renderPattern(h, 'headline', runSeed)),
     });
   }
@@ -504,66 +638,26 @@ export function generateBlueprint(p: ScoredProfile): Blueprint {
         : 'a careful balance across all of these — your answers sit closer to the middle than the extremes, which suggests someone still assembling their own picture of what closeness should look like.'),
     'None of this is a verdict. It\'s a description of a pattern — drawn from dozens of small decisions you made about imaginary people, which is usually where real instincts live. Some of it will land as obviously you. Some of it will feel slightly off. Both reactions are useful: the parts that ring true are worth saying out loud to the people close to you, and the parts that don\'t are worth arguing with.',
   ];
-  sections.push({ id: '__synthesis', heading: 'A Relationship That May Feel Natural to You', paragraphs: synthesis });
+  // Synthesis heading: seeded rotation — the closer's title varies like every
+  // other title in the document, while the paragraphs stay profile-specific.
+  const SYNTHESIS_HEADINGS = [
+    'A Relationship That May Feel Natural to You',
+    'What Your Answers Point Toward',
+    'The Shape of a Relationship That Fits',
+    'What Tends to Work for You',
+    'The Relationship Your Answers Describe',
+  ];
+  sections.push({
+    id: '__synthesis',
+    heading: seededPick(SYNTHESIS_HEADINGS, hash('synthesis' + String(p.consistencyIndex) + String(p.answered))),
+    paragraphs: synthesis,
+  });
 
   // (The closing/“Short Version” block was removed by design: its three
   // meta-branch summaries read as boilerplate against the per-profile prose
   // everywhere else, and its sign-off was a direct lift from the founding
   // values document — a mirror shouldn't end by quoting the original it
   // was built from. The document now ends on the synthesis section.)
-
-  // ── Epigraph: keyed to the most distinctive signal in the profile ──
-  const dimsArr = (Object.values(p.dimensions) as { id: DimensionId; score: number; unmeasured?: boolean }[]).filter(
-    (d) => d.id !== 'express_receive_alignment' && !d.unmeasured,
-  );
-  const topHigh = [...dimsArr].sort((a, b) => b.score - a.score)[0];
-  const topLow = [...dimsArr].sort((a, b) => a.score - b.score)[0];
-
-  const EPIGRAPH_BY_LOW: Partial<Record<DimensionId, string>> = {
-    receiving_comfort: 'Loves loudly, receives carefully.',
-    scorekeeping: 'Someone who loves in actions and counts in silences.',
-    direct_communication: 'Careful where it counts, direct where it matters.',
-    desire: 'A quiet interior that wants, without announcing it.',
-    affection_daily: 'Closeness held at a chosen temperature.',
-    perspective_taking: 'Reads fast, trusts slowly.',
-    relational_privacy: 'A life the two of you keep between you.',
-    sexual_communication: 'Feels deeply, says less where it counts most.',
-    capitalization: 'Loves steadily; celebrates quietly.',
-    commitment_sacrifice: 'Carries an internal audit alongside the giving.',
-    money_coordination: 'Keeps the books; means well by it.',
-  };
-  const EPIGRAPH_BY_HIGH: Partial<Record<DimensionId, string>> = {
-    care_initiation: 'Notices first, moves first — love as anticipation.',
-    repair_orientation: 'Always circling back.',
-    listening_first: 'A safe place to fall apart.',
-    same_side_problems: 'Same side of everything.',
-    affection_daily: 'Fluent in the small touches.',
-    vulnerability_safety: 'A vault people trust without checking.',
-    autonomy_connection: 'Two whole people, choosing each other daily.',
-    curiosity_worlds: 'Interest as a form of love.',
-    relational_privacy: 'Keeps what matters between you.',
-    sexual_communication: 'Nothing unsayable, even there.',
-    positivity_play: 'Gardens fun; plants the plan nobody knew they wanted.',
-    capitalization: 'Where joy goes to land.',
-    conflict_engagement: 'Curious even mid-argument.',
-    commitment_sacrifice: 'Backs people — visibly, without an invoice.',
-    money_coordination: 'Talks about money like a teammate.',
-  };
-
-  let epigraph: string;
-  if (topLow && topLow.score <= 36 && EPIGRAPH_BY_LOW[topLow.id]) {
-    epigraph = EPIGRAPH_BY_LOW[topLow.id]!;
-  } else if (topHigh && topHigh.score >= 70 && EPIGRAPH_BY_HIGH[topHigh.id]) {
-    epigraph = EPIGRAPH_BY_HIGH[topHigh.id]!;
-  } else {
-    const fallbacks = [
-      'A steady presence that wants, quietly, to be chosen back.',
-      'Direct where it matters, careful where it counts.',
-      'Loves specifically, not generally.',
-      'Built for the ordinary evenings.',
-    ];
-    epigraph = seededPick(fallbacks, hash((topHigh?.id ?? 'x') + String(p.consistencyIndex)));
-  }
 
   const bands = (Object.values(p.dimensions) as { id: DimensionId; score: number; unmeasured?: boolean }[]).map((d) => {
     const nContrib = p.variance?.[d.id]?.contributions.length ?? p.dimensions[d.id]?.varianceShape?.count;
@@ -636,10 +730,10 @@ export function blueprintToMarkdown(bp: Blueprint, p: ScoredProfile): string {
     lines.push('');
   }
   }
-  lines.push('## A Relationship That May Feel Natural to You');
-  lines.push('');
   const synthesis = bp.sections.find((s) => s.id === '__synthesis');
   if (synthesis) {
+    lines.push(`## ${synthesis.heading}`);
+    lines.push('');
     for (const para of synthesis.paragraphs) {
       lines.push(para);
       lines.push('');
