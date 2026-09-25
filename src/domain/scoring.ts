@@ -36,6 +36,10 @@ export const CONSISTENCY_PAIRS: [string, string, DimensionId | 'ambiguity_update
   ['q78', 'q88', 'capitalization'],
   ['q75', 'q85', 'sexual_communication'],
   ['q87', 'q90', 'commitment_sacrifice'],
+  // Wave 7: receiving care freely (live scenario) vs the gesture-reversal
+  // scenario — measures whether role-reversal reception is consistent or
+  // context-dependent.
+  ['q145', 'q147', 'care_role_flexibility'],
 ];
 
 /** Questions that reveal the channel you most naturally EXPRESS care in. */
@@ -43,9 +47,9 @@ export const EXPRESS_QUESTIONS = new Set(['q54', 'q58', 'q49']);
 
 /** Ordered dimension list — also used by the share-code encoder. */
 export const ALL_DIMENSIONS: DimensionId[] = [
-  'affection_daily', 'desire', 'desire_initiation', 'intimacy_attunement', 'vulnerability_safety', 'reassurance_security',
+  'affection_daily', 'desire', 'desire_initiation', 'intimacy_attunement', 'desire_grace', 'vulnerability_safety', 'reassurance_security',
   'sexual_communication', 'positivity_play',
-  'care_initiation', 'receiving_comfort', 'scorekeeping', 'express_receive_alignment',
+  'care_initiation', 'receiving_comfort', 'care_role_flexibility', 'scorekeeping', 'express_receive_alignment',
   'listening_first', 'logic_emotion_integration', 'curiosity_worlds', 'perspective_taking',
   'capitalization', 'feedback_receiving',
   'direct_communication', 'repair_orientation', 'same_side_problems', 'conflict_engagement',

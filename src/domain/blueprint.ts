@@ -106,6 +106,17 @@ function noteFor(dim: DimensionId, score: number): string {
 }
 
 /**
+ * A label built for a stat-screen slot can read badly dropped into a sentence:
+ * "care roles — giving and receiving are the pair doing the most work" — the
+ * em-dash fragment grammatically dangles. This strips anything after an
+ * em-dash/colon and lowercases for inline prose use ("care roles").
+ */
+function proseLabel(dim: DimensionId): string {
+  const label = DIMENSION_LABELS[dim] ?? dim;
+  return (label.split(/ [—–:] /)[0] ?? label).toLowerCase();
+}
+
+/**
  * The express/receive alignment score measures BREADTH (how similar the spread
  * of your giving and receiving channels is); the tension card keys on the
  * MODAL channels. When the modes differ, the mid-band "mostly consonant"
@@ -411,11 +422,14 @@ const SECTION_SPECS: SectionSpec[] = [
       { when: (p) => ti(p, 'scorekeeping') >= 4, texts: ['Giving Without an Invoice (Almost)', 'The Quiet Audit', 'Generous, With a Memory'] },
       { when: (p) => ti(p, 'scorekeeping') <= 2, texts: ['The Ledger-Free Heart', 'Giving That Doesn’t Keep Score', 'Zero Invoices'] },
       { when: (p) => ti(p, 'receiving_comfort') <= 2, texts: ['Better at Giving Than Taking', 'Where Receiving Gets Hard', 'The Return Trip Stalls'] },
+      { when: (p) => ti(p, 'care_role_flexibility') <= 2, texts: ['The Lanes of Care', 'Giving Is My Side of the Street', 'Care, in Its Assigned Seats'] },
+      { when: (p) => ti(p, 'care_role_flexibility') >= 4, texts: ['Treasured Both Ways', 'The Two-Way Street', 'Precious, in Both Directions'] },
       { when: (p) => ti(p, 'care_initiation') >= 4 && ti(p, 'receiving_comfort') >= 4, texts: ['Care, Full Circle', 'Moving First, Landing Softly', 'Both Directions, Fully Open'] },
     ],
-    dims: ['care_initiation', 'receiving_comfort', 'scorekeeping'],
+    dims: ['care_initiation', 'receiving_comfort', 'care_role_flexibility', 'scorekeeping'],
     patternHeadings: [
       { anyOf: ['noticed_not_managing'], texts: ['The Ask Is Easy; the Noticing Is Love', 'Beyond Being Asked', 'Noticed Without Being Managed'] },
+      { anyOf: ['care_loop_open', 'one_way_care'], texts: ['The Care Loop', 'Who Gets Taken Care of Here', 'The Give and the Gate'] },
     ],
     intro: () =>
       'This is where your answers were most consistent: what you do with care — giving it, receiving it, and whether it turns into an accounting problem.',
@@ -442,13 +456,16 @@ const SECTION_SPECS: SectionSpec[] = [
     headings: [
       { when: (p) => ti(p, 'affection_daily') >= 4 && ti(p, 'desire') >= 4, texts: ['Warm Year-Round', 'High Ambient Warmth', 'Running Warm'] },
       { when: (p) => ti(p, 'affection_daily') <= 2, texts: ['Closeness at a Chosen Temperature', 'Warmth by Design, Not Default', 'Contact as Occasion'] },
+      { when: (p) => ti(p, 'desire_grace') <= 2, texts: ['The Mismatch Ledger', 'What a No Sets in Motion', 'Want, With Strings'] },
+      { when: (p) => ti(p, 'desire_grace') >= 4, texts: ['Want Without Obligation', 'A No Stays a No', 'Grace Under the Mismatch'] },
       { when: (p) => ti(p, 'sexual_communication') >= 4, texts: ['An Open Script for Want', 'The Bedroom Speaks Plainly Too', 'Nothing Unsayable'] },
       { when: (p) => ti(p, 'sexual_communication') <= 2, texts: ['The Unsaid Part of Want', 'Where Words Stay Out', 'Desire Off the Record'] },
       { when: (p) => ti(p, 'positivity_play') >= 4, texts: ['Lightness, Tended', 'Fun as Infrastructure', 'The Recess Clause'] },
     ],
-    dims: ['affection_daily', 'desire', 'desire_initiation', 'intimacy_attunement', 'sexual_communication', 'positivity_play', 'express_receive_alignment'],
+    dims: ['affection_daily', 'desire', 'desire_initiation', 'intimacy_attunement', 'desire_grace', 'sexual_communication', 'positivity_play', 'express_receive_alignment'],
     patternHeadings: [
       { anyOf: ['independent_but_connected'], texts: ['Close in the Time You Share', 'Density, Not Distance', 'The Time You Share, Dense'] },
+      { anyOf: ['grace_architecture', 'mismatch_audit'], texts: ['Want Without the Audit', 'What a No Costs Here', 'The Grace Ledger'] },
     ],
     intro: () =>
       'Your answers sketch how closeness actually travels in and out of you — through what channel, at what volume, how you keep attraction alive, and how much of the relationship\'s lightness is tended.',
@@ -536,7 +553,10 @@ export function generateBlueprint(p: ScoredProfile): Blueprint {
   );
   const topHigh = [...dimsArr].sort((a, b) => b.score - a.score)[0];
   const topLow = [...dimsArr].sort((a, b) => a.score - b.score)[0];
+
   const EPIGRAPH_BY_LOW: Partial<Record<DimensionId, string[]>> = {
+    care_role_flexibility: ['Gives the gestures; cannot receive the same ones back.', 'Care has lanes, and receiving is outside yours.', 'The giving side is open; the receiving side is locked.'],
+    desire_grace: ['Every mismatch files a report.', 'Want, in your answers, arrives with an invoice attached.', 'A no is never just a no.'],
     receiving_comfort: ['Loves loudly, receives carefully.', 'Gives freely; receives like it costs.', 'Open hand out, closed hand in.', 'The door swings out more easily than in.'],
     scorekeeping: ['Someone who loves in actions and counts in silences.', 'A quiet ledger behind open generosity.', 'Gives big; remembers quietly.', 'Generosity with a memory.'],
     direct_communication: ['Careful where it counts, direct where it matters.', 'Says the true thing — except when it exposes.', 'Plain speech with a private wing.', 'Truth, selectively scheduled.'],
@@ -550,6 +570,8 @@ export function generateBlueprint(p: ScoredProfile): Blueprint {
     money_coordination: ['Keeps the books; means well by it.', 'A fairness organ, turned all the way up.', 'Every purchase gets a quiet hearing.', 'The auditor never fully sleeps.'],
   };
   const EPIGRAPH_BY_HIGH: Partial<Record<DimensionId, string[]>> = {
+    care_role_flexibility: ['Treasured, and lets itself be treasured.', 'The gestures flow both ways.', 'Makes people feel precious; knows how to be made to feel precious.'],
+    desire_grace: ['A no stays a no.', 'Want in the room, without an invoice.', 'Where desire is never taxed.'],
     care_initiation: ['Notices first, moves first — love as anticipation.', 'Love, in your answers, shows up early.', 'Anticipates the need; arrives before the ask.', 'The first responder of the people they love.'],
     repair_orientation: ['Always circling back.', 'Returns, repairs, remains.', 'The one who comes back.', 'Nothing stays broken between you for long.'],
     listening_first: ['A safe place to fall apart.', 'Heard all the way to the end.', 'Where the story gets to finish.', 'People bring you their unfinished sentences.'],
@@ -569,7 +591,7 @@ export function generateBlueprint(p: ScoredProfile): Blueprint {
 
   let epigraph: string;
   // Seed = f(dimension, score) only — nothing that differs between the owner
-  // and a BP5 share-code profile (pairLeans presence would shift the seed and
+  // and a BP6 share-code profile (pairLeans presence would shift the seed and
   // break the byte-parity invariant). Rotation comes from the exact score.
   if (topLow && topLow.score <= 36 && EPIGRAPH_BY_LOW[topLow.id]) {
     epigraph = seededPick(EPIGRAPH_BY_LOW[topLow.id]!, hash(topLow.id + String(topLow.score)));
@@ -848,8 +870,8 @@ export function generateBlueprint(p: ScoredProfile): Blueprint {
   }
   const domPattern = plan.headline[0]?.pattern;
   if (domPattern && domPattern.dims.length >= 2) {
-    const label1 = DIMENSION_LABELS[domPattern.dims[0]]?.toLowerCase() ?? domPattern.dims[0];
-    const label2 = DIMENSION_LABELS[domPattern.dims[1]]?.toLowerCase() ?? domPattern.dims[1];
+    const label1 = proseLabel(domPattern.dims[0]);
+    const label2 = proseLabel(domPattern.dims[1]);
     const spineLeads = [
       `The most specific work in your answers happens where ${label1} meets ${label2} — that interaction is the spine of this document.`,
       `If this document has a spine, it is where ${label1} meets ${label2}: each one changes what the other means for you.`,
@@ -863,12 +885,12 @@ export function generateBlueprint(p: ScoredProfile): Blueprint {
     // starts reading as boilerplate.
     if (dividedDims.length === 1) {
       const d0 = dividedDims[0];
-      const dl = DIMENSION_LABELS[d0]?.toLowerCase() ?? d0;
+      const dl = proseLabel(d0);
       shapeSentences.push(
         `And one part of this picture is genuinely two-valued rather than settled: your ${dl} reads as a back-and-forth still in negotiation — the sections above name what the average was hiding.`,
       );
     } else if (dividedDims.length <= 3) {
-      const names = dividedDims.slice(0, 2).map((d) => DIMENSION_LABELS[d]?.toLowerCase() ?? d).join(' and ');
+      const names = dividedDims.slice(0, 2).map((d) => proseLabel(d)).join(' and ');
       shapeSentences.push(
         `And parts of this picture are still negotiating rather than settled — ${names}${dividedDims.length === 3 ? ', and one more' : ''} read as live back-and-forths above, where the averages hid the tug-of-war.`,
       );
@@ -906,7 +928,10 @@ export function generateBlueprint(p: ScoredProfile): Blueprint {
       'The relationship that works with you runs on shared information: a partner who says the true thing while it is small, and asks before concluding. With you, the fight is survivable and the curation is not. What fails is the slow editorial version — a partner deciding what you can handle, even kindly, is manufacturing the exact concealment your answers punish hardest. Watch your own half too: your charity is genuine, but it gets spent faster when the facts arrive late. Your directness and your benefit-of-the-doubt built this reading together; neither alone would predict that concealment outranks conflict as your dealbreaker.',
     separate_worlds_curious:
       'You are suited to the visiting arrangement: two people with their own worlds who keep touring each other\'s. The partner who fits you has a life you find interesting and room for you inside it — not as a guest wing, but as a reader. What fails is the drift into polite strangers: invitations that stop, tours that end, not from conflict but from nobody booking the next visit. Your answers pay for this reading on both sides — the space you keep and the second question you ask — and that combination is rarer than either trait alone.',
-  };
+    care_loop_open:
+      'The dynamic that works with you is a circulating loop, not an assigned post: care flows whichever way the week demands, and being the one looked after never reads to you as demotion. The partner who fits that is not the designated caretaker or the designated charge — it is someone who can be held on Tuesday and hold on Thursday without anyone keeping the ledger. What fails against you is role rigidity in either direction: a partner who cannot receive without guilt starves the loop from one side, and one who cannot give without an audience starves it from the other. Your flexibility and your comfort being comforted built this reading together — the loop is open because both halves of it answered.',
+    grace_architecture:
+      'The dynamic that works with you runs on want without invoice: desire that gets said out loud and then left free, and a no that lands as information rather than rejection. The partner who fits that is someone who can be wanted hard and not collected on — who trusts that your wanting them is not a debt they now owe in scheduled payments. What fails against you is the audit: a partner who tracks who wanted whom more, and converts every mismatch of timing into evidence about the relationship. Your answers fund this in two places — the grace you extend when want does not land, and the attunement that tells you which silences are weather and which are messages.'}
   // The final word is COMPOSED, not selected: the authored core dynamic is
   // the spine, and up to three conditional modules deepen it with other
   // signals — so two profiles sharing a dominant pattern still get different
@@ -935,7 +960,7 @@ export function generateBlueprint(p: ScoredProfile): Blueprint {
     }
     const dividedCore = domPattern.dims.find((d) => dividedDims.includes(d));
     if (dividedCore) {
-      const dl = DIMENSION_LABELS[dividedCore]?.toLowerCase() ?? dividedCore;
+      const dl = proseLabel(dividedCore);
       parts.push(`Worth one more layer: ${dl} — one of the dimensions doing the work in this dynamic — is itself the divided reading named above. The partner who fits you will meet whichever side of that negotiation is on duty that week, which makes naming the back-and-forth to them part of making the dynamic work.`);
     }
     finalWord = parts.join(' ');
@@ -1201,7 +1226,7 @@ function pairTensionCard(c: ConsistencyPair, p: ScoredProfile, runSeed = 0): Blu
   const dimScore = p.dimensions[c.dimension as DimensionId]?.score;
   const scale =
     dimScore !== undefined && !p.dimensions[c.dimension as DimensionId]?.unmeasured
-      ? ` Where this sits overall: the ${DIMENSION_LABELS[c.dimension as DimensionId]?.toLowerCase() ?? 'territory'} reads ${tierLabelFor(dimScore)} on this dimension — the disagreement is about which pull leads, not whether the trait is present.`
+      ? ` Where this sits overall: the ${proseLabel(c.dimension as DimensionId)} reads ${tierLabelFor(dimScore)} on this dimension — the disagreement is about which pull leads, not whether the trait is present.`
       : '';
 
   const posA = c.positionA;

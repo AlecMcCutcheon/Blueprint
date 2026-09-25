@@ -1,18 +1,20 @@
 // Domain types for the relationship blueprint questionnaire.
 
 export type DimensionId =
-  // Domain A — Closeness (8)
+  // Domain A — Closeness (10)
   | 'affection_daily'
   | 'desire'
   | 'desire_initiation'
   | 'intimacy_attunement'
+  | 'desire_grace'
   | 'vulnerability_safety'
   | 'reassurance_security'
   | 'sexual_communication'
   | 'positivity_play'
-  // Domain B — Reciprocity (4)
+  // Domain B — Reciprocity (6)
   | 'care_initiation'
   | 'receiving_comfort'
+  | 'care_role_flexibility'
   | 'scorekeeping'
   | 'express_receive_alignment'
   // Domain C — Emotional processing (6)
@@ -34,7 +36,10 @@ export type DimensionId =
   | 'money_coordination'
   // Domain F — Boundaries (2)
   | 'relational_privacy'
-  | 'external_processing';
+  | 'external_processing'
+  // Wave 7 — filled from the founding values document's under-visible needs
+  | 'care_role_flexibility'
+  | 'desire_grace';
 
 export type DomainId =
   | 'closeness'
@@ -208,6 +213,8 @@ export interface Blueprint {
 }
 
 export const DIMENSION_LABELS: Record<DimensionId, string> = {
+  care_role_flexibility: 'Care Roles — Giving and Receiving',
+  desire_grace: 'Grace Around Mismatched Want',
   sexual_communication: 'Talking About Intimacy',
   positivity_play: 'Cultivating Lightness & Play',
   capitalization: 'Showing Up for Good News',

@@ -179,6 +179,78 @@ export const PATTERNS: DerivedPattern[] = [
     ],
   },
   {
+    // Wave 7 synthesis: the care-role loop. HIGH state = the full loop (gives
+    // and receives without identity tax — the king/queen section). REVERSE
+    // TELL: the low state has its own authored reading (lanes), so a locked
+    // receiving side is interpreted rather than rendered as absence.
+    id: 'care_loop_open',
+    dims: ['care_role_flexibility', 'receiving_comfort'],
+    conditions: [
+      { dim: 'care_role_flexibility', band: 'high', cond: high('care_role_flexibility') },
+      { dim: 'receiving_comfort', band: 'midPlus', cond: midPlus('receiving_comfort') },
+    ],
+    when: both(high('care_role_flexibility'), midPlus('receiving_comfort')),
+    mode: 'synthesis',
+    priority: 88,
+    frame: 'The care loop runs both ways — and that is rarer than it sounds.',
+    narrative: [
+      'Your care-role flexibility and your receiving comfort point at the same architecture from two sides: you give gestures freely, and the same gestures arriving back land as care rather than as costume. That combination is the thing the founding document keeps calling mutual — not both people performing identical roles, but neither person\'s role being a wall. Its practical value is quiet but large: partners who feel they can take care of you actually take care of you, which means the loop feeds itself instead of running on one motor. The watch-item is the outside world: people sometimes read role-flexibility as rolelessness, and it is worth naming that the flexibility IS the commitment, not a lack of shape.',
+    ],
+  },
+  {
+    // REVERSE-STATE pattern: fires when the receiving half of care is WALLED
+    // (low flexibility, high giving) — the giver who cannot be given to.
+    id: 'one_way_care',
+    dims: ['care_role_flexibility', 'care_initiation'],
+    conditions: [
+      { dim: 'care_role_flexibility', band: 'lowish', cond: lowish('care_role_flexibility') },
+      { dim: 'care_initiation', band: 'midPlus', cond: midPlus('care_initiation') },
+    ],
+    when: both(lowish('care_role_flexibility'), midPlus('care_initiation')),
+    mode: 'tension',
+    priority: 80,
+    frame: 'You take care of people masterfully — and being taken care of has a locked door.',
+    narrative: [
+      'The giving side of your care runs freely — you anticipate, you carry, you make people feel precious. The receiving side of the SAME gestures is the locked room: being pampered, planned-for, or waited on registers as a role violation rather than as love, and you will sometimes actively reclaim the gesture by doing something for them before it settles. Often that comes from what taking care has meant, or from what receiving it once cost. The practical shape of it: a partner learns within months which door is closed, and stops offering — so the only care you get is the care you cannot receive, and the hunger goes unnamed in both directions. The unlock is small and specific rather than global: name the one or two reversals you COULD receive, and let those run first.',
+    ],
+    placement: { section: 'reciprocity', after: 'care_initiation' },
+  },
+  {
+    // REVERSE-STATE pattern: the mismatch audit — low desire_grace with desire
+    // still present, so want exists but carries a running account.
+    id: 'mismatch_audit',
+    dims: ['desire_grace', 'desire'],
+    conditions: [
+      { dim: 'desire_grace', band: 'lowish', cond: lowish('desire_grace') },
+      { dim: 'desire', band: 'midPlus', cond: midPlus('desire') },
+    ],
+    when: both(lowish('desire_grace'), midPlus('desire')),
+    mode: 'tension',
+    priority: 76,
+    frame: 'Want runs hot in you — and every mismatch files a report.',
+    narrative: [
+      'Your answers hold wanting and bookkeeping in the same hand: the desire is real and alive, but a partner\'s no, an off night, or your own deflection gets recorded somewhere — read into the relationship, weighed, kept. That combination usually means want has been tied to evidence: being wanted proved the bond, so not-being-wanted-in-this-moment started disproving it. The cost is invisible at first — a partner who has to perform availability stops telling the truth about their body, and the performance is precisely what makes their yes feel less like desire. The repair is the grace side of the same trait you already have: want allowed to exist in the room without an answer required, in both directions.',
+    ],
+    placement: { section: 'closeness', after: 'desire' },
+  },
+  {
+    // Wave 7 synthesis: the grace ethic — where it stands alone as an
+    // architecture rather than only as the audit's absence.
+    id: 'grace_architecture',
+    dims: ['desire_grace', 'intimacy_attunement'],
+    conditions: [
+      { dim: 'desire_grace', band: 'high', cond: high('desire_grace') },
+      { dim: 'intimacy_attunement', band: 'midPlus', cond: midPlus('intimacy_attunement') },
+    ],
+    when: both(high('desire_grace'), midPlus('intimacy_attunement')),
+    mode: 'synthesis',
+    priority: 84,
+    frame: 'Mismatch does not become a story in your answers — that is an architecture.',
+    narrative: [
+      'Two scores describe the same room from different corners: your attunement catches the drift and your grace lets it pass without a verdict. Together they mean a partner\'s no can be a plain no, an off night can be an off night, and want can exist in the room without either person being put on trial for it. This is the specific trait the research ties to desire surviving the years — not constant appetite, but the absence of a performance review. The watch-item is your own no: people this graceful about receiving a refusal are sometimes terrible at voicing one, and the grace has to run both directions or it curdles into self-erasure.',
+    ],
+  },
+  {
     id: 'separate_worlds_curious',
     dims: ['autonomy_connection', 'curiosity_worlds'],
     conditions: [

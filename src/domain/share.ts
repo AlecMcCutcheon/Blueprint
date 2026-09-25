@@ -25,16 +25,20 @@ import { QUESTIONS } from './questions';
 //              money_coordination + three new echo pairs.
 //   v4 (BP4) — 28 dimensions, adds desire_initiation, intimacy_attunement
 //              (closeness), feedback_receiving (processing),
-//              external_processing (boundaries) — keeping every domain even.
-//   v5 (BP5) — derived-evidence parity code: everything BP4 carries, plus a
+//              external_processing (boundaries) — keeping every domain even.//   v5 (BP5) — derived-evidence parity code: everything BP4 carries, plus a
 //              QUANTIZED VARIANCE SHAPE per dimension (answering count,
 //              positive count, cancellation — exactly what the variance-prose
 //              gates consume), per-pair disagreement DIRECTION, and the
-//              receiving-channel breadth. Deliberately still far short of the
+//              receiving-channel breadth. Deliberately still short of the
 //              raw answers: the policy is that the code may carry exactly what
 //              the shared document reveals, and nothing more. Billions of
 //              answer-sets collapse into the same aggregates, so nothing here
 //              is invertible back to how anyone answered any specific question.
+//   v6 (BP6) — 30 dimensions, adds care_role_flexibility (reciprocity) and
+//              desire_grace (closeness) from the founding document's
+//              under-visible sections, + 1 new echo pair. Same derived-evidence
+//              payload as BP5, sized to the 30-dim layout. BP1–BP5 decode with
+//              the two newer dimensions flagged unmeasured (never guessed).
 // Legacy codes decode with newer dimensions marked "unmeasured" (score 50,
 // evidence 0) rather than guessed — the document renders the gap explicitly.
 
@@ -51,7 +55,8 @@ interface CodeVersion {
 }
 
 function versionFor(dims: number, pairs: number, missing: DimensionId[], missingPairs: number): CodeVersion {
-  return { prefix: `BP${dims === 17 ? 1 : dims === 18 ? 2 : dims === 24 ? 3 : 4}`, dims, pairs, missing, missingPairs };
+  const prefix = dims === 17 ? 'BP1' : dims === 18 ? 'BP2' : dims === 24 ? 'BP3' : dims === 28 ? 'BP4' : dims === 30 ? 'BP6' : 'BP5';
+  return { prefix, dims, pairs, missing, missingPairs };
 }
 
 /** Test/verification helper: encode a profile in a legacy layout (no unmeasured dims allowed). */
@@ -74,27 +79,35 @@ export function encodeLegacyCode(p: ScoredProfile, versionIndex: 0 | 1 | 2): str
   return v.prefix + b64encode(new Uint8Array(bytes));
 }
 
-// The three historical layouts. Dimensions are cumulative — v1 ⊂ v2 ⊂ v3 — so
-// one decoder covers all of them: each version contributes its present
-// dimensions and pairs in order, and the rest are marked unmeasured.
+// The four historical layouts plus the current one. Dimensions are cumulative —
+// v1 ⊂ v2 ⊂ v3 ⊂ v4 ⊂ v6 — so one decoder covers all of them: each version
+// contributes its present dimensions and pairs in order, and the rest are
+// marked unmeasured. (v4's layout is frozen at 28 dims even though the bank
+// grew; v6 is the only version that encodes the wave-7 dimensions.)
 const VERSIONS: CodeVersion[] = [
   versionFor(
-    ALL_DIMENSIONS.length - 11,
+    ALL_DIMENSIONS.length - 13,
+    CONSISTENCY_PAIRS.length - 8,
+    ['relational_privacy', 'sexual_communication', 'positivity_play', 'capitalization', 'conflict_engagement', 'commitment_sacrifice', 'money_coordination', 'desire_initiation', 'intimacy_attunement', 'feedback_receiving', 'external_processing', 'care_role_flexibility', 'desire_grace'],
+    8,
+  ),
+  versionFor(
+    ALL_DIMENSIONS.length - 12,
     CONSISTENCY_PAIRS.length - 7,
-    ['relational_privacy', 'sexual_communication', 'positivity_play', 'capitalization', 'conflict_engagement', 'commitment_sacrifice', 'money_coordination', 'desire_initiation', 'intimacy_attunement', 'feedback_receiving', 'external_processing'],
+    ['sexual_communication', 'positivity_play', 'capitalization', 'conflict_engagement', 'commitment_sacrifice', 'money_coordination', 'desire_initiation', 'intimacy_attunement', 'feedback_receiving', 'external_processing', 'care_role_flexibility', 'desire_grace'],
     7,
   ),
   versionFor(
-    ALL_DIMENSIONS.length - 10,
-    CONSISTENCY_PAIRS.length - 6,
-    ['sexual_communication', 'positivity_play', 'capitalization', 'conflict_engagement', 'commitment_sacrifice', 'money_coordination', 'desire_initiation', 'intimacy_attunement', 'feedback_receiving', 'external_processing'],
-    6,
+    ALL_DIMENSIONS.length - 6,
+    CONSISTENCY_PAIRS.length - 1,
+    ['desire_initiation', 'intimacy_attunement', 'feedback_receiving', 'external_processing', 'care_role_flexibility', 'desire_grace'],
+    1,
   ),
   versionFor(
-    ALL_DIMENSIONS.length - 4,
-    CONSISTENCY_PAIRS.length,
-    ['desire_initiation', 'intimacy_attunement', 'feedback_receiving', 'external_processing'],
-    0,
+    ALL_DIMENSIONS.length - 2,
+    CONSISTENCY_PAIRS.length - 1,
+    ['care_role_flexibility', 'desire_grace'],
+    1,
   ),
   versionFor(ALL_DIMENSIONS.length, CONSISTENCY_PAIRS.length, [], 0),
 ];
@@ -132,10 +145,13 @@ function shapeOf(p: ScoredProfile, d: DimensionId): VarShape | null {
   return { count: v.contributions.length, posCount: v.contributions.filter((c) => c > 0).length, cancellation: v.cancellation };
 }
 
-/** The BP4 body bytes (everything after the prefix). */
-function bp4Body(p: ScoredProfile): number[] {
-  const bytes: number[] = [4]; // version
-  for (const d of ALL_DIMENSIONS) bytes.push(clamp(p.dimensions[d].score));
+/** The BP4 body bytes (everything after the prefix), parameterized by layout version. */
+function codeBody(p: ScoredProfile, version: CodeVersion, versionTag: number): number[] {
+  const bytes: number[] = [versionTag];
+  for (const d of ALL_DIMENSIONS) {
+    if (version.missing.includes(d)) continue;
+    bytes.push(clamp(p.dimensions[d].score));
+  }
   bytes.push(clamp(p.consistencyIndex));
   for (const [a, b] of CONSISTENCY_PAIRS) {
     const found = p.consistency.find((x) => x.a === a && x.b === b);
@@ -147,6 +163,8 @@ function bp4Body(p: ScoredProfile): number[] {
   return bytes;
 }
 
+
+
 /**
  * BP5 — the derived-evidence share code. Payload: [5][BP4 body][per-dimension
  * count/posCount/cancellation][per-pair lean signs, 2 bits each][receiving
@@ -155,7 +173,28 @@ function bp4Body(p: ScoredProfile): number[] {
  * quantized so nothing is invertible back to specific answers.
  */
 export function profileToCode5(p: ScoredProfile): string {
-  const bytes: number[] = [5, ...bp4Body(p)];
+  return derivedEvidenceCode(p, VERSIONS[3], 5, 'BP5', () => profileToCode(p));
+}
+
+/**
+ * BP6 — the current derived-evidence code: BP5's payload over the 30-dimension
+ * layout (adds care_role_flexibility + desire_grace and the new echo pair).
+ * Fallback when no variance data exists is a plain BP4 — the 28-dim layout
+ * stays valid forever, and the two wave-7 dimensions decode unmeasured.
+ */
+export function profileToCode6(p: ScoredProfile): string {
+  return derivedEvidenceCode(p, VERSIONS[4], 6, 'BP6', () => profileToCode(p));
+}
+
+/** Shared BP5/BP6 payload builder: [tag][layout body][per-dim shapes][pair leans][breadth][checksum]. */
+function derivedEvidenceCode(
+  p: ScoredProfile,
+  version: CodeVersion,
+  tag: number,
+  prefix: string,
+  fallback: () => string,
+): string {
+  const bytes: number[] = [tag, ...codeBody(p, version, tag)];
   let anyShape = false;
   for (const d of ALL_DIMENSIONS) {
     const s = shapeOf(p, d);
@@ -177,21 +216,22 @@ export function profileToCode5(p: ScoredProfile): string {
   for (const [a, b] of CONSISTENCY_PAIRS) bytes.push(leanByte(a, b));
   bytes.push(Math.min(255, Math.max(0, p.receiveBreadth ?? 0)));
   bytes.push(fnv1aLow(new Uint8Array(bytes)));
-  if (!anyShape) return profileToCode(p); // no variance data at all → plain BP4
-  return 'BP5' + b64encode(new Uint8Array(bytes));
+  if (!anyShape) return fallback(); // no variance data at all → plain BP4
+  return prefix + b64encode(new Uint8Array(bytes));
 }
 
 /**
- * Decode BP5: reconstruct the BP4 profile from its embedded body, then layer
- * the derived evidence (varianceShape per dimension, pairLeans, breadth) so
- * prose gates evaluate exactly as they do for the owner. A checksum failure
- * or malformed tail returns null → the caller falls back to legacy handling.
+ * Decode a BP5/BP6 derived-evidence code: reconstruct the layout profile from
+ * its embedded body, then layer the derived evidence (varianceShape per
+ * dimension, pairLeans, breadth) so prose gates evaluate exactly as they do
+ * for the owner. A checksum failure or malformed tail returns null → the
+ * caller falls back to legacy handling.
  */
-function decodeProfile5(bytes: Uint8Array): ScoredProfile | null {
-  const bodyLen = expectedBytes(VERSIONS[3]);
+function decodeDerivedEvidence(bytes: Uint8Array, version: CodeVersion): ScoredProfile | null {
+  const bodyLen = expectedBytes(version);
   if (bytes.length < 1 + bodyLen + ALL_DIMENSIONS.length * 3 + 3 + 1 + 1) return null;
   if (bytes[bytes.length - 1] !== fnv1aLow(bytes.slice(0, bytes.length - 1))) return null;
-  const base = decodeVersion(VERSIONS[3], bytes.slice(1, 1 + bodyLen));
+  const base = decodeVersion(version, bytes.slice(1, 1 + bodyLen));
   if (!base) return null;
   let i = 1 + bodyLen;
   const shapes = new Map<DimensionId, VarShape>();
@@ -229,9 +269,15 @@ export function profileToCode(p: ScoredProfile): string {
     );
   }
   const bytes: number[] = [4]; // version
-  for (const d of ALL_DIMENSIONS) bytes.push(clamp(p.dimensions[d].score));
+  for (const d of ALL_DIMENSIONS) {
+    if (VERSIONS[3].missing.includes(d)) continue;
+    bytes.push(clamp(p.dimensions[d].score));
+  }
   bytes.push(clamp(p.consistencyIndex));
-  for (const [a, b] of CONSISTENCY_PAIRS) {
+  // Frozen BP4 layout: the wave-7 echo pair postdates it, so it is not on the
+  // wire — legacy decoders expect exactly v.dims + v.pairs bytes.
+  const bp4Pairs = CONSISTENCY_PAIRS.slice(0, CONSISTENCY_PAIRS.length - VERSIONS[3].missingPairs);
+  for (const [a, b] of bp4Pairs) {
     const found = p.consistency.find((c) => c.a === a && c.b === b);
     bytes.push(found ? clamp(found.agreement) : 0);
   }
@@ -289,7 +335,8 @@ export function decodeProfile(code: string): ScoredProfile | null {
     const prefix = trimmed.slice(0, 3).toUpperCase();
     const payload = trimmed.slice(3);
     const bytes = b64decode(payload);
-    if (prefix === 'BP5') return decodeProfile5(bytes);
+    if (prefix === 'BP5') return decodeDerivedEvidence(bytes, VERSIONS[3]);
+    if (prefix === 'BP6') return decodeDerivedEvidence(bytes, VERSIONS[4]);
     const version = VERSIONS.find((v) => v.prefix === prefix);
     if (!version) return null;
     if (bytes.length !== expectedBytes(version)) return null;
@@ -507,7 +554,7 @@ export function parseShareUrl(input: string | URLSearchParams): ParsedShareUrl |
     const params = typeof input === 'string' ? new URL(input, 'http://x.invalid').searchParams : input;
     const code = (params.get('bp') ?? '').trim();
     if (!code) return null;
-    if (!/^BP[1-5]/i.test(code)) return null; // metric codes only
+    if (!/^BP[1-6]/i.test(code)) return null; // metric codes only
     const decoded = decodeProfile(code);
     if (!decoded) return null;
     const meta = decodeMetaSegment(code, (params.get('m') ?? '').trim());

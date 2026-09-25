@@ -628,6 +628,42 @@ export const LEGACY: LegacyNarrative[] = [
     midNote: 'Situational — size of the tangle decides',
     highNote: 'Thinks out loud — the trusted voice as apparatus',
   },
+  {
+    id: 'care_role_flexibility',
+    domain: 'reciprocity',
+    what: 'Whether care-roles are fixed or flexible: can you be taken care of, pampered, planned-for — without it costing you anything you believe about yourself, and can you extend the same freedom to a partner?',
+    low: [
+      'Care has assigned roles in your operating model: you are the one who gives the back rub, opens the door, plans the surprise — and being on the receiving end of the same gestures reads as foreign, or as something you would have to laugh off to tolerate. Sometimes that comes from how you were raised; sometimes from what being taken care of has meant before. Either way, the person who loves you is working with half a map: they can give you effort, but not the version where you are the one being looked after. That is worth naming out loud, because some partners will misread the reflex as not wanting them at all.',
+      'Being pampered, planned-for, or waited on costs you something — comfort, maybe, or a quiet sense that the role is not yours to occupy. The giving side of care is where you live, and you live there generously; the watch-item is whether the receiving side was ever really declined, or just never rehearsed. A partner who tries the reversal once and gets waved off will usually not try twice — which means the refusal to be cared for becomes invisible, and the hunger (if there is one) goes unfed in both directions.',
+    ],
+    mid: [
+      'Your care-roles are mostly traditional with exceptions you approve of: you give the gestures, and you can accept certain ones back — the massage, the cooked meal — while others would genuinely not sit right. That selectivity is legitimate and worth knowing precisely: which reversals feel like love to you, and which feel like a costume. A partner who knows the difference can take care of you in the register you can actually receive.',
+    ],
+    high: [
+      'Care-roles in your answers are equipment, not identity: you give the gestures freely, and you receive them the same way — the back rub, the planned evening, being taken care of after a hard day — without it costing you anything you believe about yourself. This is rarer than it sounds, especially where gendered expectations are involved: the reflex to treat each other like someone precious, in both directions, without either of you having to stop being who you are. A partner gets the full loop with you — someone who makes them feel treasured AND lets themselves be treasured, which is what keeps the loop from becoming a service arrangement.',
+    ],
+    lowNote: 'Care has assigned roles; receiving reads foreign',
+    midNote: 'Traditional with approved exceptions',
+    highNote: 'Roles as equipment — gives and receives without cost',
+  },
+  {
+    id: 'desire_grace',
+    domain: 'closeness',
+    what: 'What a mismatch costs in you: whether a no stays a no, whether bodies\' off days stay off the record, and whether want is allowed to exist without becoming an obligation.',
+    low: [
+      'In your answers, a mismatch tends to arrive with weight attached: a partner\'s not-now registers as a verdict to be managed, your own not-now is hard to voice without softening it into a excuse, and desire carries an audit trail — who initiated, who deferred, what the imbalance means. None of that is cruelty; it is usually what happens when want has been tied to evidence of being wanted. The cost is real though: a partner who has to perform availability stops telling the truth about their body, and that silence is where the distance actually starts.',
+      'Desire, in your operating model, comes with stakes: a deflection lingers, an off-day gets read into the relationship, and saying no carries a debt you feel obligated to repay. The reflex usually comes from somewhere specific — a stretch where being wanted felt conditional. Worth knowing precisely because it is load-bearing: the partner who cannot decline around you will eventually resent the performing, and you will sense the performance without knowing its name.',
+    ],
+    mid: [
+      'Grace around mismatch is mostly there with lapses: most nos land as information, most off-days stay off the record — but some versions of the conversation still carry a charge, and you know which ones. The useful precision is naming which mismatches you can absorb freely and which ones you privately total up; a partner can work with a map, but not with weather.',
+    ],
+    high: [
+      'Your answers give mismatch an easy weight: a partner\'s not-now can simply be a not-now — no verdict attached, no audit opened — and your own no comes out clean rather than as a softened excuse. Bodies\' weather (the days things do not cooperate) reads as information, not evidence of anything; want is allowed to exist in the room without becoming an obligation either person has to answer for. This is the specific trait the research ties to desire surviving the years: not constant appetite, but the absence of a performance review. A partner can be honest with you at their least available, which is exactly what keeps them honest at their most.',
+    ],
+    lowNote: 'Mismatch carries weight and an audit',
+    midNote: 'Mostly grace, with known charges',
+    highNote: 'A no stays a no — no verdict, no audit',
+  },
 ];
 
 /**
@@ -860,6 +896,22 @@ const TIER_MODIFIERS: Partial<Record<DimensionId, { vlow: string; mlow: string; 
     vlowShort: 'Processes inside first',
     vhighShort: 'Thinks out loud',
   },
+  care_role_flexibility: {
+    vlow: 'Here the roles are walls: the giving side is real, but the receiving side is locked, and a partner will learn the lock as a door that does not open.',
+    mlow: 'The reversal is tolerated more than enjoyed — the gestures land as gestures, not as being taken care of.',
+    mhigh: 'The reversal mostly lands as love rather than as a role violation — one notch up and you would be the person the gestures flow both ways around.',
+    vhigh: 'At this intensity, the loop is the point: you make people feel precious, and being made to feel precious lands as care, not as a costume — the mutuality your document keeps describing is visible here.',
+    vlowShort: 'Care has its lanes',
+    vhighShort: 'Treasured both ways',
+  },
+  desire_grace: {
+    vlow: 'Here every mismatch files a report: the no gets read into the relationship, the off-day becomes evidence, and want comes with an invoice attached.',
+    mlow: 'Grace is there on good weeks; the charged versions of the conversation are the tell — you know exactly which nos you cannot absorb freely.',
+    mhigh: 'Most nos and off-days land clean in you — the remaining charges are specific enough to name.',
+    vhigh: 'At this intensity, want in the room is obligation-free in both directions — the specific trait that keeps desire honest, and alive, for years.',
+    vlowShort: 'Mismatch keeps a ledger',
+    vhighShort: 'Want without obligation',
+  },
 };
 
 /**
@@ -1005,6 +1057,8 @@ export const VARIANCE_LIBRARY: Partial<Record<DimensionId, string>> = {
   intimacy_attunement: 'Your attunement score sits near the middle because reading-the-moment and following-your-own-current both answered. You likely track well in calm moments and lose the thread in charged ones — the condition, not the midpoint, is the finding.',
   feedback_receiving: 'Your feedback score lands near the middle, but the underneath is contested: genuine curiosity about the point next to a reflex of defense. Which one wins probably depends on how exposed the feedback finds you — knowing your trigger beats defending the average.',
   external_processing: 'Your processing score sits near the middle because thinking-out-loud and working-it-through-alone both got real votes. What decides is probably the size of the tangle and whether you already know your own mind — the average hides that your method has states, not a level.',
+  care_role_flexibility: 'Your care-role score lands near the middle, but the middle here is a permission slip with conditions: some reversals read as love and others as costume. The map of which is which is worth more than the average — a partner can work with a list, not with a vibe.',
+  desire_grace: 'Your grace score sits near the middle because easy and charged both answered: most mismatches land clean, some versions of the conversation still carry a price. Which ones charge you is the actual finding — the average smooths a map into a mood.',
 };
 
 /** Fallback variance prose for dimensions without a specific entry. */

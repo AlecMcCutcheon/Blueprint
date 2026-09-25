@@ -3509,7 +3509,137 @@ const WAVE6_QUESTIONS: Question[] = [
   },
 ];
 
-export const QUESTIONS: Question[] = [...CORE_QUESTIONS, ...WAVE4_QUESTIONS, ...WAVE5_QUESTIONS, ...WAVE6_QUESTIONS];
+// ───────────────────── Wave 7 — the under-visible constructs ─────────────────────
+// Two dimensions the founding values document describes at length that the
+// bank never measured: care-role flexibility (the "king and queen" section —
+// receiving care without it costing identity) and desire grace (the mismatch
+// ethic — a no stays a no, bodies' weather is information, want without
+// obligation). Every option tone-parity checked; no answer is the healthy one.
+
+const WAVE7_QUESTIONS: Question[] = [
+  {
+    id: 'q145',
+    layer: 1,
+    format: 'scenario',
+    prompt: [
+      'You are wiped out — the flat-on-the-couch kind. Your partner, unprompted, brings you food, takes over the evening, and tells you to just rest while they handle everything.',
+      'What is the honest internal weather?',
+    ],
+    options: [
+      { id: 'a', label: 'Warmth — being taken care of lands as exactly right, and I let it', description: 'Receiving lands as care itself: the reversal is welcome, not tolerated.', weight: { care_role_flexibility: 0.7, receiving_comfort: 0.2 } },
+      { id: 'b', label: 'Grateful — with a small itch to be up and doing my share', description: 'The care is enjoyed, with a low hum of role-reversal the body has not fully rehearsed.', weight: { care_role_flexibility: 0.25, care_initiation: 0.1 } },
+      { id: 'c', label: 'Torn — I appreciate it, and I would rather we trade: rest now, my turn to carry tomorrow', description: 'Receiving is fine priced against a return; free being-taken-care-of is the part that itches.', weight: { care_role_flexibility: -0.15, scorekeeping: 0.2 } },
+      { id: 'd', label: 'Restless — being waited on makes me itch; I would rather we both just do our normal things', description: 'The receiving side of care is locked, whatever the giving side is.', weight: { care_role_flexibility: -0.6 } },
+    ],
+    diagnosticWeight: 1.2,
+  },
+  {
+    id: 'q146',
+    layer: 2,
+    format: 'forced_pair',
+    prompt: ['Which would land better from a partner who loves you?'],
+    options: [
+      { id: 'a', label: 'They quietly take the traditionally-theirs job off your plate and just handle it, regularly', description: 'Care as steady role-swapping: the loop runs on reliability.', weight: { care_role_flexibility: 0.5, shared_home_effort: 0.2 } },
+      { id: 'b', label: 'They occasionally go big on you — the planned evening, the pampering, the full treatment', description: 'Care as deliberate reversal: being treasured on purpose, the gesture aimed at you.', weight: { care_role_flexibility: 0.5, receiving_comfort: 0.2, care_initiation: 0.1 } },
+    ],
+    diagnosticWeight: 1.0,
+    note: 'Both are love — pick the one that would mean more.',
+  },
+  {
+    id: 'q147',
+    layer: 3,
+    format: 'scenario',
+    prompt: [
+      'Your partner opens the car door for you, plans a whole evening around things you love, and tells you to sit down while they bring you a drink. Traditionally, most of these gestures flow the other direction.',
+      'What is true for you?',
+    ],
+    options: [
+      { id: 'a', label: 'I would love it — being treated like that tells me they wanted to take care of me', description: 'The reversal lands as being precious, with no identity tax attached.', weight: { care_role_flexibility: 0.7 } },
+      { id: 'b', label: 'Mostly lovely — one or two of those gestures would sit better aimed the other way', description: 'Selective reception: some reversals are welcome, others have lanes.', weight: { care_role_flexibility: 0.2 } },
+      { id: 'c', label: 'I would enjoy it once in a while — as an event, not a pattern I could settle into', description: 'Reversal as occasion: wonderful rarely, uncomfortable as a default.', weight: { care_role_flexibility: -0.2, receiving_comfort: 0.1 } },
+      { id: 'd', label: 'Something in me would squirm the whole evening — I would be plotting how to take the gestures back', description: 'The receiving role is walled off, however freely the giving side flows.', weight: { care_role_flexibility: -0.6, care_initiation: 0.2 } },
+    ],
+    diagnosticWeight: 1.2,
+  },
+  {
+    id: 'q148',
+    layer: 4,
+    format: 'agreement',
+    prompt: ['"I am just as comfortable being taken care of as I am taking care of someone — neither one costs me anything."'],
+    options: [
+      { id: '1', label: 'Not comfortable — giving is my side', value: 1, description: 'The roles have lanes, and receiving is outside yours.', weight: { care_role_flexibility: -0.5, care_initiation: 0.1 } },
+      { id: '2', label: 'I can receive, but it is never quite relaxed', value: 2, description: 'The yes exists; the ease does not.', weight: { care_role_flexibility: -0.25 } },
+      { id: '3', label: 'Depends on the gesture', value: 3, description: 'Some reversals land as love, others as costume — the map matters.', weight: { care_role_flexibility: 0 } },
+      { id: '4', label: 'Mostly comfortable both ways', value: 4, description: 'The loop runs in both directions with rare friction.', weight: { care_role_flexibility: 0.3 } },
+      { id: '5', label: 'Fully — being cared for is as natural as caring', value: 5, description: 'Care-roles as equipment, not identity: the full loop, no tax.', weight: { care_role_flexibility: 0.5, receiving_comfort: 0.1 } },
+    ],
+    diagnosticWeight: 0.8,
+  },
+  {
+    id: 'q149',
+    layer: 1,
+    format: 'scenario',
+    prompt: [
+      'You reach for your partner tonight; they are tired and not in the mood. Tomorrow night, the roles are reversed — they reach for you and you are the tired one.',
+      'What does the reversal feel like from inside?',
+    ],
+    options: [
+      { id: 'a', label: 'Clean — last night was a no and tonight is one; neither is a story about us', description: 'Mismatch absorbed freely: a no stays a no, in both directions, with no residue.', weight: { desire_grace: 0.7, intimacy_attunement: 0.1 } },
+      { id: 'b', label: 'Fine — though I would probably still try to meet them halfway', description: 'Grace with a giving instinct: the no is honored, but not without offering something.', weight: { desire_grace: 0.3, care_initiation: 0.2 } },
+      { id: 'c', label: 'The no is fine; my own no is harder — I would feel like I owed them the tomorrow', description: 'Asymmetric grace: accepting a partner\'s no is easy, voicing one is not.', weight: { desire_grace: -0.2, receiving_comfort: -0.1 } },
+      { id: 'd', label: 'Uneven — one mismatch I would shake off, but two in a row would start writing a story in my head', description: 'The audit wakes on repetition: the second no is read as evidence, not information.', weight: { desire_grace: -0.5, reassurance_security: -0.2 } },
+    ],
+    diagnosticWeight: 1.2,
+  },
+  {
+    id: 'q150',
+    layer: 3,
+    format: 'scenario',
+    prompt: [
+      'Mid-moment, your partner\'s body simply is not cooperating — nothing wrong, no story, just an off night. They are visibly embarrassed anyway.',
+      'What actually happens?',
+    ],
+    options: [
+      { id: 'a', label: 'It stays small on purpose — we end up talking or falling asleep next to each other, and that is a fine ending', description: 'Bodies\' weather as information: the moment downsizes without becoming a verdict.', weight: { desire_grace: 0.7, intimacy_attunement: 0.2 } },
+      { id: 'b', label: 'I would reassure them fast — and privately wonder whether something is changing', description: 'The comfort is real, and so is the file it gets filed in.', weight: { desire_grace: -0.15, reassurance_security: -0.1 } },
+      { id: 'c', label: 'I would try to make it easy for them — but the evening would keep a small awkward shape afterward', description: 'No verdict spoken; the residue arrives anyway and both people feel it.', weight: { desire_grace: -0.3 } },
+      { id: 'd', label: 'Honestly, it would sting — I would need a minute before I could make it stay small', description: 'The mismatch registers as rejection first, information second.', weight: { desire_grace: -0.55, vulnerability_safety: -0.1 } },
+    ],
+    diagnosticWeight: 1.2,
+  },
+  {
+    id: 'q151',
+    layer: 4,
+    format: 'agreement',
+    prompt: ['"In my relationship, want is allowed to exist without becoming an obligation — nobody has to answer for a look, a text, or a mood."'],
+    options: [
+      { id: '1', label: 'No — want always carries an ask inside it', value: 1, description: 'Desire arrives pre-priced: expressed want creates a debt either way.', weight: { desire_grace: -0.5 } },
+      { id: '2', label: 'Rarely — most expressions of want come with pressure attached', value: 2, description: 'The performance review is mostly on.', weight: { desire_grace: -0.25 } },
+      { id: '3', label: 'Sometimes — it depends on the mood of the room', value: 3, description: 'Obligation-free want exists in some weathers, not others.', weight: { desire_grace: 0 } },
+      { id: '4', label: 'Mostly true', value: 4, description: 'Want can usually just exist; the exceptions are known and named.', weight: { desire_grace: 0.3 } },
+      { id: '5', label: 'Exactly — that is the standard I would hold', value: 5, description: 'Want without obligation as the operating rule: desire stays honest because it is never taxed.', weight: { desire_grace: 0.5, sexual_communication: 0.1 } },
+    ],
+    diagnosticWeight: 0.8,
+  },
+  {
+    id: 'q152',
+    layer: 5,
+    format: 'scenario',
+    prompt: [
+      'You have to tell your partner "not tonight" — you are running on fumes, and they would have said yes if you had asked.',
+      'How does the sentence come out?',
+    ],
+    options: [
+      { id: 'a', label: 'Plainly and warmly — "not tonight, I am out of gas — come here anyway" — with no softening or excuse', description: 'A clean no plus a kept connection: the refusal does not have to become a retreat.', weight: { desire_grace: 0.7, affection_daily: 0.1 } },
+      { id: 'b', label: 'With a rain check attached — "not tonight, but tomorrow is on me"', description: 'The no comes with a repayment plan — graceful, and slightly billed.', weight: { desire_grace: 0.15, scorekeeping: 0.1 } },
+      { id: 'c', label: 'Softened with a reason I half-invent, because the bare no would need explaining', description: 'The no arrives disguised: honesty deferred to manage the reaction.', weight: { desire_grace: -0.35, direct_communication: -0.2 } },
+      { id: 'd', label: 'I would probably just not say it — stay quiet, let the evening be ordinary, and hope they do not ask', description: 'The no avoided entirely: the mismatch goes unspoken and the partner cannot know.', weight: { desire_grace: -0.55, direct_communication: -0.2 } },
+    ],
+    diagnosticWeight: 1.2,
+  },
+];
+
+export const QUESTIONS: Question[] = [...CORE_QUESTIONS, ...WAVE4_QUESTIONS, ...WAVE5_QUESTIONS, ...WAVE6_QUESTIONS, ...WAVE7_QUESTIONS];
 
 /**
  * Bank history, oldest wave first. Lets the profile distinguish "you skipped
@@ -3517,7 +3647,7 @@ export const QUESTIONS: Question[] = [...CORE_QUESTIONS, ...WAVE4_QUESTIONS, ...
  * partial-run card that blames the taker for the bank's growth is reading
  * fraud. Every future wave must be appended here AND to QUESTIONS.
  */
-export const QUESTION_WAVES: Question[][] = [CORE_QUESTIONS, WAVE4_QUESTIONS, WAVE5_QUESTIONS, WAVE6_QUESTIONS];
+export const QUESTION_WAVES: Question[][] = [CORE_QUESTIONS, WAVE4_QUESTIONS, WAVE5_QUESTIONS, WAVE6_QUESTIONS, WAVE7_QUESTIONS];
 
 export const QUESTION_BY_ID: Record<string, Question> = Object.fromEntries(
   QUESTIONS.map((q) => [q.id, q]),

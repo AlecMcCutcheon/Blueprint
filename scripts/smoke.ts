@@ -60,7 +60,7 @@ if (a.profile.state !== undefined) { console.error('FAIL: state survey retired b
 // Full-session restore (import path): encode answers → decode → re-score must
 // reproduce the EXACT profile. No reconstruction, no drift — this is the
 // property that replaced reconstruct.ts.
-import { encodeFullSession, decodeFullSession, buildShareLink, parseShareUrl, profileToCode5, decodeProfile } from '../src/domain/share';
+import { encodeFullSession, decodeFullSession, buildShareLink, parseShareUrl, profileToCode6, decodeProfile } from '../src/domain/share';
 import { buildSessionFile, importSessionJson } from '../src/domain/session';
 import { BONUS_POOL } from '../src/domain/questions';
 {
@@ -133,15 +133,15 @@ import { BONUS_POOL } from '../src/domain/questions';
   // byte-identical to the owner's — same variance gates, same tension-card
   // directions, same alignment branch — while carrying no raw answers.
   {
-    const code5 = profileToCode5(a.profile);
-    if (!code5.startsWith('BP5')) { console.error('FAIL: expected BP5 code for a full profile'); process.exit(1); }
-    const shared = decodeProfile(code5);
-    if (!shared) { console.error('FAIL: BP5 code failed to decode'); process.exit(1); }
-    if (code5.includes('q01') || code5.includes('optionId')) { console.error('FAIL: BP5 leaks answer-shaped data'); process.exit(1); }
+    const code6 = profileToCode6(a.profile);
+    if (!code6.startsWith('BP6')) { console.error('FAIL: expected BP6 code for a full profile'); process.exit(1); }
+    const shared = decodeProfile(code6);
+    if (!shared) { console.error('FAIL: BP6 code failed to decode'); process.exit(1); }
+    if (code6.includes('q01') || code6.includes('optionId')) { console.error('FAIL: BP6 leaks answer-shaped data'); process.exit(1); }
     const ownerDoc = JSON.stringify(generateBlueprint(a.profile));
     const sharedDoc = JSON.stringify(generateBlueprint(shared));
     if (ownerDoc !== sharedDoc) {
-      console.error('FAIL: BP5 parity broken — shared document differs from owner document');
+      console.error('FAIL: BP6 parity broken — shared document differs from owner document');
       const oa = JSON.parse(ownerDoc), sa = JSON.parse(sharedDoc);
       for (let si = 0; si < Math.max(oa.sections.length, sa.sections.length); si++) {
         const osp = oa.sections[si]?.paragraphs ?? [], ssp = sa.sections[si]?.paragraphs ?? [];
@@ -152,9 +152,9 @@ import { BONUS_POOL } from '../src/domain/questions';
       process.exit(1);
     }
     // Checksum integrity: flip the final byte (checksum) → decode must fail.
-    const raw = atob(code5.slice(3).replace(/-/g, '+').replace(/_/g, '/'));
-    const corrupted = 'BP5' + btoa(String.fromCharCode(raw.charCodeAt(0), 0, 0)).replace(/\+/g, '-').replace(/\//g, '_').replace(/=+$/, '');
-    if (decodeProfile(corrupted) !== null) { console.error('FAIL: corrupted BP5 must not decode'); process.exit(1); }
+    const raw = atob(code6.slice(3).replace(/-/g, '+').replace(/_/g, '/'));
+    const corrupted = 'BP6' + btoa(String.fromCharCode(raw.charCodeAt(0), 0, 0)).replace(/\+/g, '-').replace(/\//g, '_').replace(/=+$/, '');
+    if (decodeProfile(corrupted) !== null) { console.error('FAIL: corrupted BP6 must not decode'); process.exit(1); }
   }
   const bp = profileToCode(a.profile);
   const l1 = buildShareLink(bp, { name: 'Maya', intent: 'invite' });
@@ -253,8 +253,11 @@ import { profileToCode, decodeProfile, compareProfiles, encodeLegacyCode } from 
   const code = profileToCode(a.profile);
   const decoded = decodeProfile(code);
   if (!decoded) { console.error('FAIL: share code did not decode'); process.exit(1); }
+  // profileToCode emits the frozen BP4 layout — the wave-7 dimensions ride on
+  // BP6 only, so they decode unmeasured here rather than matching.
   const mismatches = Object.entries(a.profile.dimensions).filter(
-    ([k, v]) => decoded.dimensions[k as keyof typeof decoded.dimensions].score !== v.score,
+    ([k, v]) => !decoded.dimensions[k as keyof typeof decoded.dimensions].unmeasured &&
+      decoded.dimensions[k as keyof typeof decoded.dimensions].score !== v.score,
   );
   if (mismatches.length > 0) {
     console.error(`FAIL: decoded scores differ: ${mismatches.map(([k]) => k).join(',')}`);
@@ -287,10 +290,10 @@ import { profileToCode, decodeProfile, compareProfiles, encodeLegacyCode } from 
   // re-encoding refused, and comparison skipping the gaps.
   {
     const MISSING_BY_VERSION: Record<number, string[]> = {
-      1: ['relational_privacy', 'sexual_communication', 'positivity_play', 'capitalization', 'conflict_engagement', 'commitment_sacrifice', 'money_coordination', 'desire_initiation', 'intimacy_attunement', 'feedback_receiving', 'external_processing'],
-      2: ['sexual_communication', 'positivity_play', 'capitalization', 'conflict_engagement', 'commitment_sacrifice', 'money_coordination', 'desire_initiation', 'intimacy_attunement', 'feedback_receiving', 'external_processing'],
-      3: ['desire_initiation', 'intimacy_attunement', 'feedback_receiving', 'external_processing'],
-      4: [],
+      1: ['relational_privacy', 'sexual_communication', 'positivity_play', 'capitalization', 'conflict_engagement', 'commitment_sacrifice', 'money_coordination', 'desire_initiation', 'intimacy_attunement', 'feedback_receiving', 'external_processing', 'care_role_flexibility', 'desire_grace'],
+      2: ['sexual_communication', 'positivity_play', 'capitalization', 'conflict_engagement', 'commitment_sacrifice', 'money_coordination', 'desire_initiation', 'intimacy_attunement', 'feedback_receiving', 'external_processing', 'care_role_flexibility', 'desire_grace'],
+      3: ['desire_initiation', 'intimacy_attunement', 'feedback_receiving', 'external_processing', 'care_role_flexibility', 'desire_grace'],
+      4: ['care_role_flexibility', 'desire_grace'],
     };
     for (const ver of [1, 2, 3, 4] as const) {
       const missing = MISSING_BY_VERSION[ver];
@@ -322,7 +325,8 @@ import { profileToCode, decodeProfile, compareProfiles, encodeLegacyCode } from 
         }
         const bp = generateBlueprint(decoded);
         // Sections group several dimensions, so count unmeasured *paragraphs* —
-        // exactly one per missing dimension.
+        // exactly one per missing dimension (stitching may merge prose, but the
+        // placeholders are protected and stay standalone).
         const gapParas = bp.sections.reduce(
           (n, s) => n + s.paragraphs.filter((p) => p.includes('not measured')).length, 0,
         );
@@ -334,10 +338,21 @@ import { profileToCode, decodeProfile, compareProfiles, encodeLegacyCode } from 
         }
         console.log(`BP${ver} legacy: decodes OK · ${missing.length} dims unmeasured · re-encode refused · compare skips · blueprint marks gaps`);
       } else {
+        // BP4 is a FROZEN legacy layout since wave 7: its code carries 28 dims
+        // and 12 pairs, so the two wave-7 dimensions decode unmeasured.
+        for (const d of missing) {
+          if (!decoded.dimensions[d as keyof typeof decoded.dimensions]?.unmeasured) {
+            console.error(`FAIL: BP4 code should mark ${d} unmeasured`); process.exit(1);
+          }
+        }
         const bp = generateBlueprint(decoded);
-        const unmeasured = bp.bands.filter((b) => b.unmeasured).length;
-        if (unmeasured !== 0) { console.error('FAIL: BP4 blueprint should have no unmeasured bands'); process.exit(1); }
-        console.log(`BP4 current: ${code.length} chars · round-trip exact · no gaps`);
+        const gapParas = bp.sections.reduce(
+          (n, s) => n + s.paragraphs.filter((p) => p.includes('not measured')).length, 0,
+        );
+        if (gapParas !== missing.length) {
+          console.error(`FAIL: BP4 blueprint should mark exactly ${missing.length} paragraphs unmeasured, got ${gapParas}`); process.exit(1);
+        }
+        console.log(`BP4 frozen: ${code.length} chars · 28 dims/12 pairs on the wire · wave-7 dims decode unmeasured`);
       }
     }
   }
