@@ -2525,33 +2525,48 @@ const CORE_QUESTIONS: Question[] = [
     diagnosticWeight: 1.2,
   },
   {
+    // Situational conversion (scored-change wave): the agreement item was a
+    // classic self-report desirability magnet — disagreeing with it admitted
+    // jealousy. The scenario keeps the same construct and anchor weights
+    // (+0.5 … -0.5, same diagnosticWeight) while measuring the reaction
+    // instead of the self-description.
     id: 'q89',
     layer: 4,
-    format: 'agreement',
-    prompt: ['"I can be fully happy for the wins of someone I love — even the ones that are inconvenient for me."'],
-    // (Label 5's former description — "the rarest form of generosity" — was
+    format: 'scenario',
+    prompt: [
+      'You and your partner both get news the same afternoon. Theirs is the win they have been working toward for months. Yours is good too — but it means the thing they just won will cost you something: more carrying at home, a plan rearranged, a season postponed.',
+      'What happens inside you, honestly?',
+    ],
     options: [
-      { id: '1', label: 'Hard to say honestly', value: 1, description: 'Envy or cost speaks first for you — their wins sometimes arrive as subtraction.', weight: { capitalization: -0.5 } },
-      { id: '2', label: 'Mostly, with friction', value: 2, description: 'The happiness is real but arrives second, after the cost has had its say.', weight: { capitalization: -0.25 } },
-      { id: '3', label: 'Usually', value: 3, description: 'Delight comes through more often than not, with occasional static from the price tag.', weight: { capitalization: 0 } },
-      { id: '4', label: 'Almost always', value: 4, description: 'Their wins land as additions. The friction is rare enough to be an event.', weight: { capitalization: 0.3 } },
-      { id: '5', label: 'That\'s genuinely me', value: 5, description: 'Their wins register as additions to your life — delight without invoice.', weight: { capitalization: 0.5 } },
+      { id: 'a', label: 'Delight first — their win is real and I feel it; the cost can be a problem for later-us', description: 'The win registers as an addition before the price tag registers at all.', weight: { capitalization: 0.5 } },
+      { id: 'b', label: 'Happy for them — and I notice the recalculating start somewhere in the background', description: 'Joy first, with the ledger opening quietly behind it.', weight: { capitalization: 0.15 } },
+      { id: 'c', label: 'Both at once, tangled — proud of them and already mourning my rearranged plan', description: 'The two reactions arrive together and neither pretends to be the only one.', weight: { capitalization: -0.25 } },
+      { id: 'd', label: 'The cost speaks first — I would feel the win as a bill arriving', description: 'The subtraction registers before the addition; the win arrives pre-priced.', weight: { capitalization: -0.5 } },
     ],
     diagnosticWeight: 0.8,
   },
 
   // ───────────────────── Expansion: commitment_sacrifice ─────────────────────
   {
+    // Situational conversion (scored-change wave): "I rarely audit whether it
+    // was worth it" invites claiming non-transactionality. The scenario asks
+    // where the mind actually goes on an ordinary evening. Anchor weights
+    // preserved; the audit option's scorekeeping secondary was corrected to
+    // +0.2 — every other audit-flavored option in the bank (q14b, q27d,
+    // q55b, q62c) scores ledger-activity positive, and the old -0.2 contradicted
+    // the dimension's polarity everywhere else.
     id: 'q90',
     layer: 4,
-    format: 'agreement',
-    prompt: ['"When I sacrifice something for a relationship, I rarely find myself auditing whether it was worth it."'],
+    format: 'scenario',
+    prompt: [
+      'You gave up something real for the relationship a while back — not a grand gesture, just a steady cost you keep paying.',
+      'On an ordinary evening, where does your mind go with it?',
+    ],
     options: [
-      { id: '1', label: 'I audit constantly', value: 1, description: 'Sacrifice, for you, comes with a running internal invoice — worth knowing, because partners feel audits even unspoken.', weight: { commitment_sacrifice: -0.5, scorekeeping: -0.2 } },
-      { id: '2', label: 'More than I\'d like', value: 2, description: 'The value-check runs quietly in the background of most giving.', weight: { commitment_sacrifice: -0.25 } },
-      { id: '3', label: 'Sometimes', value: 3, description: 'Big choices get weighed, small ones don\'t — a fairly normal economy.', weight: { commitment_sacrifice: 0 } },
-      { id: '4', label: 'Rarely', value: 4, description: 'When you give to the relationship, the giving mostly settles the question.', weight: { commitment_sacrifice: 0.3 } },
-      { id: '5', label: 'Almost never — giving settles it', value: 5, description: 'Your investment closes its own books. Commitment as a settled way of being, not a running cost-benefit.', weight: { commitment_sacrifice: 0.5 } },
+      { id: 'a', label: 'Nowhere, really — it folded into the life we built; I stopped counting that one a while ago', description: 'The cost stopped being itemized: it became part of the shared project rather than a line item.', weight: { commitment_sacrifice: 0.5 } },
+      { id: 'b', label: 'It surfaces occasionally — mostly settled, though certain weeks it feels closer than others', description: 'Largely closed books, with seasonal reopenings you can name.', weight: { commitment_sacrifice: 0.3 } },
+      { id: 'c', label: 'Depends which part — some of the cost closed out, some still runs in the background', description: 'Selective accounting: settled in some currencies, open in others.', weight: { commitment_sacrifice: 0 } },
+      { id: 'd', label: 'It still runs a quiet total — I know roughly what I have given and what it added up to', description: 'The audit never fully sleeps: the giving is real, and so is the running tally of it.', weight: { commitment_sacrifice: -0.5, scorekeeping: 0.2 } },
     ],
     diagnosticWeight: 0.8,
   },
@@ -2615,16 +2630,21 @@ const CORE_QUESTIONS: Question[] = [
     diagnosticWeight: 1.2,
   },
   {
+    // Situational conversion (scored-change wave): the fairness principle was
+    // one almost nobody can disagree with without self-indicting. The budget
+    // scenario forces the actual tradeoff. Anchor weights preserved.
     id: 'q93',
     layer: 4,
-    format: 'agreement',
-    prompt: ['"In a shared life, both people\'s hobbies — mine included — would get equal seriousness when money comes up."'],
+    format: 'scenario',
+    prompt: [
+      'It is a budgeting month, and there is room for one hobby purchase, not two: theirs, or mine.',
+      'What feels most natural?',
+    ],
     options: [
-      { id: '1', label: 'No — mine get judged', value: 1, description: 'You feel the scrutiny on your own spending. That asymmetry is exactly what resentment uses as kindling.', weight: { money_coordination: -0.5 } },
-      { id: '2', label: 'Leaning no — I\'d like to think mine would be exempt', value: 2, description: 'An unspoken hierarchy exists — though your own interests feel like the exception to it.', weight: { money_coordination: -0.25 } },
-      { id: '3', label: 'Roughly equal', value: 3, description: 'No active double standard — spending legitimacy is roughly symmetrical in your house.', weight: { money_coordination: 0 } },
-      { id: '4', label: 'Mostly equal', value: 4, description: 'Both people\'s interests get benefit of the doubt when the card comes out.', weight: { money_coordination: 0.3 } },
-      { id: '5', label: 'Completely equal', value: 5, description: 'Teammate symmetry as a lived rule: neither person\'s joys are on trial. Rare, and quietly protective.', weight: { money_coordination: 0.5 } },
+      { id: 'a', label: 'Whichever matters more right now wins — the purchase is judged on its own merits, not its owner', description: 'The call is about the purchase, not the person asking for it.', weight: { money_coordination: 0.5 } },
+      { id: 'b', label: 'Split the difference — smaller versions of both, or one deferred to next month', description: 'Both interests get a version of a yes, at the cost of neither getting the full one.', weight: { money_coordination: 0.3 } },
+      { id: 'c', label: 'Whoever\'s turn it is — we keep rough track and trade off month to month', description: 'Turn-taking as the fairness mechanism: the ledger is the referee.', weight: { money_coordination: -0.25 } },
+      { id: 'd', label: 'Each of us funds our own from our own money — that is what personal spending budgets are for', description: 'Separate ledgers as the peace treaty: shared bills shared, private joys private.', weight: { money_coordination: -0.5 } },
     ],
     diagnosticWeight: 0.8,
   },

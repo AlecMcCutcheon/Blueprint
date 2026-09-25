@@ -209,6 +209,15 @@ and the taker never sees dimension names during the quiz.
    relationship history. q96–q98 are retired from scoring (post-blueprint state survey) and
    q100 is scored as state — the reviewer's "separate, don't rewrite" for the reflection items
    was already implemented.
+5. **Situational conversion of self-report magnets** (scored-change wave, Sep 2026): q89
+   (delight at a partner's inconvenient win), q90 (post-sacrifice audit), and q93 (hobby-budget
+   symmetry) moved from agreement items to scenarios measuring the reaction instead of the
+   self-description. Anchor weights preserved (±0.5 at the same diagnosticWeight), except one
+   polarity correction: q90's audit option now scores `scorekeeping: +0.2`, matching every other
+   audit-flavored option in the bank (q14b, q27d, q55b, q62c). Verified after conversion: all
+   7 tiers still reachable on capitalization / commitment_sacrifice / money_coordination, the
+   q87|q90 echo pair's direction rule still maps, and bench stats shifted only at scored-wave
+   magnitude (19759 paragraphs, 38.7% overlap, GATE green).
 3. **No obvious correct answers**; no option should read as the "good partner" answer.
 3b. **Option-tone parity** (added after user review): every option label must describe the
    *function* the behavior serves (fairness, protection, self-respect, honesty) rather than
