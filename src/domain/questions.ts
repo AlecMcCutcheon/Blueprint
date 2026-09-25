@@ -2741,7 +2741,7 @@ const CORE_QUESTIONS: Question[] = [
 /**
  * End-of-run state survey (3 PANAS-logic items): how the taker felt after the
  * instrument. Presented AFTER the blueprint exists, in its own stage — never
- * counted toward the 97 scored questions.
+ * counted toward the 115 scored questions.
  */
 export const STATE_SURVEY: Question[] = [
   {

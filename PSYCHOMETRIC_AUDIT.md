@@ -20,7 +20,7 @@ evidence actually says, and what remains undone. Re-read whenever the instrument
 
 ## 2. Coverage: what the numbers actually are (recomputed after the expansion — `scripts/audit.ts`)
 
-95 questions across 24 dimensions; 83 of 95 questions carry weights on 2+ dimensions (the
+115 questions across 28 dimensions; 99 of the 115 questions carry weights on 2+ dimensions (the
 interwoven design working as intended).
 
 | dimension | questions | | dimension | questions |
@@ -164,7 +164,7 @@ over-sampled dimensions are rebalanced simultaneously.
 - [x] Bank rounded to a clean 100 questions: 97 scored core items + two refinement items
       (q99 need-voicing, q100 picture-specificity) + 3 clarifying questions appended at the
       tail of every run (real conflicts first, remaining bank items after — every run reaches
-      100 presented questions; scored in the main pass, excluded from the answered count and
+      118 presented questions; scored in the main pass, excluded from the answered count and
       consistency pairs) — done
 - [x] Randomized presentation order — done (`domain/order.ts`): seeded per-run shuffle;
       echo pairs structurally ≥15% of the quiz apart (reserved slot geometry); same-dimension

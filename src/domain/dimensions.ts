@@ -939,7 +939,7 @@ const INTERPLAY_LIBRARY: Partial<Record<DimensionId, Record<string, string>>> = 
 };
 
 /**
- * The 24 dimensions, rebuilt at 7-tier resolution: legacy 3-band paragraphs
+ * The 28 dimensions, rebuilt at 7-tier resolution: legacy 3-band paragraphs
  * carry the tone; hand-authored modifiers differentiate the leaning and
  * extreme tiers; the interplay library conditions on co-occurring scores.
  */

@@ -218,22 +218,22 @@ src/
   domain/
     types.ts        — Question, Option, Weight, Scores, Blueprint types
     dimensions.ts   — 28 dimensions + 3 meta-composites + narrative banks (low/mid/high)
-    questions.ts    — core bank (119 scored questions: 100 original + wave-4 q101–q122) + BONUS_POOL (3 tail-of-run clarifiers)
-    order.ts        — seeded constrained shuffle: echo-pair slot reservation, adjacency preference (119 core items)
+    questions.ts    — core bank (115 scored questions: 97 original + wave-4, ids q01–q118) + BONUS_POOL (3 tail-of-run clarifiers)
+    order.ts        — seeded constrained shuffle: echo-pair slot reservation, adjacency preference (115 core items)
     scoring.ts      — normalization (core + clarifiers in the main pass), consistency deltas, meta-composites
     blueprint.ts    — narrative generation (bands, tensions, closing)
     share.ts        — BP1/BP2/BP3 metric codes, BPS full-session codes, share links (name + intent)
     session.ts      — full-session JSON export/import (raw answers + order seed + optional name)
   app/
-    App.tsx         — state machine: intro → quiz (100 incl. clarifiers) → review → blueprint → compare; visitor mode from share links
+    App.tsx         — state machine: intro → quiz (118 incl. clarifiers) → review → blueprint → compare; visitor mode from share links
     components/     — Intro, Quiz, Review, BlueprintView, Compare
   styles.css        — single stylesheet, warm paper aesthetic (the blueprint should feel like a document)
 ```
 
-Band chart: 24 dimension bars with score, one-line tier readout (e.g. "Touch as first language"),
+Band chart: 28 dimension bars with score, one-line tier readout (e.g. "Touch as first language"),
 and fill; unmeasured dimensions render as a grayed gap.
 
-Persistence: localStorage checkpoint after every answer (a 119-question scored run should never be lost).
+Persistence: localStorage checkpoint after every answer (a 115-question scored run should never be lost).
 The presentation order is seeded and persisted too — a refresh resumes in the identical order; a
 retake reseeds.
 Export: blueprint as downloadable Markdown.

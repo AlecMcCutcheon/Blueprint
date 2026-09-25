@@ -95,10 +95,10 @@ export default function Intro({
         </p>
 
         <div className="intro__meta">
-          {/* 97 core questions + 3 clarifying questions that close the run —
+          {/* 115 scored core questions + 3 clarifying questions that close the run —
               presented as part of the normal flow, so the count is honest. */}
           <span className="chip">{QUESTIONS.length + BONUS_POOL.length} questions</span>
-          <span className="chip">10–20 minutes</span>
+          <span className="chip">20–30 minutes</span>
           <span className="chip">browser-only, nothing uploaded</span>
         </div>
 

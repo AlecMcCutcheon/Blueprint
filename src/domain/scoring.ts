@@ -337,8 +337,8 @@ export function scoreProfile(input: Answers): ScoredProfile {
     channels,
     receiveBreadth,
     // Honest count: core answers only. A clarifier is a response to a finding,
-    // not part of the instrument's advertised 100 — otherwise a run that
-    // answered 100 core + 2 clarifiers would claim 102/100.
+    // not part of the instrument's advertised 115 — otherwise a run that
+    // answered all core + 2 clarifiers would claim 117/115.
     answered: QUESTIONS.reduce((n, q) => n + (answers[q.id] !== undefined ? 1 : 0), 0),
     total: QUESTIONS.length,
   };

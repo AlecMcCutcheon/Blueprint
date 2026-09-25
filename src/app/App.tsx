@@ -194,9 +194,9 @@ function AppInner() {
   const profile = useMemo(() => scoreProfile(answers), [answers]);
 
   // ── Clarifying questions: appended at the END of the normal flow. ──
-  // Once the core 100 are all answered, echo-pair analysis picks which
+  // Once the core bank is fully answered, echo-pair analysis picks which
   // clarifiers matter (real conflicts first, remaining bank items after —
-  // every run reaches the advertised 100 and clean runs still collect
+  // every run reaches the advertised 118 and clean runs still collect
   // resolution evidence). They then present as ordinary questions at the tail
   // of the quiz, not as a separate post-blueprint detour.
   const [clarifierQueue, setClarifierQueue] = useState<Question[]>([]);

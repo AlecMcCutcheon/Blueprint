@@ -115,8 +115,9 @@ export default function BlueprintView({
             {vName ? `This is ${vName}'s relationship blueprint` : 'A shared relationship blueprint'}
           </h1>
           <p className="bp__visitor-body">
-            {vName ? `${vName} answered` : 'Someone answered'} 100 questions about how they love,
-            and this document is the result — built entirely from their pattern of choices.
+            {vName ? `${vName} answered` : 'Someone answered'} {profile.answered} questions about
+            how they love, and this document is the result — built entirely from their pattern of
+            choices.
             {visitor?.intent === 'invite' ? (
               <> They've invited you to take the test yourself, so the two of you can compare
               blueprints side by side — on your device, in this browser, with nothing uploaded.</>
@@ -127,7 +128,7 @@ export default function BlueprintView({
           </p>
           <p className="bp__visitor-body bp__visitor-body--soft">
             The document below speaks to them — its “you” means {vName ?? 'them'}. If you'd like a
-            comparison of your own, you can take the same test here; it's 10–20 minutes and
+            comparison of your own, you can take the same test here; it's 20–30 minutes and
             entirely yours.
           </p>
           <div className="bp__visitor-actions">
