@@ -287,27 +287,91 @@ export function decodeFullSession(code: string): DecodedSession | null {
 // ─── Share links ─────────────────────────────────────────────────────────────
 
 /**
- * A share link wraps a metric code in a URL, optionally with the sharer's
- * NAME and the sharing INTENT:
- *   ?bp=BP3…            the metric code (always present)
- *   ?name=Maya          optional display name (URL-encoded; never in the code)
- *   ?mode=invite        'show' (default) = look at my blueprint
- *                       'invite' = I want YOU to take the test and compare
+ * A share link wraps a metric code in a URL. The sharer's NAME and sharing
+ * INTENT ride in a single opaque, checksummed segment (?m=…) rather than as
+ * readable params: the link works without a readable name, and the checksum
+ * means a modified or corrupted segment degrades to the generic "somebody
+ * shared this" presentation instead of delivering a tampered name.
  *
- * The base is window.location.origin + pathname — no server, no tracking;
- * the link is self-contained and works wherever the app is hosted.
+ * Segment layout: urlsafe base64 of [ flags, name utf-8 bytes…, checksum ]
+ *   flags bit 0: intent (0 = show, 1 = invite)
+ *   checksum: low byte of FNV-1a over (code + flags + name) — the segment is
+ *   bound to the profile it accompanies, so swapping segments between links
+ *   also fails the check.
+ *
+ * Legacy ?name=/?mode= params are ignored entirely. The bp code itself is
+ * separately validated by decodeProfile.
  */
 export type ShareIntent = 'show' | 'invite';
 
 const NAME_MAX = 40;
 
+function fnv1aLow(bytes: Uint8Array): number {
+  let h = 0x811c9dc5;
+  for (let i = 0; i < bytes.length; i++) {
+    h ^= bytes[i];
+    h = Math.imul(h, 0x01000193);
+  }
+  return (h >>> 0) & 0xff;
+}
+
+const textEnc = typeof TextEncoder !== 'undefined' ? new TextEncoder() : null;
+const textDec = typeof TextDecoder !== 'undefined' ? new TextDecoder() : null;
+
+function utf8Bytes(s: string): Uint8Array {
+  if (textEnc) return textEnc.encode(s);
+  return new Uint8Array(Array.from(s, (c) => c.charCodeAt(0) & 0xff));
+}
+
+function encodeMetaSegment(code: string, name: string, intent: ShareIntent): string {
+  const flags = intent === 'invite' ? 1 : 0;
+  const nameBytes = utf8Bytes(name);
+  const codeBytes = utf8Bytes(code);
+  const body = new Uint8Array(codeBytes.length + 1 + nameBytes.length);
+  body.set(codeBytes, 0);
+  body[codeBytes.length] = flags;
+  body.set(nameBytes, codeBytes.length + 1);
+  const sum = fnv1aLow(body);
+  const seg = new Uint8Array(1 + nameBytes.length + 1);
+  seg[0] = flags;
+  seg.set(nameBytes, 1);
+  seg[seg.length - 1] = sum;
+  return b64encode(seg);
+}
+
+interface DecodedMeta { name: string | null; intent: ShareIntent }
+
+/** Any structural or checksum failure degrades to the generic presentation. */
+function decodeMetaSegment(code: string, segment: string): DecodedMeta {
+  const generic: DecodedMeta = { name: null, intent: 'show' };
+  try {
+    const bytes = b64decode(segment);
+    if (bytes.length < 2) return generic;
+    const flags = bytes[0];
+    const nameBytes = bytes.slice(1, bytes.length - 1);
+    const sum = bytes[bytes.length - 1];
+    const codeBytes = utf8Bytes(code);
+    const body = new Uint8Array(codeBytes.length + 1 + nameBytes.length);
+    body.set(codeBytes, 0);
+    body[codeBytes.length] = flags;
+    body.set(nameBytes, codeBytes.length + 1);
+    if (fnv1aLow(body) !== sum) return generic;
+    const intent: ShareIntent = (flags & 1) === 1 ? 'invite' : 'show';
+    const name = nameBytes.length > 0 && textDec ? textDec.decode(nameBytes).slice(0, NAME_MAX) : null;
+    return { name, intent };
+  } catch {
+    return generic;
+  }
+}
+
 export function buildShareLink(code: string, opts?: { name?: string | null; intent?: ShareIntent }): string {
   const params = new URLSearchParams();
   params.set('bp', code);
   const name = opts?.name?.trim();
-  if (name) params.set('name', name.slice(0, NAME_MAX));
   const intent = opts?.intent ?? 'show';
-  if (intent !== 'show') params.set('mode', intent);
+  if ((name && name.length > 0) || intent !== 'show') {
+    params.set('m', encodeMetaSegment(code, name ? name.slice(0, NAME_MAX) : '', intent));
+  }
   const base = typeof window !== 'undefined' && window.location
     ? window.location.origin + window.location.pathname
     : '/';
@@ -326,6 +390,10 @@ export interface ParsedShareUrl {
  * when no recognizable metric code is present — session codes (BPS) and
  * imports are deliberately NOT accepted here: a link is for visiting someone
  * else's blueprint, and the owner-side flows import through file/code boxes.
+ *
+ * Name/intent come from the checksummed ?m= segment; missing or corrupt
+ * segments decode to the generic unnamed/'show' presentation rather than an
+ * error — a broken link should still show the blueprint, just generically.
  */
 export function parseShareUrl(input: string | URLSearchParams): ParsedShareUrl | null {
   try {
@@ -335,11 +403,8 @@ export function parseShareUrl(input: string | URLSearchParams): ParsedShareUrl |
     if (!/^BP[1-4]/i.test(code)) return null; // metric codes only
     const decoded = decodeProfile(code);
     if (!decoded) return null;
-    const rawName = (params.get('name') ?? '').trim();
-    const name = rawName ? rawName.slice(0, NAME_MAX) : null;
-    const mode = (params.get('mode') ?? '').toLowerCase();
-    const intent: ShareIntent = mode === 'invite' ? 'invite' : 'show';
-    return { code, name, intent };
+    const meta = decodeMetaSegment(code, (params.get('m') ?? '').trim());
+    return { code, name: meta.name, intent: meta.intent };
   } catch {
     return null;
   }

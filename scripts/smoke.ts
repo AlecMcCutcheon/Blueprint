@@ -145,6 +145,30 @@ import { BONUS_POOL } from '../src/domain/questions';
   if (parseShareUrl('http://x.invalid/?bp=BP3garbage') !== null) {
     console.error('FAIL: invalid bp payloads must be rejected'); process.exit(1);
   }
+  // Meta segment integrity: a modified/corrupted ?m= degrades to the generic
+  // unnamed presentation instead of delivering a tampered name or intent.
+  const tamperOf = (url: string, mutate: (m: string) => string): ReturnType<typeof parseShareUrl> => {
+    const u = new URL(url, 'http://x.invalid');
+    u.searchParams.set('m', mutate(u.searchParams.get('m') ?? ''));
+    return parseShareUrl(u.searchParams);
+  };
+  if (tamperOf(l1, (m) => m.slice(0, -2))?.name !== null) {
+    console.error('FAIL: truncated meta segment must degrade to generic'); process.exit(1);
+  }
+  if (tamperOf(l1, (m) => m.slice(0, 4) + (m[4] === 'A' ? 'B' : 'A') + m.slice(5))?.name !== null) {
+    console.error('FAIL: bit-flipped meta segment must degrade to generic'); process.exit(1);
+  }
+  const lOther = buildShareLink(profileToCode(b.profile), { name: 'Maya', intent: 'invite' });
+  const mOther = new URL(lOther, 'http://x.invalid').searchParams.get('m') ?? '';
+  const swapped = new URL(l1, 'http://x.invalid');
+  swapped.searchParams.set('m', mOther);
+  if (parseShareUrl(swapped.searchParams)?.name !== null) {
+    console.error('FAIL: meta segment must be bound to its own code'); process.exit(1);
+  }
+  const legacy = parseShareUrl(`http://x.invalid/?bp=${encodeURIComponent(bp)}&name=Maya&mode=invite`);
+  if (legacy?.name !== null || legacy?.intent !== 'show') {
+    console.error('FAIL: legacy readable name/mode params must be ignored'); process.exit(1);
+  }
   if (bp.includes('Maya')) { console.error('FAIL: name leaked into the metric code'); process.exit(1); }
 
   console.log(`session restore: code round-trip exact (${Object.keys(dec.answers).length} answers) · JSON+name round-trip · tamper dropped · ${BONUS_POOL.length} clarifiers scored-in-main-pass · link name/intent round-trip`);
