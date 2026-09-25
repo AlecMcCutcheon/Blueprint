@@ -815,7 +815,7 @@ const TIER_MODIFIERS: Partial<Record<DimensionId, { vlow: string; mlow: string; 
   commitment_sacrifice: {
     vlow: 'Here, giving runs on a short leash — the internal invoice arrives quickly, and sacrifice stays rare and priced.',
     mlow: 'You give, but the value-check runs quietly behind most of it.',
-    mhigh: 'Your giving mostly settles its own books — one notch up and the audit would fall silent.',
+    mhigh: 'Almost every ledger closes when you give — the one exception worth knowing is the sacrifice that went unnoticed, which is where an audit briefly reopens.',
     vhigh: 'At this intensity, you back people all the way in — the giving is constitutive of who you are, which makes choosing whom to give it to the real question.',
     vlowShort: 'Short leash',
     vhighShort: 'All the way in',
@@ -856,7 +856,7 @@ const TIER_MODIFIERS: Partial<Record<DimensionId, { vlow: string; mlow: string; 
     vlow: 'Here, processing is a private discipline — the clarity is made alone, and what a partner sees is the finished product.',
     mlow: 'An outside voice is occasionally useful, rarely necessary — the tangles mostly unwind inside.',
     mhigh: 'In practice, though, the voice is an option you rate highly rather than a need you run on — most tangles still unwind inside first, and what you hold firmly is the permission in both directions: fine with a partner using a trusted voice, fine with using one yourself when a tangle earns it. The line you actually keep is declaration over discovery.',
-    vhigh: 'At this intensity, the trusted voice is part of your thinking apparatus — with openness as the load-bearing condition, which your answers already respect.',
+    vhigh: 'At this intensity the voice is infrastructure — the watch-item is not whether to use it but whether the two-person room still receives the finished thinking too, not only the processed version.',
     vlowShort: 'Processes inside first',
     vhighShort: 'Thinks out loud',
   },
@@ -1110,6 +1110,6 @@ export const TIER_VARIANTS: Partial<Record<DimensionId, Partial<Record<'mhigh' |
     mhigh: 'Hard feedback gets a full hearing from you before anything fires back. Your answers suggest the defense reflex does not get the first word — curiosity does: what took them so long to tell me, what am I missing. The people close to you can say the true thing while it is still small, because they have learned it lands. That is among the rarer and more load-bearing skills a relationship can run on.',
   },
   external_processing: {
-    mhigh: 'A trusted outside voice is part of your thinking apparatus. Your answers treat talking something through — openly, declared, aimed at understanding — as a legitimate way to untangle it, and they extend the same permission to a partner. The line you keep is not about silence; it is about consent: processing declared is collaboration, processing discovered is exclusion. You know the difference, and it shows.',
+    mhigh: 'Your best untangling happens out loud, with someone you trust. Your answers treat talking something through — openly, declared, aimed at understanding — as a legitimate way to think, and they extend the same permission to a partner. The line you keep is not about silence; it is about consent: processing declared is collaboration, processing discovered is exclusion. You know the difference, and it shows.',
   },
 };

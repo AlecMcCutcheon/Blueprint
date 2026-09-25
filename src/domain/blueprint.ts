@@ -122,6 +122,18 @@ function alignmentParagraphFor(p: ScoredProfile, runSeed: number): string {
     const name = (c: string) => CHANNEL_LABELS[c] ?? c;
     return `Your giving and receiving profiles overlap in breadth — you speak and hear several registers of care — but your flagship channels differ: you give most naturally through ${name(express)}, while what lands hardest arrives through ${name(receive)}. Breadth and emphasis are different measurements, and both are real; the single-channel asymmetry is named in the tensions below, because it is the one worth a dictionary exchange.`;
   }
+  if (express && !receive) {
+    const name = (c: string) => CHANNEL_LABELS[c] ?? c;
+    // Receive side gave no modal channel (answers point different ways or go
+    // unnamed). The generic tier paragraph would INVENT an offset channel —
+    // say the honest thing instead: giving has a flagship, receiving is
+    // unmapped in this run.
+    return `Your giving runs through one flagship channel — ${name(express)} — but your answers never converged on a single channel for receiving: the receive-side questions point in different directions, so this document will not guess. That is a finding in itself. A partner may assume your way of giving is your way of needing, and the honest answer right now is "unmapped" — watch what actually lands when care arrives, and tell them when it does.`;
+  }
+  if (!express && receive) {
+    const name = (c: string) => CHANNEL_LABELS[c] ?? c;
+    return `The care that reaches you comes most clearly through ${name(receive)} — but your giving side never converged on one flagship channel in this run, so this document will not guess at how you most naturally give. The useful move is the same in both directions: notice which register you reach for when someone you love has a rough day, and say it out loud.`;
+  }
   const s = p.dimensions.express_receive_alignment?.score;
   return s === undefined ? '' : paragraphFor('express_receive_alignment', s, runSeed);
 }
