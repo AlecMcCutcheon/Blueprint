@@ -117,6 +117,7 @@ export default function BlueprintView({
           <h1 className="bp__visitor-title">
             {vName ? `This is ${vName}'s relationship blueprint` : 'A shared relationship blueprint'}
           </h1>
+          <p className="bp__epigraph" style={{ fontSize: '1.1rem', fontStyle: 'italic', margin: '0 0 0.75rem' }}>{blueprint.epigraph}</p>
           <p className="bp__visitor-body">
             {vName ? `${vName} answered` : 'Someone answered'} {profile.answered} questions about
             how they love, and this document is the result — built entirely from their pattern of

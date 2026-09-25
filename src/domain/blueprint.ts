@@ -342,7 +342,7 @@ function channelProfileText(p: ScoredProfile): string | null {
   // true one.
   if (exp && !rec) {
     if ((p.receiveBreadth ?? 0) >= 3) {
-      return `Your answers show you give most naturally through ${name(exp)} — and on the receiving side, something rarer: each care question named a different channel, which reads less like an unreadable dictionary and more like a wide one. Care appears to reach you in whatever register it is offered. The risk flips accordingly: not starvation, but a partner never learning which gesture mattered most — so tell them, when something lands.`;
+      return `Your answers show you give most naturally through ${name(exp)} — and on the receiving side, something rarer: each care question named a different channel, which reads less like an unreadable dictionary and more like a wide one. Care appears to reach you in whatever register it is offered. The risk flips accordingly: not starvation, but a partner never learning which gesture mattered most.`;
     }
     return `Your answers show you give most naturally through ${name(exp)}. What the answers say less clearly is which channel reaches you when you're the one who needs care — worth watching for, and worth telling the people close to you.`;
   }
@@ -392,7 +392,7 @@ export function generateBlueprint(p: ScoredProfile): Blueprint {
       const nContrib = p.variance?.[dim]?.contributions.length ?? p.dimensions[dim]?.varianceShape?.count;
       if (nContrib !== undefined && nContrib <= 3) {
         const last = paragraphs[paragraphs.length - 1];
-        paragraphs[paragraphs.length - 1] = `Worth reading gently — this dimension rests on the fewest answers in your run (${nContrib} ${nContrib === 1 ? 'answer carries' : 'answers carry'} it, where most others have many more): ${last}`;
+        paragraphs[paragraphs.length - 1] = `Worth reading gently — this dimension rests on some of the fewest answers in your run (${nContrib} ${nContrib === 1 ? 'answer carries' : 'answers carry'} it, where most others have many more): ${last}`;
       }
       // Derived patterns render at their placement point (a co-occurring score
       // changes this paragraph's meaning), then legacy interplay covers

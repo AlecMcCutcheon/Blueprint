@@ -840,7 +840,7 @@ const TIER_MODIFIERS: Partial<Record<DimensionId, { vlow: string; mlow: string; 
     vlow: 'Here, the moment is experienced more than navigated — drift goes unremarked, and the current runs one-way while feeling shared.',
     mlow: 'You notice the shift but the naming is where yours stops — hope replaces the check.',
     mhigh: 'You track the moment well — one notch up and nothing would need to be performed at all.',
-    vhigh: 'At this intensity, you read the room in the dark — drift, hesitation, want versus willingness — and bodies\' weather never becomes a verdict.',
+    vhigh: 'At this intensity, attunement is continuous — the room is legible even in the dark, and bodies\' weather never becomes a verdict.',
     vlowShort: 'Experienced, not navigated',
     vhighShort: 'Reads the room in the dark',
   },
@@ -1092,7 +1092,7 @@ export const TIER_VARIANTS: Partial<Record<DimensionId, Partial<Record<'mhigh' |
     mhigh: 'Good news gets a reception at your place. Your answers chose the full-body response to someone\'s win — put it down, turn around, start from the beginning — the active-constructive pattern that turns a report into a bond. People who live with you likely experience their victories as bigger for having told you, and they learn where joy goes to land.',
   },
   conflict_engagement: {
-    mhigh: 'You do not leave the ring. Your answers show you staying in hard conversations at full heat — defending your position while genuinely tracking theirs, reaching for the brake ("let\'s name the temperature") instead of the counterattack. Disagreement, in your make-up, does not have to become damage; it can just be the two of you working. That is a learnable skill, and your answers suggest you already learned it.',
+    mhigh: 'You do not leave the ring. Your answers show you staying in hard conversations and defending your position while genuinely tracking theirs — and reaching for the brake ("let\'s name the temperature") rather than the counterattack when the temperature rises. Disagreement, in your make-up, does not have to become damage; it can just be the two of you working. That is a learnable skill, and your answers suggest you already learned it.',
   },
   commitment_sacrifice: {
     mhigh: 'When you give something up for the relationship, the giving settles it. Your answers show no running invoice, no background cost-benefit — sacrifice reads as constitutive, part of what choosing someone meant. The upside is a steadiness partners can build on; the caution is proportionality — make sure the same arithmetic-free door swings both ways, because one-way carrying is the only load this generosity cannot absorb.',
