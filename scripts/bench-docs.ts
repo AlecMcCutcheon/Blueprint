@@ -70,6 +70,8 @@ const docParas: string[][] = [];
 const epigraphsBench = new Map<string, number>();
 const headingTexts = new Map<string, Map<string, number>>(); // "sectionId" -> heading -> count
 let headingPoolDocs = 0, headingStaticDocs = 0, headingComboSum = 0;
+let crossHeadingMode = 0; // Crosscurrents titles drawn from a mix-keyed pair pool
+const crossHeadingTexts = new Map<string, number>();
 const headingDupes: string[] = [];
 let totalParas = 0, lightlyHeld = 0;
 
@@ -91,6 +93,12 @@ for (let run = 0; run < RUNS; run++) {
     if (sec.headingAdaptive) poolPicked = true;
   }
   if (poolPicked) headingPoolDocs += 1; else headingStaticDocs += 1;
+  const cross = bp.sections.find((s) => s.id === '__crosscurrents');
+  if (cross) {
+    const nHead = cross.paragraphs.filter((p) => p.startsWith('**')).length;
+    crossHeadingMode += nHead >= 2 ? 1 : 0;
+    crossHeadingTexts.set(cross.heading, (crossHeadingTexts.get(cross.heading) ?? 0) + 1);
+  }
   headingComboSum += docHeadings.size;
   if (docHeadings.size < bp.sections.length) headingDupes.push([...docHeadings].length + '/' + bp.sections.length);
 
@@ -206,6 +214,7 @@ console.log(`distinct epigraphs across ${RUNS} runs: ${epigraphsBench.size}`);
     const [txt, n] = [...m.entries()].sort((a, b) => b[1] - a[1])[0];
     console.log(`  ${id.padEnd(16)} ${String(m.size).padStart(2)} distinct · top "${txt.slice(0, 38)}" ${n}×`);
   }
+  console.log(`  crosscurrents titles: ${crossHeadingTexts.size} distinct · ${crossHeadingMode}/${RUNS} docs drew a pair-keyed title (≥2 frames) · top: ${[...crossHeadingTexts.entries()].sort((a, b) => b[1] - a[1]).slice(0, 3).map(([t, n]) => `${n}× "${t.slice(0, 30)}"`).join(' · ')}`);
   // Gates: titles must stay unique WITHIN a document (any repeat is a naming
   // failure), and the epigraph pool must keep breathing (25+ tellings in use).
   if (headingDupes.length > 0) fail(`${headingDupes.length} docs carry a repeated title`);

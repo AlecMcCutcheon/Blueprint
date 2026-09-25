@@ -616,12 +616,52 @@ export function generateBlueprint(p: ScoredProfile): Blueprint {
   // at three so the section reads as "the interactions that matter most in
   // your profile", not every qualifying combination.
   if (plan.headline.length > 0) {
-    // The interaction section's title rotates like every other heading, while
-    // keeping the "water in motion" register the frame lines were written for.
-    const CROSSCURRENT_HEADINGS = ['Crosscurrents', 'Where the Signals Cross', 'Undercurrents', 'The Interactions That Matter'];
+    // Crosscurrents title keyed to the ACTUAL synthesis mix. plan.headline is
+    // priority-ordered, so the first matching pair entry names the interaction
+    // of the two dominant themes; the single entries lead with the dominant
+    // pattern alone; the static title is the last resort. Every candidate is
+    // echo-guarded against the fired frames and the epigraph — a title that
+    // restated its own lead frame would stutter on arrival.
+    const CROSS_BY_PAIR: Record<string, string[]> = {
+      'space_and_certainty|noticed_not_managing': ['The Distance That Still Reports', 'Far, and Never Uninformed', 'Room, and the Reading of It'],
+      'space_and_certainty|team_of_two': ['Free Range, United Front', 'Alone Time, Team Instincts', 'Separate Camps, One Flag'],
+      'space_and_certainty|independent_but_connected': ['Dense Hours, Wide Days', 'Close When It Counts, Free the Rest', 'The Warm Return'],
+      'space_and_certainty|shared_reality': ['Distance With Documentation', 'Room to Move, Facts to Hold', 'The Explained Absence'],
+      'space_and_certainty|separate_worlds_curious': ['Two Worlds, Wide Rooms', 'Space for Both Maps', "Rooms of One's Own, Tours of Two"],
+      'noticed_not_managing|shared_reality': ['Attentiveness and Straight Talk', 'Seen Early, Told Plainly', 'The Information Standard'],
+      'noticed_not_managing|team_of_two': ['The Early-Warning Team', 'Attentive, and on the Same Side', 'Cared For, Carried With'],
+      'noticed_not_managing|independent_but_connected': ['The Considerate Distance', 'Early Word, Wide Room', 'Attentive Without Crowding'],
+      'noticed_not_managing|separate_worlds_curious': ['The Wide-Awake Arrangement', 'Curious, and Already Prepared', 'Interest With Anticipation'],
+      'team_of_two|independent_but_connected': ['A Team of Two Full Lives', 'United Front, Separate Corners', 'The Working Partnership'],
+      'team_of_two|shared_reality': ['One Story, One Side', 'The Same Page, the Same Team', 'Plain Facts, Joint Front'],
+      'team_of_two|separate_worlds_curious': ['Separate Trails, One Summit', 'The Expedition of Two', 'Two Camps, One Expedition'],
+      'shared_reality|independent_but_connected': ['Closeness With Candor', 'Warm, and Never Vague', 'The Candid Orbit'],
+      'shared_reality|separate_worlds_curious': ['Two Worlds, One Truth', 'Curiosity, Verified', 'The Cross-Checked Map'],
+      'independent_but_connected|separate_worlds_curious': ['Warm Visits, Own Rooms', 'The Guest Who Lives Next Door', 'Interest Across the Hall'],
+    };
+    const CROSS_BY_TOP: Partial<Record<string, string[]>> = {
+      space_and_certainty: ['The Distance That Still Reports', 'Room, With a Signal', 'Space, Read Accurately'],
+      noticed_not_managing: ['The Attentiveness Standard', 'Before You Have to Ask', 'Care That Preempts the Ask'],
+      team_of_two: ['The Two-Person Front', 'A Compact Under Load', 'Side by Side, By Design'],
+      independent_but_connected: ['Dense Hours, Wide Days', 'Close on Your Own Terms', 'The Warm Orbit'],
+      shared_reality: ['The Information Standard', 'One Version of Events', 'Where Nothing Gets Curated'],
+      separate_worlds_curious: ['The Visiting Arrangement', 'Two Worlds, Both Inhabited', 'Interest Across the Hall'],
+    };
+    const fired = plan.headline.map((h) => h.pattern.id);
+    const crossBlockers = headingBlockers([], epigraph, plan.headline.map((h) => h.pattern.frame));
+    const crossPools: string[][] = [];
+    for (let i = 0; i < fired.length; i++) {
+      for (let j = i + 1; j < fired.length; j++) {
+        const pool = CROSS_BY_PAIR[`${fired[i]}|${fired[j]}`] ?? CROSS_BY_PAIR[`${fired[j]}|${fired[i]}`];
+        if (pool) crossPools.push(pool);
+      }
+    }
+    if (CROSS_BY_TOP[fired[0]]) crossPools.push(CROSS_BY_TOP[fired[0]]!);
+    const rotated = crossPools.map((texts) => seededPick(texts, hash('crosscurrents') + runSeed));
+    const crossHeading = rotated.find((c) => !titlesCollide(c, crossBlockers)) ?? 'Crosscurrents';
     sections.push({
       id: '__crosscurrents',
-      heading: seededPick(CROSSCURRENT_HEADINGS, hash('crosscurrents') + runSeed),
+      heading: crossHeading,
       paragraphs: plan.headline.flatMap((h) => renderPattern(h, 'headline', runSeed)),
     });
   }

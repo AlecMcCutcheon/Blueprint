@@ -168,6 +168,12 @@ and the taker never sees dimension names during the quiz.
   render-time echo guard otherwise drops any candidate that shares too much vocabulary with what
   the section renders — tier paragraphs, fired pattern frames, or the epigraph — falling back to
   the static title if everything collides. `headingAdaptive` records which were chosen.
+- **Crosscurrents titles keyed to the synthesis mix**: the interaction section's title comes from
+  a pool for the profile's dominant pattern PAIR (plan.headline is priority-ordered, so the pair
+  names the two dominant themes) — 15 authored pairs × 3 tellings, single-pattern pools when no
+  pair applies, and the guarded static "Crosscurrents" as last resort. Every candidate is
+  echo-guarded against the fired frames and the epigraph. 25 distinct titles observed across 300
+  runs, with 91% of docs drawing a pair-keyed title.
 - **Epigraph pools**: the opening line is keyed to the most distinctive dimension signal (score
   ≤ 36 or ≥ 70), with 3–4 tellings per keyed dimension and a seeded fallback pool — seeds derive
   only from profile content (dimension + score), never from owner-vs-share state, so BP5 share
