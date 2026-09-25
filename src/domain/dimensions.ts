@@ -678,7 +678,7 @@ const TIER_MODIFIERS: Partial<Record<DimensionId, { vlow: string; mlow: string; 
   },
   positivity_play: {
     vlow: 'Here, cultivating fun is nearly absent — leisure happens to you rather than being gardened, and the flat stretches can quietly become the default.',
-    mlow: 'You occasionally seed lightness, usually when your own reserves are full.',
+    mlow: 'A receiving style rather than a missing one: you meet play warmly when a partner brings it, and your gift is appreciating the bit rather than inventing it — which makes a plan-making partner feel brilliantly funny.',
     mhigh: 'You are nearly a habitual cultivator of fun — one notch up and it would be a role you own.',
     vhigh: 'At this intensity, play is infrastructure — you treat shared lightness as load-bearing, and its disappearance registers as structural damage.',
     vlowShort: 'Leisure happens to you',
@@ -774,7 +774,7 @@ const TIER_MODIFIERS: Partial<Record<DimensionId, { vlow: string; mlow: string; 
   },
   conflict_engagement: {
     vlow: 'Here, conflict is mostly absence — you yield or exit, and the disagreement resolves by forfeit rather than by engagement.',
-    mlow: 'You engage when pushed; the default is still retreat.',
+    mlow: 'A quieter style, not a lesser one: you step back from heat first and re-engage once the temperature drops — the pacing works well with a partner who reads the pause as processing, not absence.',
     mhigh: 'You stay in the ring nearly every time — one notch up and curiosity would hold even at full heat.',
     vhigh: 'At this intensity, you engage at full heat without losing the thread — arguments become places you work rather than places you flee.',
     vlowShort: 'Resolves by forfeit',

@@ -3430,7 +3430,59 @@ const WAVE5_QUESTIONS: Question[] = [
   },
 ];
 
-export const QUESTIONS: Question[] = [...CORE_QUESTIONS, ...WAVE4_QUESTIONS, ...WAVE5_QUESTIONS];
+// Wave 6 — the social-desirability defense. Four forced pairs in which BOTH
+// options are genuinely flattering: there is no prestige answer to inflate
+// toward, so a motivated self-presenter cannot pick their way to a perfect
+// score here — either choice reveals a real hierarchy between two virtues.
+// These also deepen the thinnest remaining constructs (capitalization,
+// curiosity_worlds, external_processing, receiving_comfort).
+const WAVE6_QUESTIONS: Question[] = [
+  {
+    id: 'q141',
+    layer: 4,
+    format: 'forced_pair',
+    prompt: [
+      'Both of these are admirable ways to love. Be honest about which is truer of you — not better.',
+      'Which is closer to the truth?',
+    ],
+    options: [
+      { id: 'a', label: 'I make room for the good news — I stop what I\'m doing so a win gets its moment', description: 'Celebration as priority: joy gets an audience in you, even at a cost to momentum.', weight: { capitalization: 0.7, listening_first: -0.1 } },
+      { id: 'b', label: 'I make room for the hard thing — I stop what I\'m doing so a struggle gets company', description: 'Presence-as-priority: pain gets an audience in you first, and joy is celebrated on the way.', weight: { listening_first: 0.7, capitalization: -0.1 } },
+    ],
+  },
+  {
+    id: 'q142',
+    layer: 4,
+    format: 'forced_pair',
+    prompt: ['Both are gifts. Which one do you give more naturally — again, truer, not better?'],
+    options: [
+      { id: 'a', label: 'Entering their world — learning what they love, even when it is nothing to me', description: 'Interest as the gift: you extend curiosity outward, into territory that is not yours.', weight: { curiosity_worlds: 0.7, receiving_comfort: -0.1 } },
+      { id: 'b', label: 'Letting them into mine — showing what I love even when it risks not landing', description: 'Openness as the gift: you offer your interior world and trust it to be received.', weight: { receiving_comfort: 0.6, curiosity_worlds: -0.1, vulnerability_safety: 0.2 } },
+    ],
+  },
+  {
+    id: 'q143',
+    layer: 3,
+    format: 'forced_pair',
+    prompt: ['Two strengths that cannot both lead. Which describes you more honestly?'],
+    options: [
+      { id: 'a', label: 'I carry it alone until I understand it — then I let people in', description: 'The private processor: clarity first, company second. Your people get your conclusions.', weight: { external_processing: -0.7, autonomy_connection: 0.1 } },
+      { id: 'b', label: 'I think out loud with someone I trust — the talking is how I understand it', description: 'The out-loud processor: company first, clarity through it. Your people get your drafting table.', weight: { external_processing: 0.7, autonomy_connection: -0.1 } },
+    ],
+  },
+  {
+    id: 'q144',
+    layer: 2,
+    format: 'forced_pair',
+    prompt: ['Both are real care. Which is more instinctively yours?'],
+    options: [
+      { id: 'a', label: 'Doing something about it — the fix, the plan, the practical rescue', description: 'Care as competence: you answer need with action, and the load actually gets lighter.', weight: { care_initiation: 0.5, listening_first: -0.2 } },
+      { id: 'b', label: 'Being someone it can fall apart in front of — the company, the no-agenda presence', description: 'Care as shelter: you answer need with company, and nothing has to be fixed to be loved.', weight: { listening_first: 0.6, care_initiation: -0.1 } },
+    ],
+  },
+];
+
+export const QUESTIONS: Question[] = [...CORE_QUESTIONS, ...WAVE4_QUESTIONS, ...WAVE5_QUESTIONS, ...WAVE6_QUESTIONS];
 
 export const QUESTION_BY_ID: Record<string, Question> = Object.fromEntries(
   QUESTIONS.map((q) => [q.id, q]),
