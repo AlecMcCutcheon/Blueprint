@@ -20,27 +20,41 @@ evidence actually says, and what remains undone. Re-read whenever the instrument
 
 ## 2. Coverage: what the numbers actually are (recomputed after the expansion — `scripts/audit.ts`)
 
-115 questions across 28 dimensions; 99 of the 115 questions carry weights on 2+ dimensions (the
+133 questions across 28 dimensions; 114 of the 133 questions carry weights on 2+ dimensions (the
 interwoven design working as intended).
 
-| dimension | questions | | dimension | questions |
+| dimension | touching | | dimension | touching |
 |---|---|---|---|---|
-| direct_communication | 42 | | same_side_problems | 17 |
-| care_initiation | 33 | | affection_daily | 18 |
-| listening_first | 27 | | receiving_comfort | 19 |
-| perspective_taking | 22 | | scorekeeping | 20 |
-| autonomy_connection | 21 | | repair_orientation | 13 |
-| reassurance_security | 11 | | money_coordination | 4 |
-| curiosity_worlds | **9** *(was 3)* | | relational_privacy | **10** *(was 5)* |
-| capitalization | 6 | | sexual_communication, positivity_play, conflict_engagement, commitment_sacrifice | 3 each |
-| logic_emotion_integration, shared_home_effort, desire, vulnerability_safety | 9–10 | | express_receive_alignment | derived from channel tags |
+| direct_communication | 84 | | relational_privacy | 32 |
+| listening_first | 55 | | vulnerability_safety | 32 |
+| care_initiation | 50 | | autonomy_connection | 31 |
+| perspective_taking | 51 | | reassurance_security | 29 |
+| scorekeeping | 50 | | same_side_problems | 30 |
+| receiving_comfort | 41 | | repair_orientation | 21 |
+| affection_daily | 35 | | logic_emotion_integration | 21 |
+| intimacy_attunement | 24 | | shared_home_effort | 20 |
+| sexual_communication | 20 | | capitalization | 18 |
+| conflict_engagement | 19 | | feedback_receiving | 17 |
+| positivity_play | 19 | | desire | 16 |
+| commitment_sacrifice | 19 | | money_coordination | 15 |
+| external_processing | 15 | | desire_initiation | 14 |
+| curiosity_worlds | 20 | | express_receive_alignment | derived from channel tags |
 
-Findings after the expansion wave:
+("Touching" = questions that can move the dimension at a balanced baseline — `scripts/sensitivity.ts`,
+the honest metric now that the normalizer charges only naming options.)
 
-- **Coverage debt paid**: curiosity_worlds tripled (3→9), relational_privacy doubled (5→10).
-- **The six new dimensions launched at 3–6 questions each** — the same launch density the
-  original dimensions had (3–5). This is the documented floor for a narrative band; deepening
-  them to 5–6 is the natural next wave, listed in §7.
+Findings after the evidence-depth wave (wave 5):
+
+- **The seven thin constructs were doubled or better**: external_processing 2→4 contributing items
+  in a typical run, feedback_receiving 2→5, sexual_communication 3→6, conflict_engagement 3→6,
+  intimacy_attunement 3→6, positivity_play 4→6, commitment_sacrifice 4→6. Mean single-answer
+  swings on these fell from 9–20 pts into the 4–9 pts band — a tier is now a pattern, not a coin.
+- **The logic_emotion_integration floor is broken**: q137/q138 add the bank's only negative
+  weights on the construct; the reachability probe confirms all 7 tiers are now reachable
+  (was: floor of 70, four tiers of dead prose).
+- **Chips no longer borrow confidence**: dimensions still carried by ≤3 answers render
+  "· lightly held" on their score chip — the honest display for legacy runs scored against
+  the older bank.
 - Over-sampling in direct_communication (42) and care_initiation (33) is **harmless by design**:
   scores normalize within each dimension, so extra items add stability, not bias. The originally
   planned "rebalance by demoting weights" was dropped as pointless — removing signal adds noise.
@@ -164,7 +178,7 @@ over-sampled dimensions are rebalanced simultaneously.
 - [x] Bank rounded to a clean 100 questions: 97 scored core items + two refinement items
       (q99 need-voicing, q100 picture-specificity) + 3 clarifying questions appended at the
       tail of every run (real conflicts first, remaining bank items after — every run reaches
-      118 presented questions; scored in the main pass, excluded from the answered count and
+      136 presented questions; scored in the main pass, excluded from the answered count and
       consistency pairs) — done
 - [x] Randomized presentation order — done (`domain/order.ts`): seeded per-run shuffle;
       echo pairs structurally ≥15% of the quiz apart (reserved slot geometry); same-dimension

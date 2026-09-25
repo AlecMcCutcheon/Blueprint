@@ -206,7 +206,7 @@ and the taker never sees dimension names during the quiz.
    ("if something wasn't working for me in bed, I'd say so out loud").
 6. **Formats mixed**: multiple-choice scenario, forced-choice pairs (A/B), 1–5 agreement scales
    (used sparingly, framed behaviorally), "which affects you most" vs. "which would you do".
-7. **~95 questions, 20–30 minutes.** Dimensions get 3+ questions each; consistency pairs add more.
+7. **~133 questions, 25–40 minutes.** Every dimension gets multiple questions; the thinnest constructs (intimacy attunement, outside-voice processing, feedback reception) get dedicated evidence-depth waves.
    (q63–q67 privacy Sep 2026; q68–q95 Sep 2026 expansion: 3 curiosity_worlds + 3 relational_privacy
    coverage debt, then 6 new dimensions. New questions always append to ORDER so existing local
    runs resume unchanged and simply gain the newer questions.)
@@ -218,14 +218,14 @@ src/
   domain/
     types.ts        — Question, Option, Weight, Scores, Blueprint types
     dimensions.ts   — 28 dimensions + 3 meta-composites + narrative banks (low/mid/high)
-    questions.ts    — core bank (115 scored questions: 97 original + wave-4, ids q01–q118) + BONUS_POOL (3 tail-of-run clarifiers)
-    order.ts        — seeded constrained shuffle: echo-pair slot reservation, adjacency preference (115 core items)
+    questions.ts    — core bank (133 scored questions: 97 original + wave-4 + wave-5 evidence-depth wave, ids q01–q140) + BONUS_POOL (3 tail-of-run clarifiers)
+    order.ts        — seeded constrained shuffle: echo-pair slot reservation, adjacency preference (133 core items)
     scoring.ts      — normalization (core + clarifiers in the main pass), consistency deltas, meta-composites
     blueprint.ts    — narrative generation (bands, tensions, closing)
     share.ts        — BP1/BP2/BP3 metric codes, BPS full-session codes, share links (name + intent)
     session.ts      — full-session JSON export/import (raw answers + order seed + optional name)
   app/
-    App.tsx         — state machine: intro → quiz (118 incl. clarifiers) → review → blueprint → compare; visitor mode from share links
+    App.tsx         — state machine: intro → quiz (136 incl. clarifiers) → review → blueprint → compare; visitor mode from share links
     components/     — Intro, Quiz, Review, BlueprintView, Compare
   styles.css        — single stylesheet, warm paper aesthetic (the blueprint should feel like a document)
 ```
@@ -233,7 +233,7 @@ src/
 Band chart: 28 dimension bars with score, one-line tier readout (e.g. "Touch as first language"),
 and fill; unmeasured dimensions render as a grayed gap.
 
-Persistence: localStorage checkpoint after every answer (a 115-question scored run should never be lost).
+Persistence: localStorage checkpoint after every answer (a 133-question scored run should never be lost).
 The presentation order is seeded and persisted too — a refresh resumes in the identical order; a
 retake reseeds.
 Export: blueprint as downloadable Markdown.

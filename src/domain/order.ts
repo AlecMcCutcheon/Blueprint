@@ -33,7 +33,7 @@ function questionDims(qId: string): Set<DimensionId> {
 }
 
 /**
- * Constrained seeded order of the 115 scored core questions. The three state
+ * Constrained seeded order of the 133 scored core questions. The three state
  * items live in the end-of-run survey and the bonus questions are
  * conflict-triggered — neither belongs to the core presentation order.
  */

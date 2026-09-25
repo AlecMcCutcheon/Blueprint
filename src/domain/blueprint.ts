@@ -535,13 +535,24 @@ export function generateBlueprint(p: ScoredProfile): Blueprint {
     epigraph = seededPick(fallbacks, hash((topHigh?.id ?? 'x') + String(p.consistencyIndex)));
   }
 
-  const bands = (Object.values(p.dimensions) as { id: DimensionId; score: number; unmeasured?: boolean }[]).map((d) => ({
-    id: d.id,
-    label: DIMENSION_LABELS[d.id],
-    score: d.score,
-    tierLabel: d.unmeasured ? undefined : TIER_LABELS[tierOf(d.score)],
-    unmeasured: d.unmeasured,
-  }));
+  const bands = (Object.values(p.dimensions) as { id: DimensionId; score: number; unmeasured?: boolean }[]).map((d) => {
+    const nContrib = p.variance?.[d.id]?.contributions.length;
+    let tierLabel = d.unmeasured ? undefined : TIER_LABELS[tierOf(d.score)];
+    // Thin-evidence hedge: when three or fewer answers carry a dimension, a
+    // single flip can move it a full band (measured: 9–20 pts mean single-
+    // answer swing on the 2–3-item constructs vs 1.5–5 on the well-evidenced
+    // core). The chip flags that instead of borrowing the core's confidence.
+    if (tierLabel && !d.unmeasured && nContrib !== undefined && nContrib <= 3) {
+      tierLabel = `${tierLabel} · lightly held`;
+    }
+    return {
+      id: d.id,
+      label: DIMENSION_LABELS[d.id],
+      score: d.score,
+      tierLabel,
+      unmeasured: d.unmeasured,
+    };
+  });
 
   // One calibration pass over everything the reader will see: the
   // evidence-distance rule applies to the final text, wherever it was built.

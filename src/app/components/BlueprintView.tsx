@@ -128,7 +128,7 @@ export default function BlueprintView({
           </p>
           <p className="bp__visitor-body bp__visitor-body--soft">
             The document below speaks to them — its “you” means {vName ?? 'them'}. If you'd like a
-            comparison of your own, you can take the same test here; it's 20–30 minutes and
+            comparison of your own, you can take the same test here; it's 25–40 minutes and
             entirely yours.
           </p>
           <div className="bp__visitor-actions">

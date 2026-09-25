@@ -150,7 +150,7 @@ import { BONUS_POOL } from '../src/domain/questions';
   console.log(`session restore: code round-trip exact (${Object.keys(dec.answers).length} answers) · JSON+name round-trip · tamper dropped · ${BONUS_POOL.length} clarifiers scored-in-main-pass · link name/intent round-trip`);
 }
 
-// Order constraints: 115 core items, no state/bonus items, echo pairs far apart.
+// Order constraints: 133 core items, no state/bonus items, echo pairs far apart.
 {
   const pos = new Map(ORDER.map((id, i) => [id, i]));
   for (const m of ['q96', 'q97', 'q98']) {

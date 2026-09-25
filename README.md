@@ -3,7 +3,7 @@
 **A relationship-instincts questionnaire that writes your document for you.**
 
 Not "what's your love language." Not a compatibility score. Blueprint measures how you
-*actually* tend to love — through 115 situational questions where the measurement is
+*actually* tend to love — through 133 situational questions where the measurement is
 hidden inside scenarios, forced choices, and behavioral agreement scales — then generates
 a personalized narrative document about how you appear to love, built entirely from your
 own answer pattern.
@@ -15,7 +15,7 @@ of small decisions you made when you didn't know what was being measured.*
 
 ## What it measures
 
-115 scored questions across **28 hidden dimensions** — from everyday affection and
+133 scored questions across **28 hidden dimensions** — from everyday affection and
 desire to repair after conflict, invisible household effort, money-as-teamwork, and
 the boundary around the relationship itself. No dimension is ever shown as a bare
 number first; every score arrives as prose.
@@ -26,7 +26,7 @@ wide receiving next to a touch-first giving channel implies, where two strong sc
 quietly create a risk neither would create alone. Within-dimension variance detection
 catches the averages that are actually tug-of-wars and says so.
 
-The run ends with 3 clarifying questions (118 items total), generated from echo pairs — scenarios that
+The run ends with 3 clarifying questions (136 items total), generated from echo pairs — scenarios that
 came back wearing different clothes — and the document reports how often your answers
 agreed with themselves.
 
@@ -34,7 +34,7 @@ agreed with themselves.
 
 1. **Intro** — the honesty contract: answer fast, first instinct, there are no
    "good partner" answers, and some scenarios come back later wearing different clothes.
-2. **Quiz** — the 115-item core in a randomized-but-stable order that never places
+2. **Quiz** — the 133-item core in a randomized-but-stable order that never places
    same-dimension items back-to-back, then the 3 clarifiers once the engine knows
    which territories need a closer look. Progress checkpoints to localStorage after
    every answer.

@@ -3165,7 +3165,272 @@ export const BONUS_POOL: Question[] = [
   },
 ];
 
-export const QUESTIONS: Question[] = [...CORE_QUESTIONS, ...WAVE4_QUESTIONS];
+// Wave 5 — the evidence-depth wave. The sensitivity audit (scripts/sensitivity.ts)
+// showed seven constructs carried by only 2–4 questions each, where one answer can
+// swing the score 9–20 points (a full tier). These items double their evidence so
+// their 7-tier display is earned rather than borrowed: external_processing,
+// feedback_receiving, sexual_communication, conflict_engagement, intimacy_attunement,
+// positivity_play, commitment_sacrifice — plus one negative-weight item for
+// logic_emotion_integration, whose every other option in the bank weights it
+// positively (structural floor of 70; its lower-tier prose was unreachable).
+const WAVE5_QUESTIONS: Question[] = [
+  {
+    id: 'q123',
+    layer: 4,
+    format: 'agreement',
+    prompt: ['"When something is bothering me about us, I need to talk it through with someone outside the relationship before I know what I think."'],
+    options: [
+      { id: '1', label: 'Not how I work — inside first, always', value: 1, description: 'The two-person room is where your thinking happens; the outside voice is for later, if ever.', weight: { external_processing: -0.6, relational_privacy: 0.1 } },
+      { id: '2', label: 'Rarely — the tangle is ours', value: 2, description: 'You might seek perspective, but the untangling itself happens between you.', weight: { external_processing: -0.3 } },
+      { id: '3', label: 'Depends how tangled it is', value: 3, description: 'Context-dependent: light knots unwind inside, heavy ones get a second head.', weight: { external_processing: 0 } },
+      { id: '4', label: 'Often — perspective is how I think', value: 4, description: 'An outside voice is part of your processing apparatus, and you know it.', weight: { external_processing: 0.3 } },
+      { id: '5', label: 'Almost always — the voice is how I untangle', value: 5, description: 'You genuinely cannot locate your own position on something until it has been spoken to someone.', weight: { external_processing: 0.6, relational_privacy: -0.1 } },
+    ],
+  },
+  {
+    id: 'q124',
+    layer: 4,
+    format: 'scenario',
+    prompt: [
+      'Mid-argument, you realize you are out of your depth — the fight has layers you did not see coming.',
+      'What do you actually want to do?',
+    ],
+    options: [
+      { id: 'a', label: 'Pause it, and bring in a trusted friend\'s perspective before we go further', description: 'The outside voice as a resource — declared, aimed at understanding, not at winning.', weight: { external_processing: 0.7, relational_privacy: -0.2 } },
+      { id: 'b', label: 'Pause it and sit with it alone until my head is straight', description: 'Solo processing as the reset: the tangle gets your attention before it gets anyone else\'s.', weight: { external_processing: -0.4, autonomy_connection: 0.2 } },
+      { id: 'c', label: 'Keep going — the tangle is ours, and we untangle it or it stays tangled', description: 'The argument itself is the work; outsourcing it would make the resolution less yours.', weight: { external_processing: -0.6, same_side_problems: 0.2 } },
+      { id: 'd', label: 'Pause it, tell my partner exactly who I would want to talk to and why, and ask if they are okay with it', description: 'Processing declared is collaboration — you use the voice, but never as a hidden channel.', weight: { external_processing: 0.4, direct_communication: 0.3 } },
+    ],
+  },
+  {
+    id: 'q125',
+    layer: 3,
+    format: 'scenario',
+    prompt: [
+      'You give a presentation you cared about. A colleague — one whose opinion actually matters to you — finds one real flaw in it.',
+      'The first ten minutes inside:',
+    ],
+    options: [
+      { id: 'a', label: 'Replay the flaw on a loop; everything else about the presentation goes quiet', description: 'Criticism crowds the room: the one flaw becomes the whole verdict, and the armor never came off.', weight: { feedback_receiving: -0.6, vulnerability_safety: -0.2 } },
+      { id: 'b', label: 'Argue with it internally — find the three reasons they are wrong', description: 'The case-building starts mid-sentence: defense first, hearing later.', weight: { feedback_receiving: -0.5, perspective_taking: -0.2 } },
+      { id: 'c', label: 'Feel the sting, then get genuinely curious what they saw that I did not', description: 'Sting first is human; the curiosity is the tell. The flaw becomes information instead of attack.', weight: { feedback_receiving: 0.7, perspective_taking: 0.2 } },
+      { id: 'd', label: 'Thank them, mean it, and ask the follow-up question on the spot', description: 'Reception so open it becomes collaboration — you harvest the flaw while it is fresh.', weight: { feedback_receiving: 0.5, curiosity_worlds: 0.3, direct_communication: 0.2 } },
+    ],
+  },
+  {
+    id: 'q126',
+    layer: 3,
+    format: 'agreement',
+    prompt: ['"When someone I respect gives me hard feedback, my first instinct is to explain — the context, the reasons, what they are missing."'],
+    options: [
+      { id: '1', label: 'Never — I take it in whole first', value: 1, description: 'The hearing comes before any accounting; the whole thing lands before you respond to parts of it.', weight: { feedback_receiving: 0.7 } },
+      { id: '2', label: 'Rarely', value: 2, description: 'A reflex you mostly keep in check until they have finished.', weight: { feedback_receiving: 0.35 } },
+      { id: '3', label: 'Sometimes', value: 3, description: 'Depends on how exposed the feedback finds you.', weight: { feedback_receiving: 0 } },
+      { id: '4', label: 'Often', value: 4, description: 'The context arrives before the point does more often than not.', weight: { feedback_receiving: -0.35, perspective_taking: -0.1 } },
+      { id: '5', label: 'Almost always — the explanation arrives before I have heard the whole thing', value: 5, description: 'Defense as reflex: people learn to package anything hard for you carefully.', weight: { feedback_receiving: -0.7 } },
+    ],
+  },
+  {
+    id: 'q127',
+    layer: 3,
+    format: 'scenario',
+    prompt: [
+      'A mentor you trust tells you the thing about you that holds you back. It is half unfair — you can name the exact context they are missing.',
+      'What do you do with it?',
+    ],
+    options: [
+      { id: 'a', label: 'Weigh it fully anyway — the half-truth usually contains the whole useful part', description: 'You separate the delivery from the content and keep the content. The rarest move in the set.', weight: { feedback_receiving: 0.6, perspective_taking: 0.3 } },
+      { id: 'b', label: 'Correct the record first; the useful part can wait until I am not mischaracterized', description: 'Fairness first — but the correction often eats the window in which feedback can actually land.', weight: { feedback_receiving: -0.4, direct_communication: 0.2 } },
+      { id: 'c', label: 'Take it to someone who will tell me I am right', description: 'The audience as armor: you process the sting by outsourcing the verdict.', weight: { feedback_receiving: -0.6, external_processing: 0.2 } },
+      { id: 'd', label: 'Sit with it for a day before deciding how much was true', description: 'Processing time as the legitimate middle: neither swallowing it nor defending against it.', weight: { feedback_receiving: 0.3, logic_emotion_integration: 0.2 } },
+    ],
+  },
+  {
+    id: 'q128',
+    layer: 3,
+    format: 'agreement',
+    prompt: ['"In intimacy, saying what I actually want — out loud, plainly — is easy for me."'],
+    options: [
+      { id: '1', label: 'Not at all', value: 1, description: 'Wants stay legible only to you; a partner has to guess, and you know they are guessing.', weight: { sexual_communication: -0.6 } },
+      { id: '2', label: 'Rarely', value: 2, description: 'The sayable list is short and the important things are not on it.', weight: { sexual_communication: -0.3 } },
+      { id: '3', label: 'Sometimes', value: 3, description: 'Comfortable with the known; the newer territory goes unsaid.', weight: { sexual_communication: 0 } },
+      { id: '4', label: 'Mostly', value: 4, description: 'Most wants are speakable; the silence around the rest is shrinking.', weight: { sexual_communication: 0.3 } },
+      { id: '5', label: 'Yes — plainly is the only way I know how', value: 5, description: 'The conversation is part of the pleasure; nothing has to survive as a guess.', weight: { sexual_communication: 0.6 } },
+    ],
+  },
+  {
+    id: 'q129',
+    layer: 3,
+    format: 'scenario',
+    prompt: [
+      'Something in your intimate life has been quietly not-working for a while. Your partner has not noticed.',
+      'When does it come up?',
+    ],
+    options: [
+      { id: 'a', label: 'It does not — I would hope they eventually sense it', description: 'Waiting to be noticed: the want stays real, and stays unspeakable.', weight: { sexual_communication: -0.6, direct_communication: -0.2 } },
+      { id: 'b', label: 'Only if it gets worse — why open a door that is holding', description: 'Threshold management: the conversation happens only when the cost of silence exceeds the cost of saying.', weight: { sexual_communication: -0.4 } },
+      { id: 'c', label: 'At a neutral moment, gently and specifically — not in the act, not as a complaint', description: 'The raised-as-information move: the most load-bearing timing there is.', weight: { sexual_communication: 0.7, direct_communication: 0.2 } },
+      { id: 'd', label: 'In the moment if it is fixable right then; otherwise at a calm time', description: 'Situational honesty: the moment is for adjustments, the calm is for architecture.', weight: { sexual_communication: 0.5, intimacy_attunement: 0.2 } },
+    ],
+  },
+  {
+    id: 'q130',
+    layer: 3,
+    format: 'scenario',
+    prompt: [
+      'A partner tells you a want of theirs you did not know — something they have been shy to bring up.',
+      'Your honest first response?',
+    ],
+    options: [
+      { id: 'a', label: 'Delight — the fact that they said it is the thing', description: 'Receptiveness as the message: the saying gets rewarded, so the next thing also gets said.', weight: { sexual_communication: 0.7, receiving_comfort: 0.2 } },
+      { id: 'b', label: 'Curiosity — questions, so I actually understand it', description: 'Interest before verdict; the want becomes a shared territory instead of a test.', weight: { sexual_communication: 0.5, curiosity_worlds: 0.3 } },
+      { id: 'c', label: 'A flicker of worry about what it implies, before I can get to glad', description: 'The want reads as information about you first — receptiveness arrives, but late.', weight: { sexual_communication: -0.3, vulnerability_safety: -0.2 } },
+      { id: 'd', label: 'Quiet discomfort I would probably not show them', description: 'The hidden reception: the script can no longer be edited, because the editor never said anything.', weight: { sexual_communication: -0.6, vulnerability_safety: -0.2 } },
+    ],
+  },
+  {
+    id: 'q131',
+    layer: 5,
+    format: 'agreement',
+    prompt: ['"When a disagreement gets heated, I get more focused, not less."'],
+    options: [
+      { id: '1', label: 'The opposite — heat scatters me entirely', value: 1, description: 'Flooding arrives fast: past a certain volume, the thinking part of you leaves the room.', weight: { conflict_engagement: -0.6, vulnerability_safety: -0.1 } },
+      { id: '2', label: 'I get less focused', value: 2, description: 'The heat costs you precision before it costs you anything else.', weight: { conflict_engagement: -0.3 } },
+      { id: '3', label: 'About the same', value: 3, description: 'Volume does not change your clarity much either way.', weight: { conflict_engagement: 0 } },
+      { id: '4', label: 'Somewhat more focused', value: 4, description: 'Heat sharpens you up to a point — and you know roughly where that point is.', weight: { conflict_engagement: 0.3 } },
+      { id: '5', label: 'Much more focused — heat is where I am sharpest', value: 5, description: 'Full-voice engagement without losing the thread; arguments become places you work.', weight: { conflict_engagement: 0.6 } },
+    ],
+  },
+  {
+    id: 'q132',
+    layer: 5,
+    format: 'scenario',
+    prompt: [
+      'An argument over something real is picking up volume. Twenty minutes in, you are both at full voice and nothing is landing.',
+      'What is true of you in that moment?',
+    ],
+    options: [
+      { id: 'a', label: 'I am sharper — the heat focuses me, and I want to see it through', description: 'Durability under heat: you can stay in the work at full volume without losing the thread.', weight: { conflict_engagement: 0.7 } },
+      { id: 'b', label: 'I am reaching for the brake — naming the temperature, slowing it down', description: 'The brake-reaching reflex: a real skill, and it scores as lower heat-tolerance because it is.', weight: { conflict_engagement: -0.4, repair_orientation: 0.2, listening_first: 0.2 } },
+      { id: 'c', label: 'I am gone — not walking out, but the lights are off behind my eyes', description: 'Shutdown: present in the room, absent from the argument. The most expensive exit there is.', weight: { conflict_engagement: -0.6, vulnerability_safety: -0.2 } },
+      { id: 'd', label: 'Still in it, but only barely — one more round and I would be gone too', description: 'The edge of flooding: your engagement is real and rationed.', weight: { conflict_engagement: 0.2 } },
+    ],
+  },
+  {
+    id: 'q133',
+    layer: 2,
+    format: 'scenario',
+    prompt: [
+      'You reach for them; they are not in the mood — no words, just a slight turning away.',
+      'What happens in you in the next minute?',
+    ],
+    options: [
+      { id: 'a', label: 'I notice it immediately and adjust — the reach changes, the closeness does not have to die', description: 'Attunement without verdict: the signal is received, and it is not taken as a ruling on you.', weight: { intimacy_attunement: 0.7, receiving_comfort: 0.1 } },
+      { id: 'b', label: 'I notice a beat too late — I am still reaching while they have already answered', description: 'Half-speed tracking: the signal lands, just not in time to matter to the moment.', weight: { intimacy_attunement: -0.2 } },
+      { id: 'c', label: 'I miss it in the moment and replay it later, reading it as something about me', description: 'Missed signal plus personalization: attunement arrives at 2am, wearing doubt.', weight: { intimacy_attunement: -0.5, reassurance_security: 0.3 } },
+      { id: 'd', label: 'I probably would not register it at all until they said something', description: 'The unworded channel is mostly closed: what is not said aloud does not reach you.', weight: { intimacy_attunement: -0.6 } },
+    ],
+  },
+  {
+    id: 'q134',
+    layer: 2,
+    format: 'agreement',
+    prompt: ['"I can tell the difference between my partner being quiet because something is wrong and being quiet because they are just resting."'],
+    options: [
+      { id: '1', label: 'No — quiet is ambiguous, and it eats at me', value: 1, description: 'Ambiguity reads as threat: every silence has to be resolved before you can settle.', weight: { intimacy_attunement: -0.6, reassurance_security: 0.2 } },
+      { id: '2', label: 'Not usually', value: 2, description: 'You guess, and your guesses skew anxious more often than not.', weight: { intimacy_attunement: -0.3 } },
+      { id: '3', label: 'Sometimes', value: 3, description: 'Depends on the day, the week, and how known they are feeling.', weight: { intimacy_attunement: 0 } },
+      { id: '4', label: 'Usually', value: 4, description: 'The unworded channel mostly works; the misreads are exceptions you catch.', weight: { intimacy_attunement: 0.3 } },
+      { id: '5', label: 'Yes — their weather is legible to me', value: 5, description: 'Reading the room in the dark: drift, hesitation, and rest are distinguishable signals.', weight: { intimacy_attunement: 0.6 } },
+    ],
+  },
+  {
+    id: 'q135',
+    layer: 2,
+    format: 'scenario',
+    prompt: [
+      'A completely flat Tuesday evening. Nothing is wrong — there is just nothing.',
+      'What do you catch yourself doing?',
+    ],
+    options: [
+      { id: 'a', label: 'Inventing something — a walk with a destination, a ridiculous movie, a project nobody planned', description: 'Flat time as material: the invention reflex that treats lightness as maintenance you enjoy.', weight: { positivity_play: 0.7, affection_daily: 0.1 } },
+      { id: 'b', label: 'Content to let it be flat — not every evening owes anyone an event', description: 'Genuine comfort with quiet: rest is rest, not a problem to solve.', weight: { positivity_play: -0.3, autonomy_connection: 0.2 } },
+      { id: 'c', label: 'Wishing one of us would invent something, and being a little resentful neither does', description: 'Passive resentment: the want exists, waits, and quietly bills.', weight: { positivity_play: -0.4, scorekeeping: 0.2 } },
+      { id: 'd', label: 'Making the flatness itself pleasant — food, blankets, parallel couch time — without needing it to be more', description: 'Warmth without invention: comfortable and content, but not what builds the shared joke library.', weight: { positivity_play: 0.2, affection_daily: 0.3 } },
+    ],
+  },
+  {
+    id: 'q136',
+    layer: 2,
+    format: 'agreement',
+    prompt: ['"Inside a relationship, silliness — the deliberately dumb voice, the running joke, the bit — is a need, not a garnish."'],
+    options: [
+      { id: '1', label: 'Garnish — nice when it happens', value: 1, description: 'Play is decoration: pleasant, optional, and the first thing a busy season eats.', weight: { positivity_play: -0.6 } },
+      { id: '2', label: 'Mostly garnish', value: 2, description: 'You enjoy the bit when it arrives; you do not miss it when it does not.', weight: { positivity_play: -0.3 } },
+      { id: '3', label: 'Somewhere in between', value: 3, description: 'You would notice its absence within a season, not within a week.', weight: { positivity_play: 0 } },
+      { id: '4', label: 'Mostly a need', value: 4, description: 'A week without the bit registers; you would be the one to restart it.', weight: { positivity_play: 0.3 } },
+      { id: '5', label: 'A need — the shared joke is part of the architecture', value: 5, description: 'Silliness as infrastructure: it is how the relationship stays light enough to be safe.', weight: { positivity_play: 0.6 } },
+    ],
+  },
+  {
+    id: 'q137',
+    layer: 1,
+    format: 'scenario',
+    prompt: [
+      'Someone you love is crying in front of you — genuinely crying.',
+      'What is running the first minute?',
+    ],
+    options: [
+      { id: 'a', label: 'Feeling first — I am in it with them before any part of me starts figuring', description: 'Feeling-led presence: the joining comes first, and it is genuine.', weight: { logic_emotion_integration: 0.7, listening_first: 0.2 } },
+      { id: 'b', label: 'Both at once — I am with them AND a quiet part of me is mapping what is actually wrong', description: 'The integrated stance: analysis that carries feeling, feeling that carries structure.', weight: { logic_emotion_integration: 0.6, perspective_taking: 0.2 } },
+      { id: 'c', label: 'Figuring first — I need the structure before I can be any real use to them', description: 'Structure as prerequisite: you can be present, but only after the problem has a shape.', weight: { logic_emotion_integration: -0.3, listening_first: -0.2 } },
+      { id: 'd', label: 'Almost pure figuring — the feeling is theirs; my job is the solution', description: 'Analysis as distance: the feeling is treated as the problem instead of the context.', weight: { logic_emotion_integration: -0.7, listening_first: -0.3 } },
+    ],
+  },
+  {
+    id: 'q138',
+    layer: 3,
+    format: 'agreement',
+    prompt: ['"I almost always understand my own feelings by analyzing them — and I trust the analysis more than the feeling."'],
+    options: [
+      { id: '1', label: 'No — the feeling is the data; analysis is the footnotes', value: 1, description: 'Feeling-led self-knowledge: you trust what arises, and think about it afterwards.', weight: { logic_emotion_integration: 0.4 } },
+      { id: '2', label: 'I use both, roughly equally', value: 2, description: 'The integrated default: neither instrument outranks the other.', weight: { logic_emotion_integration: 0.5 } },
+      { id: '3', label: 'Slightly the analysis', value: 3, description: 'A mild tilt: you check the feeling against the map before trusting the territory.', weight: { logic_emotion_integration: 0.1 } },
+      { id: '4', label: 'Mostly the analysis', value: 4, description: 'The map outranks the territory more often than not.', weight: { logic_emotion_integration: -0.2 } },
+      { id: '5', label: 'Almost entirely the analysis — feelings are noisy inputs', value: 5, description: 'The dis-integration pole: the feeling is treated as noise, and noise does not get listened to.', weight: { logic_emotion_integration: -0.6, listening_first: -0.1 } },
+    ],
+  },
+  {
+    id: 'q139',
+    layer: 5,
+    format: 'scenario',
+    prompt: [
+      'To be with them, you would have to give up something real — a city you love, a career shape, a version of your life you had finished building.',
+      'After the deciding:',
+    ],
+    options: [
+      { id: 'a', label: 'It does not feel like giving something up — the choosing is the point, and the book closes', description: 'The settled form: the giving itself settles the question, and no audit runs afterwards.', weight: { commitment_sacrifice: 0.7 } },
+      { id: 'b', label: 'I give it, and I would be lying if I said I never look back at it', description: 'The honest ledger: real commitment with a quiet running total you mostly do not bill.', weight: { commitment_sacrifice: 0.2, scorekeeping: 0.2 } },
+      { id: 'c', label: 'I would need to know it was noticed — a sacrifice unseen becomes a debt uncollected', description: 'Recognition as the condition: the giving is real, and contingent on being seen as giving.', weight: { commitment_sacrifice: -0.4, scorekeeping: 0.4 } },
+      { id: 'd', label: 'I would shrink from it — the life I built is not a bargaining chip', description: 'Self-preservation as the ceiling: commitment stops where the built life starts.', weight: { commitment_sacrifice: -0.6, autonomy_connection: 0.3 } },
+    ],
+  },
+  {
+    id: 'q140',
+    layer: 5,
+    format: 'agreement',
+    prompt: ['"When I commit to someone, I stop running the arithmetic — what I gave up stops being a thing I count."'],
+    options: [
+      { id: '1', label: 'No — the arithmetic runs, and it is honest to say so', value: 1, description: 'The visible ledger: commitment with accounting attached, and you know it.', weight: { commitment_sacrifice: -0.6 } },
+      { id: '2', label: 'It slows down but never fully stops', value: 2, description: 'A quiet audit in the background: low volume, always on.', weight: { commitment_sacrifice: -0.3 } },
+      { id: '3', label: 'It depends what I gave up', value: 3, description: 'Selective accounting: some costs close their books, others stay open for years.', weight: { commitment_sacrifice: 0 } },
+      { id: '4', label: 'Mostly stops', value: 4, description: 'The books close for most things; the big ones take longer to settle.', weight: { commitment_sacrifice: 0.35 } },
+      { id: '5', label: 'Yes — the giving itself settles the question', value: 5, description: 'Investment that closes its own books: a way of being, not a running cost-benefit.', weight: { commitment_sacrifice: 0.7 } },
+    ],
+  },
+];
+
+export const QUESTIONS: Question[] = [...CORE_QUESTIONS, ...WAVE4_QUESTIONS, ...WAVE5_QUESTIONS];
 
 export const QUESTION_BY_ID: Record<string, Question> = Object.fromEntries(
   QUESTIONS.map((q) => [q.id, q]),
