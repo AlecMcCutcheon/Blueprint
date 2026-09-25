@@ -1,6 +1,6 @@
 import type { Blueprint, BlueprintSection, ConsistencyPair, DimensionId, ScoredProfile } from './types';
 import { DIMENSION_LABELS } from './types';
-import { DIMENSIONS, TIERS, TIER_LABELS, tierOf, VARIANCE_LIBRARY, genericVarianceFor } from './dimensions';
+import { DIMENSIONS, TIERS, TIER_LABELS, tierOf, TIER_VARIANTS, VARIANCE_LIBRARY, genericVarianceFor } from './dimensions';
 import { seededPick, hash, CHANNEL_LABELS, isInternallyDivided } from './scoring';
 import { buildPatternPlan, renderPattern } from './patterns';
 
@@ -67,13 +67,32 @@ function paragraphFor(dim: DimensionId, score: number, runSeed: number): string 
   const def = DIMENSIONS.find((d) => d.id === dim);
   if (!def) return '';
   const tier = tierOf(score);
-  const variants = def[tier];
+  let pool: string[] = def[tier];
+  // Alternate band prose: the legacy mhigh and high tiers share one base
+  // paragraph, so two profiles at the same band rendered identical text.
+  // The variant is chosen by POSITION WITHIN THE BAND — the lower half (a
+  // fresh arrival) reads the alternate, which is written as a flat-band
+  // claim; the upper half (approaching the next tier) reads the base, which
+  // carries the intensity suffix. That makes the split semantically
+  // meaningful and decorrelates profiles whose scores differ; the run seed
+  // only breaks exact ties inside a half-band.
+  let variantSeed = 0;
+  if (tier === 'mhigh' || tier === 'high') {
+    const alt = TIER_VARIANTS[dim]?.[tier] ?? TIER_VARIANTS[dim]?.mhigh;
+    if (alt) {
+      const bounds = tier === 'mhigh' ? [48, 62] : [62, 75];
+      const upperHalf = score >= bounds[0] + (bounds[1] - bounds[0]) / 2;
+      const tieBreak = seededPick([0, 1], hash(dim + String(score)) + runSeed * 31);
+      pool = [upperHalf ? pool[0] : alt, upperHalf ? alt : pool[0]];
+      variantSeed = tieBreak;
+    }
+  }
   // Per-run rotation: the run seed (derived from the answers themselves, so a
   // restored session always regenerates identically) decorates the stable
   // content seed — different runs at the same tier rotate their openers
   // without the text ever being random across regenerations.
-  const seed = hash(dim + String(Math.round(score / 7))) + runSeed * 31;
-  return calibrate(varyTierOpener(seededPick(variants, seed), seed));
+  const seed = hash(dim + String(Math.round(score / 7))) + runSeed * 31 + variantSeed;
+  return calibrate(varyTierOpener(seededPick(pool, seed), seed));
 }
 
 /** One-line tier readout (band chart tooltips, review screen). */

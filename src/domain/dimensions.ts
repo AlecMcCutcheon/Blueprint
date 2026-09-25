@@ -1017,3 +1017,99 @@ export const GENERIC_VARIANCE: string[] = [
 export function genericVarianceFor(seedKey: string): string {
   return seededPick(GENERIC_VARIANCE, hash(seedKey));
 }
+
+/**
+ * Alternate band paragraphs (the two bands real profiles actually land in).
+ * The legacy mhigh and high arrays share one base paragraph, so two different
+ * people at the same band previously rendered the identical prose. Each entry
+ * here is a second, fully standalone paragraph for the band — distinct opener,
+ * same factual claim, honest tone, no tier-specific intensity claims (it is
+ * used for both leaning-high and high). Selection is seeded per-run and
+ * deterministic: the same session always regenerates the same document.
+ */
+export const TIER_VARIANTS: Partial<Record<DimensionId, Partial<Record<'mhigh' | 'high', string>>>> = {
+  affection_daily: {
+    mhigh: 'Reaching comes naturally to you — the hand on the back in passing, the shoulder lean while something is on the stove. Your answers describe contact as a running background process: it does not wait for occasions, and a day or two without it is something you register and then correct. A partner rarely has to ask whether you are still glad they are there; they can feel it in the traffic — constant small evidence of proximity maintained.',
+  },
+  desire: {
+    mhigh: 'For you, desire is not a mood that visits — it is a signal that has to keep being sent. The message in the middle of the day, the look across a room, the evidence of being chosen rather than merely accommodated: these read to you as the difference between a partner and a housemate. Your answers suggest a partner could love you steadily and still leave you hungry if the wanting went quiet — and that you would notice long before you said anything.',
+  },
+  vulnerability_safety: {
+    mhigh: 'What people hand you in confidence stays handed. When an argument heats up, the temptation to reach for a disclosed soft spot is real, and your answers show you not reaching — declining the low blow even when it would have scored. That refusal is the thing people eventually describe as the reason they trusted you with the deep material: it never came back aimed at them.',
+  },
+  reassurance_security: {
+    mhigh: 'Unanswered questions about where you stand have a way of growing. Your answers show you managing the quiet stretches — coping, functioning — while a background thread keeps checking whether the distance means anything. You do not want to be talked down from ledges; you want the information that prevents the ledge: a plain sentence about someone\'s bad day arriving before you had to ask. Proactive clarity is what actually settles you.',
+  },
+  care_initiation: {
+    mhigh: 'You move first. The snack that was not asked for, the massage offered on the hard day, the errand absorbed before anyone mentioned it — in your scenarios, noticing and acting were the same step. This reads to people as being truly seen in the practical register: not told "let me know if you need anything," but simply finding it already handled. The attention to watch is the reverse direction — making sure you still let people anticipate you too.',
+  },
+  receiving_comfort: {
+    mhigh: 'Care offered to you gets to arrive. Your answers show no flinch at compliments, no reflex to split the bill on kindness, no need to repay a favor before it settles — being taken care of reads to you as love, not debt. That ease is rarer than it looks and it does real work: it lets the people who love you experience their own generosity landing, which is half of what anyone wants from giving.',
+  },
+  scorekeeping: {
+    mhigh: 'You run a long ledger, and mostly a closed one. Individual gestures in your answers carry no price tags — no one owes anyone for dinner or a favor — but the pattern over time is not invisible to you either: you notice when the giving runs one way for a season, and you expect it to bend back eventually without being invoiced. The fairness you practice is measured in years, and its one blind spot is silence — a chronic imbalance can normalize before you name it.',
+  },
+  express_receive_alignment: {
+    mhigh: 'There is a symmetry to how you love: what you naturally give and what naturally lands on you belong to the same dialect family. A partner can learn you by watching you — the way you care for people is a readable map of how you want to be cared for. That legibility is a quiet gift in a relationship: fewer translation errors, fewer unmet needs hiding behind different vocabularies.',
+  },
+  listening_first: {
+    mhigh: 'Your instinct is to hold the space open. When someone brings you something heavy, you do not reach for the fix, the reframe, or your own story — you let the sentence finish and then ask about what is inside it. People notice being heard at that level, and it changes what they bring you: more truth, earlier, less edited. The solutions can wait their turn, and in your answers, they usually do.',
+  },
+  logic_emotion_integration: {
+    mhigh: 'You keep two registers running without forcing either to translate for the other. Something happens: you can think it through, and you can feel it through, and your answers suggest you know which mode a moment calls for — without treating the other one as a failure. It is a rare integration: analysis that has not lost its warmth, feeling that has not lost its structure.',
+  },
+  curiosity_worlds: {
+    mhigh: 'Other people\'s enthusiasms pull you in. The explanation you do not understand and do not need to — you ask anyway, because the point is what it does to them when they talk about it. Your answers treat interest as a form of attention, and attention as a form of love: the person whose world you keep entering gets to feel worth entering. It is a quality people describe as feeling interesting for a lifetime rather than a season.',
+  },
+  perspective_taking: {
+    mhigh: 'You give people room. Before a story forms about why someone did the thing, your instinct is to widen it — check the facts, hold the alternate explanations, assume there is more underneath than visible. It makes you hard to feel misjudged by: the people around you get to be complicated without bracing for a verdict. The charity is not naïveté; your answers pair it with checking, not wishful thinking.',
+  },
+  direct_communication: {
+    mhigh: 'You do not let things ferment. When something bothers you, your answers route it into speech while it is still manageable — "this bothered me" said on day one rather than archived into resentment on day forty. Directness, for you, appears to be a form of respect: the relationship deserves real information, not archaeology. And you seem to want it in both directions, which matters as much as the giving.',
+  },
+  repair_orientation: {
+    mhigh: 'You come back. After the blowup or the cold stretch, your answers show you re-opening the conversation — apologizing specifically, asking what actually landed, treating the bad interaction as information rather than a verdict on anyone. Conflicts around you tend to end faster and leave less residue, because someone keeps insisting on the return. That someone is usually you.',
+  },
+  same_side_problems: {
+    mhigh: 'Problems in your answers get externalized fast. The broken thing, the tight month, the complicated relative — your first instinct reframes it as a shared situation before anyone has to become the defendant. Standing next to you in a crisis apparently feels like accompaniment rather than audit, and that is the quality partners describe as "we can get through anything" — earned, in your case, at the level of reflex.',
+  },
+  autonomy_connection: {
+    mhigh: 'You do not treat closeness and separateness as opposites. Your answers hold real comfort with a partner\'s separate life — their hobbies, their friendships, their quiet — right next to a strong pull toward connection. The combination reads as secure rather than avoidant: space does not register as rejection, and togetherness does not register as loss of self. Calibration, not commitment, is the ongoing work.',
+  },
+  shared_home_effort: {
+    mhigh: 'The household\'s invisible labor does not stay invisible to you. You notice what needs doing and mostly just do it — the researched fix, the phone call absorbed, the thing handled before it was announced as a task. Your answers also favor a home where the mental load is speakable: ask without shame, answer honestly, extend the same grammar back. The watch-item is the classic one — competence that never announces itself can mute its own recognition.',
+  },
+  relational_privacy: {
+    mhigh: 'What happens between you stays between you by default. Your answers draw a firm frame around the relationship\'s contents: counsel from a trusted voice is welcome when genuinely needed, but there is no audience to perform for and no jury to poll. It reads as protection rather than secrecy — the privacy is what lets the people close to you risk being imperfect without becoming a story someone else tells.',
+  },
+  sexual_communication: {
+    mhigh: 'In your answers, nothing in intimacy has to go unsaid. Wants, limits, curiosities, the things that are not working — they are framed as conversation rather than confession, and the ease extends to hearing a partner\'s map without flinching. Research ties this speakability to both sexual and relationship satisfaction more strongly than almost anything else, and it comes with a corollary your answers already carry: nobody has to perform a script they cannot edit.',
+  },
+  positivity_play: {
+    mhigh: 'Flat time does not stay flat around you. Your answers show you seeding lightness deliberately — the invented walk, the dumb movie, the project nobody planned — treating shared fun as something grown rather than waited for. Play, for you, is maintenance work you actually enjoy, and its payoff compounds: the couple that laughs keeps wanting each other, and you seem to know it.',
+  },
+  capitalization: {
+    mhigh: 'Good news gets a reception at your place. Your answers chose the full-body response to someone\'s win — put it down, turn around, start from the beginning — the active-constructive pattern that turns a report into a bond. People who live with you likely experience their victories as bigger for having told you, and they learn where joy goes to land.',
+  },
+  conflict_engagement: {
+    mhigh: 'You do not leave the ring. Your answers show you staying in hard conversations at full heat — defending your position while genuinely tracking theirs, reaching for the brake ("let\'s name the temperature") instead of the counterattack. Disagreement, in your make-up, does not have to become damage; it can just be the two of you working. That is a learnable skill, and your answers suggest you already learned it.',
+  },
+  commitment_sacrifice: {
+    mhigh: 'When you give something up for the relationship, the giving settles it. Your answers show no running invoice, no background cost-benefit — sacrifice reads as constitutive, part of what choosing someone meant. The upside is a steadiness partners can build on; the caution is proportionality — make sure the same arithmetic-free door swings both ways, because one-way carrying is the only load this generosity cannot absorb.',
+  },
+  money_coordination: {
+    mhigh: 'You frame money as a shared project rather than a private scoreboard. Equal seriousness for both people\'s spending when the bills are paid, early information when the month is tight, no trial for the unannounced purchase the foundation can absorb — your answers describe a teammate economy, revisable out loud, without double standards. It is rarer than it sounds, and it removes one of the standard couple fights before it starts.',
+  },
+  desire_initiation: {
+    mhigh: 'You are willing to move first — and you are willing to hear no. Your answers describe initiation without bracing: the move gets made, and when it does not land, the sting is brief and real and does not curdle into withdrawal or score-keeping. That recovery is the rare and load-bearing part; it is what makes you safe to want things around, because your wanting does not turn into pressure the moment it is not immediately matched.',
+  },
+  intimacy_attunement: {
+    mhigh: 'You track the unworded. Drift, hesitation, the difference between want and willingness — your answers show you noticing, adjusting, and checking when unsure rather than hoping. Bodies\' off days read to you as information, not verdicts, which is precisely the attunement the research links to lasting satisfaction. A partner never has to perform okay-ness with you; you would catch the performance anyway.',
+  },
+  feedback_receiving: {
+    mhigh: 'Hard feedback gets a full hearing from you before anything fires back. Your answers suggest the defense reflex does not get the first word — curiosity does: what took them so long to tell me, what am I missing. The people close to you can say the true thing while it is still small, because they have learned it lands. That is among the rarer and more load-bearing skills a relationship can run on.',
+  },
+  external_processing: {
+    mhigh: 'A trusted outside voice is part of your thinking apparatus. Your answers treat talking something through — openly, declared, aimed at understanding — as a legitimate way to untangle it, and they extend the same permission to a partner. The line you keep is not about silence; it is about consent: processing declared is collaboration, processing discovered is exclusion. You know the difference, and it shows.',
+  },
+};

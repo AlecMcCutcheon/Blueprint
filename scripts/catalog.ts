@@ -5,7 +5,7 @@
 // Usage: npx esbuild scripts/catalog.ts --bundle --platform=node --format=cjs --outfile=/tmp/catalog.cjs && node /tmp/catalog.cjs
 import { writeFileSync } from 'fs';
 import { PATTERNS, marginFor } from '../src/domain/patterns';
-import { DIMENSIONS, VARIANCE_LIBRARY, GENERIC_VARIANCE, TIER_BOUNDS } from '../src/domain/dimensions';
+import { DIMENSIONS, VARIANCE_LIBRARY, GENERIC_VARIANCE, TIER_BOUNDS, TIER_VARIANTS } from '../src/domain/dimensions';
 import { DIMENSION_LABELS, type ScoredProfile, type DimensionId } from '../src/domain/types';
 
 const dimName = (d: string) => DIMENSION_LABELS[d as DimensionId] ?? d;
@@ -84,6 +84,16 @@ for (const [id, text] of Object.entries(VARIANCE_LIBRARY)) {
 }
 lines.push(`- **generic (seeded, ${GENERIC_VARIANCE.length} variants):** ${GENERIC_VARIANCE[0]}`);
 lines.push('');
+lines.push('## Band-variant paragraphs (alternate prose for the mhigh/high bands)');
+lines.push('');
+lines.push('Selection: the lower half of a band reads the alternate (flat-band claim); the upper half reads the base paragraph (which carries the intensity suffix). The run seed breaks exact ties. Fallback: a dimension without a band-specific high variant uses its mhigh alternate.');
+lines.push('');
+for (const [id, variants] of Object.entries(TIER_VARIANTS)) {
+  for (const [band, text] of Object.entries(variants as Record<string, string>)) {
+    lines.push(`- **${id} — ${dimName(id)} (${band}):** ${text}`);
+  }
+}
+lines.push('');
 
 writeFileSync('PATTERN_CATALOG.md', lines.join('\n'), 'utf8');
-console.log(`PATTERN_CATALOG.md written: ${PATTERNS.length} patterns, ${DIMENSIONS.reduce((n, d) => n + Object.keys(d.interplay ?? {}).length, 0)} interplay keys, ${Object.keys(VARIANCE_LIBRARY).length + 1} variance entries.`);
+console.log(`PATTERN_CATALOG.md written: ${PATTERNS.length} patterns, ${DIMENSIONS.reduce((n, d) => n + Object.keys(d.interplay ?? {}).length, 0)} interplay keys, ${Object.keys(VARIANCE_LIBRARY).length + 1} variance entries, ${Object.values(TIER_VARIANTS).reduce((n, v) => n + Object.keys(v ?? {}).length, 0)} band variants.`);
