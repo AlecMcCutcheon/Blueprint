@@ -112,7 +112,10 @@ answered count; and that share links carry name/intent without ever leaking into
 
 Additional tooling under `scripts/`: `harness.ts` (pattern fire rates across 540 seeded
 profiles), `auditmine.ts` (per-dimension evidence contributions), `catalog.ts`
-(regenerates the pattern catalog).
+(regenerates the pattern catalog), and `opposite-session.ts` (builds a session that
+answers every question maximally against a source session — the divergence stress test:
+23/28 dimensions move >15 points and the generated documents share under 10% of
+paragraphs).
 
 ## License
 
