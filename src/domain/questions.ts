@@ -290,14 +290,14 @@ const CORE_QUESTIONS: Question[] = [
       },
       {
         id: 'c',
-        label: 'I feel accused and want to explain myself.',
-        description: 'Defense first — human, and usually the wrong first move. The explanation exists, but it needs to wait its turn.',
+        label: 'I feel the pull to explain myself first.',
+        description: 'The explanation arrives before the hearing — a common sequence, and one worth knowing the cost of.',
         weight: { repair_orientation: -0.5, listening_first: -0.4 },
       },
       {
         id: 'd',
-        label: '"I don\'t know if they\'re being fair, but I want to hear them out."',
-        description: 'You hold both truths: your intent and their experience. Fairness deferred in favor of understanding.',
+        label: 'I\'d want to hear them out, though part of me would still be checking whether they were being fair.',
+        description: 'Their experience and your fairness both stay in the room — the hearing starts while the verdict is suspended.',
         weight: { perspective_taking: 0.6, listening_first: 0.5, repair_orientation: 0.3 },
       },
     ],
@@ -494,26 +494,26 @@ const CORE_QUESTIONS: Question[] = [
     options: [
       {
         id: 'a',
-        label: 'Take it. Fully. Let my brain switch off and just be taken care of.',
-        description: 'You can receive without instantly paying. This is the rarer half of generosity — and it lets people love you properly.',
+        label: 'Take it. Let my brain switch off and just be taken care of.',
+        description: 'Receiving without instant repayment: the care is enjoyed as care, not filed as a debt.',
         weight: { receiving_comfort: 0.9, scorekeeping: -0.2 },
       },
       {
         id: 'b',
-        label: 'Take it — but tomorrow I owe them one, and I\'ll make sure.',
-        description: 'The care gets enjoyed — and instantly converted into something owed. Rest can wait until the books feel balanced.',
+        label: 'Take it — and part of me is already thinking about how I\'ll return it.',
+        description: 'The care is enjoyed, and the return trip is scheduled before the massage ends.',
         weight: { receiving_comfort: 0.3, scorekeeping: 0.7 },
       },
       {
         id: 'c',
-        label: '"You don\'t have to do that" — wave it off, I\'m fine.',
-        description: 'Turning care away is a reflex: being attended to can feel like spending someone else\'s energy, so you decline first.',
+        label: 'Appreciate it, but my first instinct is to say they don\'t have to.',
+        description: 'Being attended to can feel like spending someone else\'s energy, so the decline arrives before the acceptance would.',
         weight: { receiving_comfort: -0.8 },
       },
       {
         id: 'd',
         label: 'Take it, and ask if they want one too when it\'s done.',
-        description: 'Generous instinct — the question is whether it\'s warmth or the debt-relief reflex wearing warmth\'s clothes.',
+        description: 'Warmth answered with warmth — the question is whether the return is care or the debt-relief reflex wearing its clothes.',
         weight: { receiving_comfort: 0.2, care_initiation: 0.4, scorekeeping: 0.3 },
       },
     ],
@@ -665,20 +665,20 @@ const CORE_QUESTIONS: Question[] = [
     options: [
       {
         id: 'a',
-        label: '"If they loved me, I shouldn\'t have to ask for the things I need."',
-        description: 'Love as anticipation: asking can feel like proof it doesn\'t count — a belief that quietly sets partners up to miss.',
+        label: 'I want someone who notices what I need without always being asked.',
+        description: 'Anticipation as the standard: asking can feel like proof it doesn\'t count — a belief worth knowing you hold.',
         weight: { direct_communication: -0.7, care_initiation: 0.3, reassurance_security: 0.3 },
       },
       {
         id: 'b',
-        label: '"Asking is how love stays honest — but I still want them to sometimes think of it first."',
-        description: 'The mature version of the same wish: you\'ll use your words, and you still melt when the words aren\'t needed.',
+        label: 'I\'m comfortable asking — and being anticipated anyway still means something special to me.',
+        description: 'Words are the operating system; anticipation is the bonus layer. Both are real at once.',
         weight: { direct_communication: 0.6, care_initiation: 0.4 },
       },
       {
         id: 'c',
-        label: '"Nobody\'s a mind reader. If I need something, I ask. Full stop."',
-        description: 'Clean directness with no nostalgia for telepathy. Your partners always know where they stand — and what you want.',
+        label: 'I\'d rather ask directly than expect someone to figure it out.',
+        description: 'Directness as the whole policy: your partners always know where they stand — and what you want.',
         weight: { direct_communication: 0.8, reassurance_security: -0.3 },
       },
     ],
@@ -699,7 +699,7 @@ const CORE_QUESTIONS: Question[] = [
       {
         id: 'b',
         label: '"Care is care even when nothing comes back — but over years, both people should want to carry."',
-        description: 'Communal at the core with a long memory for patterns. You don\'t tally Tuesdays; you notice decades.',
+        description: 'Communal at the core: reciprocity evaluated as a long-term pattern rather than individual exchanges.',
         weight: { scorekeeping: 0.2, care_initiation: 0.3, same_side_problems: 0.2 },
       },
       {
@@ -766,8 +766,8 @@ const CORE_QUESTIONS: Question[] = [
     options: [
       {
         id: 'a',
-        label: '"I\'m glad you love it — it\'s not my favorite on you, but your happiness wins."',
-        description: 'Honesty wrapped in warmth. They get the truth and the priority in the same sentence.',
+        label: '"I\'m glad you love it — it\'s not my favorite on you, but it\'s your haircut."',
+        description: 'The opinion and the ownership both get said: your view is real, and the haircut is theirs.',
         weight: { direct_communication: 0.6, vulnerability_safety: 0.3, perspective_taking: 0.2 },
       },
       {
@@ -778,14 +778,14 @@ const CORE_QUESTIONS: Question[] = [
       },
       {
         id: 'c',
-        label: 'The truth, plainly. They asked.',
-        description: 'Respect for their question as a real request. Some partners feel respected by this; others feel ambushed by it.',
+        label: 'My actual opinion, directly — they asked for it.',
+        description: 'The question is treated as a real request for information. Some partners feel respected by this; others feel ambushed by it.',
         weight: { direct_communication: 0.7, vulnerability_safety: -0.2 },
       },
       {
         id: 'd',
         label: 'Something honest but angled — "I liked it a bit shorter" — without a verdict on this one.',
-        description: 'You steer by preference without delivering judgment. Smooth, though the truth arrives in installments.',
+        description: 'You answer with what you\'d prefer rather than a verdict on this one — preference instead of judgment.',
         weight: { direct_communication: 0.3, perspective_taking: 0.4 },
       },
     ],
@@ -802,8 +802,8 @@ const CORE_QUESTIONS: Question[] = [
     options: [
       {
         id: 'a',
-        label: 'Listen again. Being heard the third time matters more than being efficient.',
-        description: 'You understand that repetition is processing. The story shrinks each night it\'s told — if someone keeps hearing it.',
+        label: 'Listen again — the repetition is probably the processing.',
+        description: 'The story shrinks each night it\'s told — if someone keeps hearing it.',
         weight: { listening_first: 0.8, perspective_taking: 0.3 },
       },
       {
@@ -815,13 +815,13 @@ const CORE_QUESTIONS: Question[] = [
       {
         id: 'c',
         label: 'Start problem-solving out loud — three nights of this means the ideas aren\'t landing.',
-        description: 'Efficiency over empathy. Useful if asked for; premature almost every other time.',
+        description: 'You meet the third telling with solutions instead of another hearing — efficiency first, at the risk of the story not being done.',
         weight: { listening_first: -0.6, logic_emotion_integration: 0.4 },
       },
       {
         id: 'd',
         label: 'Listen, but I\'d be honest later that the loop is wearing on me.',
-        description: 'You sustain the listening, then close the loop with your own truth instead of letting resentment stockpile.',
+        description: 'The listening happens, and your own limit gets said too — both facts get their turn.',
         weight: { listening_first: 0.4, direct_communication: 0.5, scorekeeping: 0.2 },
       },
     ],
@@ -856,8 +856,8 @@ const CORE_QUESTIONS: Question[] = [
       },
       {
         id: 'd',
-        label: 'Keep a quiet tally of who\'s carried more — and if it keeps running one way, say so.',
-        description: 'Fairness matters most when you\'re running on empty. The tally is usually protection against being taken for granted — saying it out loud works better than carrying it quietly.',
+        label: 'Hold the usual division anyway — exhaustion doesn\'t suspend fairness.',
+        description: 'Fairness keeps running while capacity drops: the split stays normal even on empty, and a partner may or may not read it the same way.',
         weight: { scorekeeping: 0.8, shared_home_effort: -0.3 },
       },
     ],
@@ -880,20 +880,20 @@ const CORE_QUESTIONS: Question[] = [
       },
       {
         id: 'b',
-        label: 'Drop it. If their plate is full, pressing makes me the extra weight.',
-        description: 'You yield to their capacity. Kind — but the thing never gets resolved and quietly joins the unspoken pile.',
+        label: 'Let it go for now — their plate is full, and it can be raised later.',
+        description: 'Timing over resolution: the issue waits for a better week, and whether it ever gets its day is the thing to watch.',
         weight: { direct_communication: -0.6, perspective_taking: 0.4 },
       },
       {
         id: 'c',
-        label: '"Busy is an explanation, not an excuse." Hold the line.',
-        description: 'You keep accountability non-negotiable. Clear — though delivered as a verdict, it ends the conversation it needed to start.',
+        label: 'Stay on the issue — I don\'t want the explanation to quietly end the conversation.',
+        description: 'Accountability without a verdict: the topic survives their defense, whatever your tone does with it.',
         weight: { direct_communication: 0.5, perspective_taking: -0.4 },
       },
       {
         id: 'd',
-        label: 'Feel it, say it\'s fine, and privately note that my things come last.',
-        description: 'The withdrawal pattern: outward grace, inward tally. The resentment is real but never gets its day in court.',
+        label: 'Tell them it bothered me, but say I\'m not looking to solve it tonight.',
+        description: 'The feeling gets voiced and the repair gets scheduled — both halves named, neither litigated at 10pm.',
         weight: { scorekeeping: 0.6, direct_communication: -0.5, receiving_comfort: -0.2 },
       },
     ],
@@ -952,14 +952,14 @@ const CORE_QUESTIONS: Question[] = [
       },
       {
         id: 'b',
-        label: 'Step in. "Ours" means our problems — I\'d want them in mine.',
-        description: 'Full merger as loyalty. Powerful when welcomed; heavy when the other person needed to carry their own thing.',
+        label: 'Step in more fully — I\'d want them in mine, so I\'m in theirs.',
+        description: 'Crisis as shared territory: loyalty expressed as presence. Powerful when welcomed; heavy when they needed to carry it alone.',
         weight: { same_side_problems: 0.6, autonomy_connection: -0.3, care_initiation: 0.3 },
       },
       {
         id: 'c',
-        label: 'Accept it at face value and stay out of it.',
-        description: 'Boundaries respected literally. Safe — though "I\'ve got this" sometimes means "I don\'t know how to ask."',
+        label: 'Take their request literally and wait for them to ask.',
+        description: 'The line is honored exactly as drawn. Safe — though "I\'ve got this" sometimes means "I don\'t know how to ask."',
         weight: { autonomy_connection: 0.4, care_initiation: -0.4, perspective_taking: -0.2 },
       },
       {
@@ -1031,14 +1031,14 @@ const CORE_QUESTIONS: Question[] = [
       },
       {
         id: 'c',
-        label: 'Match it — reach for something of theirs. They escalated first.',
-        description: 'The vault opens in both directions — a wounded reflex, not a strategy. The original topic disappears; the wounds become the argument.',
+        label: 'Part of me wants to reach for something of theirs too — they escalated first.',
+        description: 'The reciprocity reflex under wound: the vault threatens to open in both directions, and the argument changes subject.',
         weight: { vulnerability_safety: -0.9, repair_orientation: -0.4 },
       },
       {
         id: 'd',
-        label: 'Something closes. The fight ends for me here — trust took the hit.',
-        description: 'You exit via shutdown. The disclosure-as-weapon gets no counterpunch, but also no repair — just a door that locks.',
+        label: 'My trust in the conversation changes — I get much more guarded from there.',
+        description: 'The counterpunch never comes, but neither does the repair: the guard goes up and stays up.',
         weight: { vulnerability_safety: 0.3, repair_orientation: -0.5, listening_first: -0.3 },
       },
     ],
@@ -1213,7 +1213,7 @@ const CORE_QUESTIONS: Question[] = [
     layer: 4,
     format: 'rank_most',
     prompt: [
-      'You just won an argument. Completely, objectively, undeniably. Your partner has gone quiet.',
+      'An argument ends with your position clearly the one supported by what happened. Your partner has gone quiet.',
       'Which thought follows?',
     ],
     options: [
@@ -1283,14 +1283,14 @@ const CORE_QUESTIONS: Question[] = [
       },
       {
         id: 'c',
-        label: 'Point out all the reassurance that\'s already there.',
-        description: 'You answer the need with the record — accurate, perhaps, but the reassurance itself still hasn\'t arrived.',
+        label: 'Reassure them, but point out the reassurance that\'s already there.',
+        description: 'The comfort arrives with the record attached — evidence given where a feeling was requested.',
         weight: { direct_communication: -0.4, listening_first: -0.5, perspective_taking: -0.3 },
       },
       {
         id: 'd',
-        label: 'Feel a flicker of "is this ever enough?" — and say something careful.',
-        description: 'The demand alarm rings quietly. Your response stays kind, but the question now lives in the room.',
+        label: 'Feel a flicker of overwhelm — and say something careful anyway.',
+        description: 'The ask registers as a lot before it registers as a need; the response stays kind with the strain inside it.',
         weight: { reassurance_security: -0.5, direct_communication: 0.2 },
       },
     ],
@@ -1380,7 +1380,7 @@ const CORE_QUESTIONS: Question[] = [
       {
         id: 'a',
         label: '"Yeah, I\'ve got it." No drama, no invoice.',
-        description: 'The two-word answer your document names as the ideal. Carried without a receipt.',
+        description: 'Carried without a receipt: the chore gets done and no invoice is opened.',
         weight: { shared_home_effort: 0.8, scorekeeping: -0.3 },
       },
       {
@@ -1410,7 +1410,7 @@ const CORE_QUESTIONS: Question[] = [
     format: 'scenario',
     prompt: [
       'You knock over a glass of wine — onto your partner\'s laptop. Their work laptop. It won\'t turn on.',
-      'What actually happens in the next five minutes?',
+      'The first thing your mind does is closest to:',
     ],
     options: [
       {
@@ -1540,7 +1540,7 @@ const CORE_QUESTIONS: Question[] = [
       {
         id: 'c',
         label: 'Go item by item and negotiate what\'s actually necessary.',
-        description: 'Efficiency first. Possibly useful triage — delivered at the exact moment they needed lifting, not auditing.',
+        description: 'Triage before lifting: the list gets sorted before anyone gets carried.',
         weight: { shared_home_effort: 0.2, listening_first: -0.4 },
       },
       {
@@ -1673,9 +1673,9 @@ const CORE_QUESTIONS: Question[] = [
       'Your first internal reaction is closest to:',
     ],
     options: [
-      { id: 'a', label: '"That\'s really sweet." Warmth, received, no strings detected.', description: 'Care lands as care. The simplest and rarest reception.', weight: { receiving_comfort: 0.8, scorekeeping: -0.2 } },
-      { id: 'b',        label: '"What did I do to deserve this?" — part gratitude, part scanning.', description: 'Kindness triggers the audit before the gratitude.', weight: { receiving_comfort: -0.5, scorekeeping: 0.4 } },
-      { id: 'c', label: '"Now I should do something for them."', description: 'Receiving converts instantly into owing. Generous — and unable to let a gift stay a gift.', weight: { scorekeeping: 0.6, receiving_comfort: 0.1 } },
+      { id: 'a', label: '"That\'s really sweet." Warmth, received, no strings detected.', description: 'Care lands as care — received, full stop.', weight: { receiving_comfort: 0.8, scorekeeping: -0.2 } },
+      { id: 'b',        label: '"What did I do to deserve this?" — part gratitude, part scanning.', description: 'Gratitude and the scan arrive together: part thanks, part search for the catch.', weight: { receiving_comfort: -0.5, scorekeeping: 0.4 } },
+      { id: 'c', label: '"Now I should do something for them."', description: 'Receiving converts into a return trip — the gift starts a ledger in your head.', weight: { scorekeeping: 0.6, receiving_comfort: 0.1 } },
       { id: 'd', label: 'I appreciate it, but I\'d rather they just tell me what they actually need.', description: 'You discount unconditional gestures in favor of explicit requests.', weight: { receiving_comfort: -0.3, direct_communication: 0.4 } },
     ],
     diagnosticWeight: 1.2,
@@ -1707,7 +1707,7 @@ const CORE_QUESTIONS: Question[] = [
     ],
     options: [
       { id: 'a', label: 'Everything — being planned for is being cared for. I\'d love every minute.', description: 'You can be swept up. Receiving effort feels like being valued, not managed.', weight: { receiving_comfort: 0.7, care_initiation: 0.2 } },
-      { id: 'b', label: 'A lot — and I\'d spend part of it hoping I react well enough.', description: 'Enjoyment with a performance review attached. Their effort becomes your obligation to display gratitude correctly.', weight: { receiving_comfort: 0.2, scorekeeping: 0.3 } },
+      { id: 'b', label: 'A lot — and I\'d spend part of it hoping I react well enough.',        description: 'Enjoyment with self-monitoring attached: part of the day is spent watching how well you react to it.', weight: { receiving_comfort: 0.2, scorekeeping: 0.3 } },
       { id: 'c', label: 'The gesture matters more than the itinerary — I\'d rather have the impulse than the schedule.', description: 'You value being wanted but resist being arranged. Spontaneity is your preferred dialect of desire.', weight: { desire: 0.4, autonomy_connection: 0.3 } },
       { id: 'd', label: 'A fully scheduled day would make me restless — I\'d rather choose things together.', description: 'Receiving organized care can feel like losing agency. Worth knowing — partners who plan for you are trying to speak your language.', weight: { receiving_comfort: -0.5, autonomy_connection: 0.5 } },
     ],
@@ -1795,7 +1795,7 @@ const CORE_QUESTIONS: Question[] = [
       // receiving_comfort micro-weights added: this question is the declared
       // echo of q14 on that dimension, and its options previously carried no
       // weights there — which made the pair's tension direction one-sided.
-      { id: 'a', label: 'Nothing that needs answering. I cooked because they needed it; the carrying shifts around.', description: 'Two weeks of giving leaves no invoice. The communal orientation, under exactly the test that breaks it.', weight: { scorekeeping: -0.8, shared_home_effort: 0.3, receiving_comfort: 0.25 } },
+      { id: 'a', label: 'Nothing that needs answering. I cooked because they needed it; the carrying shifts around.', description: 'Two weeks of giving leaves no invoice — the long-horizon orientation, under exactly its test case.', weight: { scorekeeping: -0.8, shared_home_effort: 0.3, receiving_comfort: 0.25 } },
       { id: 'b', label: 'Warmth — and a thought: "I wouldn\'t mind them taking a night soon."', description: 'A wish, not a bill. You notice the arc and hope for rotation without demanding it.', weight: { scorekeeping: -0.2, shared_home_effort: 0.3, receiving_comfort: 0.1 } },
       { id: 'c', label: 'A small ache: I\'ve been carrying this alone a while, and I\'d like a turn being taken care of.', description: 'Sustained one-way giving wakes the fairness watcher in you — and underneath it often sits something tenderer: wanting your own turn to be cared for.', weight: { scorekeeping: 0.8, receiving_comfort: -0.2 } },
       { id: 'd', label: 'I\'d say something tonight, lightly: "Your turn tomorrow, chef." Honest, in the moment.', description: 'You surface the imbalance verbally instead of silently tallying. Direct about the rotation, not resentful of the past.', weight: { scorekeeping: 0.2, direct_communication: 0.6, shared_home_effort: 0.2 } },
@@ -1900,33 +1900,33 @@ const CORE_QUESTIONS: Question[] = [
     layer: 5,
     format: 'scenario',
     prompt: [
-      'A group chat you\'re in is trading screenshots of a friend\'s text arguments, everyone picking sides for fun.',
-      'Your partner\'s messages from last night\'s disagreement are sitting right there in your phone.',
+      'A friend asks to see screenshots of a disagreement you had with your partner — they want to understand what happened, they say.',
+      'Your partner\'s messages from last night are sitting right there in your phone.',
       'What do you do?',
     ],
     options: [
       {
         id: 'a',
-        label: 'Nothing goes in. I scroll past — my relationship\'s texts aren\'t content.',
-        description: 'The two-person frame holds even as entertainment; what your partner wrote to you is not community property.',
+        label: 'Nothing gets shared. My relationship\'s texts aren\'t content.',
+        description: 'The two-person frame holds even when someone kind is asking; what your partner wrote to you is not community property.',
         weight: { relational_privacy: 0.8, vulnerability_safety: 0.3 },
       },
       {
         id: 'b',
-        label: 'Share one harmless screenshot — it\'s funny, nothing identifying, and this is what the chat is for.',
-        description: 'For you the boundary is identifying detail, not membership — the chat is a trusted room and you share inside it.',
+        label: 'Share one harmless screenshot — nothing identifying, and they\'re asking.',
+        description: 'For you the boundary is identifying detail, not membership — a trusted friend is a room you share inside.',
         weight: { relational_privacy: -0.2, vulnerability_safety: -0.1 },
       },
       {
         id: 'c',
-        label: 'Join in with your own story about last night — same energy as everyone else.',
-        description: 'The group is where your conflicts go to be processed; the boundary between chat and relationship barely registers for you.',
+        label: 'Give them the real story — including what your partner said.',
+        description: 'Your conflicts get processed out loud; the boundary between friend and relationship barely registers for you.',
         weight: { relational_privacy: -0.7, vulnerability_safety: -0.2 },
       },
       {
         id: 'd',
-        label: 'Say the group is getting mean, and change the subject.',
-        description: 'You decline the genre entirely and protect someone else\'s privacy too — the boundary is a value, not just a preference about your own stuff.',
+        label: 'Decline, and offer to talk it through generally instead.',
+        description: 'You decline the share but keep the conversation — the boundary protects, and it doesn\'t have to be a wall.',
         weight: { relational_privacy: 0.5, vulnerability_safety: 0.4, repair_orientation: 0.2 },
       },
     ],
@@ -2021,7 +2021,7 @@ const CORE_QUESTIONS: Question[] = [
       {
         id: 'a',
         label: 'Let them handle their family however they usually do — I stay out of the call.',
-        description: 'Family lanes are distinct in your model. Respectful of their autonomy — though worth checking they agree on where the line sits.',
+        description: 'Family lanes are distinct in your model: their call, their handling. The line works as long as you both see it the same way.',
         weight: { relational_privacy: 0.3, autonomy_connection: 0.3 },
       },
       {
@@ -2033,7 +2033,7 @@ const CORE_QUESTIONS: Question[] = [
       {
         id: 'c',
         label: 'The honest reason goes out — we skipped for us, and that\'s the whole answer.',
-        description: 'Transparency as default. Boundaries live in tone here, not in what\'s disclosed.',
+        description: 'Transparency as default: the truth goes out, and the boundary lives in tone rather than in what\'s disclosed.',
         weight: { relational_privacy: -0.4, direct_communication: 0.2 },
       },
       {
@@ -2091,7 +2091,7 @@ const CORE_QUESTIONS: Question[] = [
       {
         id: 'd',
         label: 'Tell them — the sibling is close to you too, and family shouldn\'t hear things from strangers.',
-        description: 'Loyalty runs wider than the couple in your model. Understandable — and your partner may find out what got shared.',
+        description: 'Loyalty runs wider than the couple in your model: to you, family hearing things from strangers is the worse outcome.',
         weight: { relational_privacy: -0.6, vulnerability_safety: -0.2 },
       },
     ],
@@ -2529,12 +2529,13 @@ const CORE_QUESTIONS: Question[] = [
     layer: 4,
     format: 'agreement',
     prompt: ['"I can be fully happy for the wins of someone I love — even the ones that are inconvenient for me."'],
+    // (Label 5's former description — "the rarest form of generosity" — was
     options: [
       { id: '1', label: 'Hard to say honestly', value: 1, description: 'Envy or cost speaks first for you — their wins sometimes arrive as subtraction.', weight: { capitalization: -0.5 } },
       { id: '2', label: 'Mostly, with friction', value: 2, description: 'The happiness is real but arrives second, after the cost has had its say.', weight: { capitalization: -0.25 } },
       { id: '3', label: 'Usually', value: 3, description: 'Delight comes through more often than not, with occasional static from the price tag.', weight: { capitalization: 0 } },
       { id: '4', label: 'Almost always', value: 4, description: 'Their wins land as additions. The friction is rare enough to be an event.', weight: { capitalization: 0.3 } },
-      { id: '5', label: 'That\'s genuinely me', value: 5, description: 'Their wins register as additions to your life. The rarest form of generosity — delight without invoice.', weight: { capitalization: 0.5 } },
+      { id: '5', label: 'That\'s genuinely me', value: 5, description: 'Their wins register as additions to your life — delight without invoice.', weight: { capitalization: 0.5 } },
     ],
     diagnosticWeight: 0.8,
   },
@@ -3008,25 +3009,29 @@ const WAVE4_QUESTIONS: Question[] = [
     id: 'q116',
     layer: 5,
     format: 'agreement',
-    prompt: ['"I have given up something large for a relationship and, looking back, I would make the same trade again."'],
+    // Hypothetical conversion (design review): the retrospective required a
+    // large trade to have already happened; now anyone can answer it.
+    prompt: ['"If being with someone required giving up something substantial in my current life, I could imagine making that trade without keeping score afterward."'],
     options: [
-      { id: '1', value: 1, label: 'Never made one large enough to count.', description: 'No data on the large trades yet — worth noticing, not judging.', weight: { commitment_sacrifice: 0 } },
-      { id: '2', value: 2, label: 'Made one, and part of me still resents the cost.', description: 'The trade happened; the books did not settle.', weight: { commitment_sacrifice: -0.4 } },
-      { id: '3', value: 3, label: 'Made one, mixed — I would again, with some wincing.', description: 'The trade settled, mostly, over time.', weight: { commitment_sacrifice: 0.15 } },
-      { id: '4', value: 4, label: 'Made one, and it settled cleanly.', description: 'Giving that closed its own books, proven by hindsight.', weight: { commitment_sacrifice: 0.4 } },
-      { id: '5', value: 5, label: 'Yes — the trade IS the proof of what it was.', description: 'Commitment as constitutive; the cost was the point.', weight: { commitment_sacrifice: 0.6 } },
+      { id: '1', value: 1, label: 'Hard to imagine — I don\'t know what I\'d give up or how I\'d feel about it.', description: 'The trade has not been priced yet in your head — no data either way.', weight: { commitment_sacrifice: 0 } },
+      { id: '2', value: 2, label: 'I could, but the cost would keep running through my head afterward.', description: 'The trade happens and the books stay open.', weight: { commitment_sacrifice: -0.4 } },
+      { id: '3', value: 3, label: 'I could make the trade — I\'d wince at it sometimes.', description: 'Mostly settled, with an occasional look back.', weight: { commitment_sacrifice: 0.15 } },
+      { id: '4', value: 4, label: 'I could, and I\'d let the books close.', description: 'Giving that closes its own books.', weight: { commitment_sacrifice: 0.4 } },
+      { id: '5', value: 5, label: 'I could — the trade itself would settle it.', description: 'Commitment as constitutive; the cost was the point.', weight: { commitment_sacrifice: 0.6 } },
     ],
   },
   {
     id: 'q117',
     layer: 4,
     format: 'agreement',
-    prompt: ['"I have specific playful things I do with a partner — bits, jokes, rituals — that I would miss if they stopped."'],
+    // Hypothetical conversion (design review): answerable without a history
+    // of partnered playfulness.
+    prompt: ['"If a relationship developed its own little jokes and rituals, I\'d probably come to miss them if they disappeared."'],
     options: [
       { id: '1', value: 1, label: 'Not really — my playfulness is more general mood than specific bits.', description: 'Play as atmosphere rather than repertoire.', weight: { positivity_play: -0.4 } },
       { id: '2', label: 'A little', value: 2, description: 'One or two, more accidental than cultivated.', weight: { positivity_play: -0.15 } },
       { id: '3', label: 'Some', value: 3, description: 'A few real ones, not a repertoire.', weight: { positivity_play: 0 } },
-      { id: '4', label: 'Yes, several', value: 4, description: 'A repertoire you tend without thinking about it.', weight: { positivity_play: 0.35 } },
+      { id: '4', label: 'Yes — I can feel which ones I\'d miss', value: 4, description: 'A repertoire you tend without thinking about it.', weight: { positivity_play: 0.35 } },
       { id: '5', value: 5, label: 'Deeply — the bits ARE the relationship texture.', description: 'Play as infrastructure; you know exactly which rituals you would mourn.', weight: { positivity_play: 0.6 } },
     ],
   },
@@ -3178,7 +3183,9 @@ const WAVE5_QUESTIONS: Question[] = [
     id: 'q123',
     layer: 4,
     format: 'agreement',
-    prompt: ['"Most of what I think about a relationship only takes its real shape once I have said it out loud to someone outside it."'],
+    // Hypothetical conversion (design review): processing STYLE, not a
+    // report on past relationships.
+    prompt: ['"When something important is happening in a close relationship, I often understand what I think by talking it through with someone outside it."'],
     options: [
       { id: '1', label: 'Not how I work — my thinking happens inside, on its own', value: 1, description: 'Your positions form privately; by the time you speak, your mind is already made up.', weight: { external_processing: -0.6, relational_privacy: 0.1 } },
       { id: '2', label: 'Rarely — the shape exists before the saying', value: 2, description: 'Talking it out can help, but the thinking itself is done beforehand.', weight: { external_processing: -0.3 } },
@@ -3311,8 +3318,8 @@ const WAVE5_QUESTIONS: Question[] = [
     ],
     options: [
       { id: 'a', label: 'I am sharper — the heat focuses me, and I want to see it through', description: 'Durability under heat: you can stay in the work at full volume without losing the thread.', weight: { conflict_engagement: 0.7 } },
-      { id: 'b', label: 'I am reaching for the brake — naming the temperature, slowing it down', description: 'The brake-reaching reflex: a real skill, and it scores as lower heat-tolerance because it is.', weight: { conflict_engagement: -0.4, repair_orientation: 0.2, listening_first: 0.2 } },
-      { id: 'c', label: 'I am gone — not walking out, but the lights are off behind my eyes', description: 'Shutdown: present in the room, absent from the argument. The most expensive exit there is.', weight: { conflict_engagement: -0.6, vulnerability_safety: -0.2 } },
+      { id: 'b', label: 'I am reaching for the brake — naming the temperature, slowing it down', description: 'The brake-reaching reflex: de-escalation as the first move when volume stops the work.', weight: { conflict_engagement: -0.4, repair_orientation: 0.2, listening_first: 0.2 } },
+      { id: 'c', label: 'I am gone — not walking out, but the argument has lost me', description: 'Shutdown: present in the room, absent from the argument — a different way of leaving than walking out.', weight: { conflict_engagement: -0.6, vulnerability_safety: -0.2 } },
       { id: 'd', label: 'Still in it, but only barely — one more round and I would be gone too', description: 'The edge of flooding: your engagement is real and rationed.', weight: { conflict_engagement: 0.2 } },
     ],
   },
@@ -3393,11 +3400,11 @@ const WAVE5_QUESTIONS: Question[] = [
     format: 'agreement',
     prompt: ['"I almost always understand my own feelings by analyzing them — and I trust the analysis more than the feeling."'],
     options: [
-      { id: '1', label: 'No — the feeling is the data; analysis is the footnotes', value: 1, description: 'Feeling-led self-knowledge: you trust what arises, and think about it afterwards.', weight: { logic_emotion_integration: 0.4 } },
-      { id: '2', label: 'I use both, roughly equally', value: 2, description: 'The integrated default: neither instrument outranks the other.', weight: { logic_emotion_integration: 0.5 } },
+      { id: '1', label: 'No — I usually trust the feeling first, and analyze it afterwards', value: 1, description: 'Feeling-led self-knowledge: what arises is the primary evidence, thought about later.', weight: { logic_emotion_integration: 0.4 } },
+      { id: '2', label: 'I use both, roughly equally', value: 2, description: 'Neither instrument outranks the other.', weight: { logic_emotion_integration: 0.5 } },
       { id: '3', label: 'Slightly the analysis', value: 3, description: 'A mild tilt: you check the feeling against the map before trusting the territory.', weight: { logic_emotion_integration: 0.1 } },
-      { id: '4', label: 'Mostly the analysis', value: 4, description: 'The map outranks the territory more often than not.', weight: { logic_emotion_integration: -0.2 } },
-      { id: '5', label: 'Almost entirely the analysis — feelings are noisy inputs', value: 5, description: 'The dis-integration pole: the feeling is treated as noise, and noise does not get listened to.', weight: { logic_emotion_integration: -0.6, listening_first: -0.1 } },
+      { id: '4', label: 'Mostly the analysis', value: 4, description: 'The analysis usually gets the final word over the raw feeling.', weight: { logic_emotion_integration: -0.2 } },
+      { id: '5', label: 'Almost entirely the analysis — I trust my interpretation more than the feeling', value: 5, description: 'Interpretation-led self-knowledge: the feeling gets weighed only after the map has spoken.', weight: { logic_emotion_integration: -0.6, listening_first: -0.1 } },
     ],
   },
   {
@@ -3409,9 +3416,9 @@ const WAVE5_QUESTIONS: Question[] = [
       'After the deciding:',
     ],
     options: [
-      { id: 'a', label: 'It does not feel like giving something up — the choosing is the point, and the book closes', description: 'The settled form: the giving itself settles the question, and no audit runs afterwards.', weight: { commitment_sacrifice: 0.7 } },
+      { id: 'a', label: 'Choosing them would make it feel worthwhile — the decision settles it', description: 'The choice itself resolves the cost: no audit runs afterwards.', weight: { commitment_sacrifice: 0.7 } },
       { id: 'b', label: 'I give it, and I would be lying if I said I never look back at it', description: 'The honest ledger: real commitment with a quiet running total you mostly do not bill.', weight: { commitment_sacrifice: 0.2, scorekeeping: 0.2 } },
-      { id: 'c', label: 'I would need to know it was noticed — a sacrifice unseen becomes a debt uncollected', description: 'Recognition as the condition: the giving is real, and contingent on being seen as giving.', weight: { commitment_sacrifice: -0.4, scorekeeping: 0.4 } },
+      { id: 'c', label: 'I\'d want my partner to understand what the decision cost me', description: 'Recognition matters: the giving is real, and it lands better when it is seen as giving.', weight: { commitment_sacrifice: -0.4, scorekeeping: 0.4 } },
       { id: 'd', label: 'I would shrink from it — the life I built is not a bargaining chip', description: 'Self-preservation as the ceiling: commitment stops where the built life starts.', weight: { commitment_sacrifice: -0.6, autonomy_connection: 0.3 } },
     ],
   },
@@ -3421,11 +3428,11 @@ const WAVE5_QUESTIONS: Question[] = [
     format: 'agreement',
     prompt: ['"When I commit to someone, I stop running the arithmetic — what I gave up stops being a thing I count."'],
     options: [
-      { id: '1', label: 'No — the arithmetic runs, and it is honest to say so', value: 1, description: 'The visible ledger: commitment with accounting attached, and you know it.', weight: { commitment_sacrifice: -0.6 } },
+      { id: '1', label: 'No — I\'d probably still keep track of what I gave up', value: 1, description: 'Commitment with accounting attached, and you know it.', weight: { commitment_sacrifice: -0.6 } },
       { id: '2', label: 'It slows down but never fully stops', value: 2, description: 'A quiet audit in the background: low volume, always on.', weight: { commitment_sacrifice: -0.3 } },
       { id: '3', label: 'It depends what I gave up', value: 3, description: 'Selective accounting: some costs close their books, others stay open for years.', weight: { commitment_sacrifice: 0 } },
       { id: '4', label: 'Mostly stops', value: 4, description: 'The books close for most things; the big ones take longer to settle.', weight: { commitment_sacrifice: 0.35 } },
-      { id: '5', label: 'Yes — the giving itself settles the question', value: 5, description: 'Investment that closes its own books: a way of being, not a running cost-benefit.', weight: { commitment_sacrifice: 0.7 } },
+      { id: '5', label: 'Yes — the choice itself settles it', value: 5, description: 'Investment that closes its own books: the decision resolves the cost rather than starting an account.', weight: { commitment_sacrifice: 0.7 } },
     ],
   },
 ];

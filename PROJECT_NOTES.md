@@ -187,14 +187,28 @@ and the taker never sees dimension names during the quiz.
 - **Alternatives, per the brief**: for every question, the app stores a full description of what each
   *other* option would have revealed. The review screen shows your choice plus what the alternatives
   would have meant — this is what makes the system "deeply interwoven": the meaning of any answer
-  depends on, and is explained through, every other possible answer.
-
-## 4. Question design principles (from questions-idea.md)
+  depends on, and is explained through, every other possible answer.## 4. Question design principles (from questions-idea.md)
 
 1. **Behavior under competing demands** beats stated values ("project due tomorrow AND partner has
    a bad night" beats "do you support your partner?").
-2. **Every option is understandable.** No strawmen. The "away" option in any bid question must be a
-   thing a decent person might actually do.
+2. **Every option is understandable.** No strawmen. The "away" option in any bid question must be
+   a thing a decent person might actually do.
+3. **Descriptive, not evaluative, option descriptions** (external design review, Sep 2026):
+   descriptions render only on the post-blueprint review screen, so they cannot bias scoring —
+   but they still frame the mirror. Phrases that grade answers ("the mature version", "the
+   rarest and most useful reflex", "person before property", "efficiency over empathy") were
+   removed across the bank so the review reads as description rather than lesson. The same pass
+   rebuilt the label gradients on the items where one option was the visible "saint" answer
+   (q08, q14, q21, q25, q26, q28, q32, q41, q43, q46–q48, q50, q55, q57, q62, q67, q71, q73,
+   q84, q89, q131, q132, q138–q140) — labels now describe reactions rather than rank them,
+   with option weights, ids, and diagnostics unchanged (verified: identical benchmark corpus
+   stats before/after).
+4. **Hypothetical, not retrospective** (external design review, Sep 2026): q116 (large
+   sacrifice), q117 (playful rituals), and q123 (processing out loud) were converted from
+   "I have done X" to "I could imagine X" / style phrasing so they are answerable without
+   relationship history. q96–q98 are retired from scoring (post-blueprint state survey) and
+   q100 is scored as state — the reviewer's "separate, don't rewrite" for the reflection items
+   was already implemented.
 3. **No obvious correct answers**; no option should read as the "good partner" answer.
 3b. **Option-tone parity** (added after user review): every option label must describe the
    *function* the behavior serves (fairness, protection, self-respect, honesty) rather than

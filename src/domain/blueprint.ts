@@ -925,7 +925,7 @@ const PAIR_TENSION_LIBRARY: Record<string, PairCardCopy> = {
   'q63|q67': {
     territory: 'what stays between the two of you',
     a: 'the morning after a hard argument, when support is what you might want',
-    b: 'a group chat trading screenshots of fights, where yours would be content',
+    b: 'a friend asking to see the screenshots of last night\'s disagreement',
     lowIs: 'your line is firmer when telling the story reads as seeking support than when it reads as entertainment',
     highIs: 'your line is firmer when sharing reads as content than when it reads as seeking counsel',
     tradeoff: 'Privacy as protection versus privacy as a wall — worth knowing which frame actually trips it, because the two feel nothing alike from inside.',
