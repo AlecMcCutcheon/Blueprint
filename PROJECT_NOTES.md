@@ -180,8 +180,12 @@ and the taker never sees dimension names during the quiz.
   codes render byte-identical documents.
 - **The blueprint** interpolates across bands: sentences are chosen per-dimension, then composed in
   the rhetorical structure of a personal values document ( Understanding → Communication → Safety → Reciprocity →
-  Bad days → Affection/Intimacy → Home → Independence → Repair → closing lines), including a
-  closing **"I am loved here"** paragraph when earned by the meta-composites.
+  Bad days → Affection/Intimacy → Home → Independence → Repair → closing lines). The synthesis
+  closer composes SIX conditional signal families — top-two highs, most distinctive low, the
+  dominant Crosscurrents interaction, a divided dimension when one exists, the channel
+  asymmetry when present, and a tensions-aware closing — every clause gated on its signal
+  existing, so thin profiles get honest silence instead of filler (replaced the old four-tier-
+  note semicolon list, which read as fortune-cookie).
 - **Tensions**: dimensions whose *paired* questions disagree (e.g. expresses affection through acts
   but wants to receive words) surface as explicit "where your answers suggest some tension" sections.
 - **Alternatives, per the brief**: for every question, the app stores a full description of what each

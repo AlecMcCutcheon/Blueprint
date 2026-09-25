@@ -490,6 +490,10 @@ export function generateBlueprint(p: ScoredProfile): Blueprint {
       .map((d) => `${d}:${p.dimensions[d].score}`)
       .join('|') + `#${p.answered}`,
   );
+  // Dimensions whose mid-band score was a real tug-of-war (collected during the
+  // section walk, same gate as the rendered variance notes) — a synthesis
+  // signal the old closer never used.
+  const dividedDims: DimensionId[] = [];
 
   // ── Epigraph: keyed to the most distinctive signal in the profile ──
   // Computed BEFORE the sections so heading selection can avoid re-saying it.
@@ -592,7 +596,10 @@ export function generateBlueprint(p: ScoredProfile): Blueprint {
       // Variance note last: after the tier prose and its contextual reads,
       // reveal what the average was hiding (mid scores built from opposites).
       const vn = varianceNoteFor(dim, p);
-      if (vn) paragraphs.push(vn);
+      if (vn) {
+        paragraphs.push(vn);
+        dividedDims.push(dim);
+      }
     }
     if (spec.id === 'reciprocity') {
       const ch = channelProfileText(p);
@@ -707,7 +714,16 @@ export function generateBlueprint(p: ScoredProfile): Blueprint {
     });
   }
 
-  // ── Synthesis: "A relationship that may feel natural to you" ──
+  // ── Synthesis: a multi-signal closing read ──
+  // Synthesis heading: seeded rotation — the closer's title varies like every
+  // other title in the document, while the paragraphs stay profile-specific.
+  const SYNTHESIS_HEADINGS = [
+    'A Relationship That May Feel Natural to You',
+    'What Your Answers Point Toward',
+    'The Shape of a Relationship That Fits',
+    'What Tends to Work for You',
+    'The Relationship Your Answers Describe',
+  ];
   // The lead-in names HOW the picture was assembled — consistency, conflicts,
   // and how the document handled them — so it is earned by this profile, not
   // stamped onto every document.
@@ -727,33 +743,72 @@ export function generateBlueprint(p: ScoredProfile): Blueprint {
       'Your answers were steady enough (' + String(p.consistencyIndex) + '% self-agreement across repeated scenarios) to sketch this picture in fair confidence — with the usual caveat that any mirror shows the face that was brought to it.';
   }
 
-  const highs = (Object.values(p.dimensions) as { id: DimensionId; score: number; unmeasured?: boolean }[])
-    .filter((d) => d.score >= 62 && d.id !== 'express_receive_alignment' && !d.unmeasured)
-    .sort((a, b) => b.score - a.score)
-    .slice(0, 4)
-    .map((d) => noteFor(d.id, d.score).toLowerCase());
-  const synthesis: string[] = [
-    leadIn,
-    'Based on your answers, a relationship that may feel natural to you would probably involve ' +
-      (highs.length > 0
-        ? highs.join('; ') + '.'
-        : 'a careful balance across all of these — your answers sit closer to the middle than the extremes, which suggests someone still assembling their own picture of what closeness should look like.'),
-    'None of this is a verdict. It\'s a description of a pattern — drawn from dozens of small decisions you made about imaginary people, which is usually where real instincts live. Some of it will land as obviously you. Some of it will feel slightly off. Both reactions are useful: the parts that ring true are worth saying out loud to the people close to you, and the parts that don\'t are worth arguing with.',
-  ];
-  // Synthesis heading: seeded rotation — the closer's title varies like every
-  // other title in the document, while the paragraphs stay profile-specific.
-  const SYNTHESIS_HEADINGS = [
-    'A Relationship That May Feel Natural to You',
-    'What Your Answers Point Toward',
-    'The Shape of a Relationship That Fits',
-    'What Tends to Work for You',
-    'The Relationship Your Answers Describe',
-  ];
+  // The shape paragraph composes SIX signal families instead of the old
+  // four-tier-note list: the two strongest highs, the most distinctive low,
+  // the dominant cross-dimension current (what actually headlined), a divided
+  // dimension when the average was hiding a tug-of-war, and the channel
+  // asymmetry when care travels in two languages. Every clause is conditional
+  // on its signal actually existing — silence, not filler, where evidence is
+  // thin.
+  const topSyn = dimsArr.filter((d) => d.score >= 62).sort((a, b) => b.score - a.score).slice(0, 2);
+  const lowSyn = dimsArr.filter((d) => d.score <= 40).sort((a, b) => a.score - b.score)[0];
+  const shapeSentences: string[] = [];
+  if (topSyn.length > 0) {
+    const notes = topSyn.map((d) => noteFor(d.id, d.score).toLowerCase());
+    const joined = notes.length === 2 ? notes[0] + ' and ' + notes[1] : notes.join('; and ');
+    shapeSentences.push(
+      'Based on your answers, a relationship that may feel natural to you would probably involve ' + joined + '.',
+    );
+  } else {
+    shapeSentences.push(
+      'Based on your answers, a relationship that may feel natural to you is still more assembly than inheritance — your scores sit close enough to the middle that the fit is something you will design with someone, not discover pre-made.',
+    );
+  }
+  if (lowSyn) {
+    shapeSentences.push('What it would not ask of you: ' + noteFor(lowSyn.id, lowSyn.score).toLowerCase() + '.');
+  }
+  const domPattern = plan.headline[0]?.pattern;
+  if (domPattern && domPattern.dims.length >= 2) {
+    const label1 = DIMENSION_LABELS[domPattern.dims[0]]?.toLowerCase() ?? domPattern.dims[0];
+    const label2 = DIMENSION_LABELS[domPattern.dims[1]]?.toLowerCase() ?? domPattern.dims[1];
+    const spineLeads = [
+      `The most specific work in your answers happens where ${label1} meets ${label2} — that interaction is the spine of this document.`,
+      `If this document has a spine, it is where ${label1} meets ${label2}: each one changes what the other means for you.`,
+      `${label1} and ${label2} are the pair doing the most work in your answers — neither reading is complete without the other.`,
+    ];
+    shapeSentences.push(seededPick(spineLeads, hash('spine') + runSeed));
+  }
+  if (dividedDims.length > 0) {
+    const d0 = dividedDims[0];
+    const dl = DIMENSION_LABELS[d0]?.toLowerCase() ?? d0;
+    shapeSentences.push(
+      `And one part of this picture is genuinely two-valued rather than settled: your ${dl} reads as a back-and-forth still in negotiation — the sections above name what the average was hiding.`,
+    );
+  }
+  if (p.channels.express && p.channels.receive && p.channels.express !== p.channels.receive) {
+    shapeSentences.push(
+      'Care also moves through you in two different languages — the one you give in and the one that reaches you — which makes the dictionary exchange the single highest-leverage habit in this whole document.',
+    );
+  }
+
+  // The closer earns its place or gets out of the way: when tensions rendered,
+  // it points at them as the unsettled part; when nothing disagreed, the
+  // keep-or-argue line stands on its own.
+  const closer =
+    tensions.length > 0
+      ? 'None of this is a verdict — and where your answers disagreed with themselves, the tensions above hold the honest version. The rest of the reading is yours to test: the parts that ring true are worth saying out loud to the people close to you, and the parts that don\'t are worth arguing with.'
+      : 'None of this is a verdict. It\'s a description of a pattern — drawn from dozens of small decisions you made about imaginary people, which is usually where real instincts live. Some of it will land as obviously you. Some of it will feel slightly off. Both reactions are useful: the parts that ring true are worth saying out loud to the people close to you, and the parts that don\'t are worth arguing with.';
+
   sections.push({
     id: '__synthesis',
     heading: seededPick(SYNTHESIS_HEADINGS, hash('synthesis' + String(p.consistencyIndex) + String(p.answered))),
-    paragraphs: synthesis,
+    paragraphs: [leadIn, ...shapeSentences, closer],
   });
+  // (The closing/“Short Version” block was removed by design: its three
+  // meta-branch summaries read as boilerplate against the per-profile prose
+  // everywhere else, and its sign-off was a direct lift from the founding
+  // values document — a mirror shouldn't end by quoting the original it
+  // was built from. The document now ends on the synthesis section.)
 
   // (The closing/“Short Version” block was removed by design: its three
   // meta-branch summaries read as boilerplate against the per-profile prose
