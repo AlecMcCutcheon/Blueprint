@@ -170,7 +170,7 @@ export const LEGACY: LegacyNarrative[] = [
     ],
     high: [
       'Care arrives before it\'s requested. Across the scenarios, you consistently chose to notice first and act first — the favorite snack, the back rub after a hard day, the "I know you\'ve been carrying a lot." Your answers describe someone whose love language is anticipatory: you don\'t wait for need to announce itself.',
-      'You appear to experience other people\'s rough days as something you are invited into. Making someone\'s day easier — food, massage, compliment, small rescue — reads in your choices as a reflex rather than a decision. This is the pattern your document calls "genuinely enjoying loving your partner," and your answers strongly resemble it.',
+      'You appear to experience other people\'s rough days as something you are invited into. Making someone\'s day easier — food, massage, compliment, small rescue — reads in your choices as a reflex rather than a decision — the shape of someone who genuinely enjoys loving their partner.',
     ],
     lowNote: 'Care available on request; rarely moves first',
     midNote: 'Notices and often acts; competes with own momentum',

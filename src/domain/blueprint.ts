@@ -1,6 +1,6 @@
 import type { Blueprint, BlueprintSection, ConsistencyPair, DimensionId, ScoredProfile } from './types';
 import { DIMENSION_LABELS } from './types';
-import { DIMENSIONS, TIERS, TIER_LABELS, tierOf, TIER_VARIANTS, VARIANCE_LIBRARY, genericVarianceFor } from './dimensions';
+import { DIMENSIONS, TIERS, TIER_BOUNDS, TIER_LABELS, tierOf, TIER_VARIANTS, VARIANCE_LIBRARY, genericVarianceFor } from './dimensions';
 import { seededPick, hash, CHANNEL_LABELS, isInternallyDivided } from './scoring';
 import { buildPatternPlan, renderPattern } from './patterns';
 
@@ -70,28 +70,31 @@ function paragraphFor(dim: DimensionId, score: number, runSeed: number): string 
   let pool: string[] = def[tier];
   // Alternate band prose: the legacy mhigh and high tiers share one base
   // paragraph, so two profiles at the same band rendered identical text.
-  // The variant is chosen by POSITION WITHIN THE BAND — the lower half (a
-  // fresh arrival) reads the alternate, which is written as a flat-band
-  // claim; the upper half (approaching the next tier) reads the base, which
-  // carries the intensity suffix. That makes the split semantically
-  // meaningful and decorrelates profiles whose scores differ; the run seed
-  // only breaks exact ties inside a half-band.
-  let variantSeed = 0;
+  // The variant is chosen by POSITION WITHIN THE BAND, and position decides
+  // outright: the lower half (a fresh arrival) reads the alternate, which is
+  // written as a flat-band claim; the upper half (approaching the next tier)
+  // reads the base, which carries the intensity suffix. Two profiles in
+  // different halves always diverge; profiles in the same half share the
+  // paragraph body (honest convergence) with run-seeded opener rotation.
   if (tier === 'mhigh' || tier === 'high') {
     const alt = TIER_VARIANTS[dim]?.[tier] ?? TIER_VARIANTS[dim]?.mhigh;
     if (alt) {
-      const bounds = tier === 'mhigh' ? [48, 62] : [62, 75];
-      const upperHalf = score >= bounds[0] + (bounds[1] - bounds[0]) / 2;
-      const tieBreak = seededPick([0, 1], hash(dim + String(score)) + runSeed * 31);
-      pool = [upperHalf ? pool[0] : alt, upperHalf ? alt : pool[0]];
-      variantSeed = tieBreak;
+      // Band range straight from the tier table. A tier spans
+      // [TIER_BOUNDS[ti-1], TIER_BOUNDS[ti]) — TIER_BOUNDS[ti] is its UPPER
+      // edge (off-by-one here silently widened every band and pushed
+      // upper-half scores into the alternate).
+      const ti = TIERS.indexOf(tier);
+      const lo = ti > 0 ? (TIER_BOUNDS[ti - 1] ?? 0) : 0;
+      const hi = TIER_BOUNDS[ti] ?? 100;
+      const upperHalf = score >= lo + (hi - lo) / 2;
+      if (!upperHalf) pool = [alt];
     }
   }
   // Per-run rotation: the run seed (derived from the answers themselves, so a
   // restored session always regenerates identically) decorates the stable
   // content seed — different runs at the same tier rotate their openers
   // without the text ever being random across regenerations.
-  const seed = hash(dim + String(Math.round(score / 7))) + runSeed * 31 + variantSeed;
+  const seed = hash(dim + String(Math.round(score / 7))) + runSeed * 31;
   return calibrate(varyTierOpener(seededPick(pool, seed), seed));
 }
 

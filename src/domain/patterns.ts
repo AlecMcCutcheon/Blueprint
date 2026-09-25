@@ -282,7 +282,7 @@ export const PATTERNS: DerivedPattern[] = [
     priority: 92,
     frame: 'The invisible load and the want to be seen carrying it are the same subject.',
     narrative: [
-      'Two strong scores point at one quiet risk. You notice what needs doing, and you do it — much of it before anyone knows it was done. That competence is a gift, but it has a known cost: work that goes unseen reads, to the person doing it, as work that does not count. Your answers also say being noticed while carrying something matters to you specifically. So the warning is not "carry less" — it is that self-sufficiency can mute the very recognition you actually want. "I\'ve got this" is true, and it can still cost you the acknowledgment that would make the having-it worth more.',
+      'Two strong scores point at one quiet risk. You notice what needs doing, and you do it — much of it before anyone knows it was done. That competence is a gift, but it has a known cost: work that goes unseen reads, to the person doing it, as work that does not count. People who carry this way usually also want the carrying to be seen — worth checking whether that is true of you. If it is, the warning is not "carry less": self-sufficiency can mute the very recognition you want. "I\'ve got this" is true, and it can still cost you the acknowledgment that would make the having-it worth more.',
     ],
     placement: { section: 'hard_days', after: 'shared_home_effort' },
   },
