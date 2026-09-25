@@ -1,7 +1,7 @@
 import type { Blueprint, BlueprintSection, ConsistencyPair, DimensionId, ScoredProfile } from './types';
 import { DIMENSION_LABELS } from './types';
 import { DIMENSIONS, TIERS, TIER_BOUNDS, TIER_LABELS, tierOf, TIER_VARIANTS, VARIANCE_LIBRARY, genericVarianceFor } from './dimensions';
-import { seededPick, hash, CHANNEL_LABELS, isInternallyDivided } from './scoring';
+import { seededPick, hash, CHANNEL_LABELS } from './scoring';
 import { buildPatternPlan, renderPattern } from './patterns';
 
 /**
@@ -171,12 +171,30 @@ function interplayFor(dim: DimensionId, p: ScoredProfile): string | null {
  */
 function varianceNoteFor(dim: DimensionId, p: ScoredProfile): string | null {
   const v = p.variance?.[dim];
-  if (!v) return null;
   const d = p.dimensions[dim];
   if (!d || d.unmeasured) return null;
   const t = tierOf(d.score);
   if (t !== 'mid' && t !== 'mlow' && t !== 'mhigh') return null;
-  if (!isInternallyDivided(v)) return null;
+  // Gate on the QUANTIZED shape, whichever source it came from: raw
+  // contributions (owner) or the reconstructed varianceShape (BP5 share code).
+  // Both are rounded to the same lattice, so owner and shared documents gate
+  // identically — that is the whole point of the derived-evidence code.
+  let count: number, posCount: number, cancellation: number;
+  if (v) {
+    count = v.contributions.length;
+    posCount = v.contributions.filter((c) => c > 0).length;
+    cancellation = Math.round(v.cancellation * 200) / 200;
+  } else if (d.varianceShape) {
+    ({ count, posCount, cancellation } = d.varianceShape);
+  } else {
+    return null;
+  }
+  const opposing = count - posCount;
+  const divided =
+    cancellation >= 0.4 &&
+    opposing >= 2 &&
+    count >= 5;
+  if (!divided) return null;
   return VARIANCE_LIBRARY[dim] ?? genericVarianceFor(dim + String(Math.round(d.score)));
 }
 
@@ -371,7 +389,7 @@ export function generateBlueprint(p: ScoredProfile): Blueprint {
       // Thin-evidence honesty: a tier paragraph carried by one or two answers
       // reads as confident temperament it hasn't earned. Say so, gently,
       // instead of letting two data points speak in generalities.
-      const nContrib = p.variance?.[dim]?.contributions.length;
+      const nContrib = p.variance?.[dim]?.contributions.length ?? p.dimensions[dim]?.varianceShape?.count;
       if (nContrib !== undefined && nContrib <= 3) {
         const last = paragraphs[paragraphs.length - 1];
         paragraphs[paragraphs.length - 1] = `Worth reading gently — this dimension rests on the fewest answers in your run (${nContrib} ${nContrib === 1 ? 'answer carries' : 'answers carry'} it, where most others have many more): ${last}`;
@@ -548,7 +566,7 @@ export function generateBlueprint(p: ScoredProfile): Blueprint {
   }
 
   const bands = (Object.values(p.dimensions) as { id: DimensionId; score: number; unmeasured?: boolean }[]).map((d) => {
-    const nContrib = p.variance?.[d.id]?.contributions.length;
+    const nContrib = p.variance?.[d.id]?.contributions.length ?? p.dimensions[d.id]?.varianceShape?.count;
     let tierLabel = d.unmeasured ? undefined : TIER_LABELS[tierOf(d.score)];
     // Thin-evidence hedge: when three or fewer answers carry a dimension, a
     // single flip can move it a full band (measured: 9–20 pts mean single-
@@ -798,15 +816,21 @@ function pairTensionCard(c: ConsistencyPair, p: ScoredProfile): Blueprint['tensi
 
   const posA = c.positionA;
   const posB = c.positionB;
-  if (posA === undefined || posB === undefined) {
-    // Imported profile (share code): no raw answers, so no direction — be
+  // BP5 share profiles carry per-pair leans instead of raw positions — the
+  // same quantized value the owner path computes below, so both render the
+  // identical directional card.
+  const lean =
+    posA !== undefined && posB !== undefined
+      ? posB - posA
+      : p.pairLeans?.[`${c.a}|${c.b}`] ?? p.pairLeans?.[`${c.b}|${c.a}`];
+  if (lean === undefined) {
+    // No direction available from either raw answers or the share code — be
     // honest about the disagreement without inventing which way it leaned.
     return {
       title: `Two readings of ${copy.territory}`,
-      body: `Two scenarios probed ${copy.territory} from different angles — ${copy.a}, then ${copy.b} — and your instincts pulled apart. The share code carries scores, not the reasoning behind them, so this document can't tell you which way the disagreement leaned. ${copy.tradeoff}${scale}`,
+      body: `Two scenarios probed ${copy.territory} from different angles — ${copy.a}, then ${copy.b} — and your instincts pulled apart. This link carries the reading, not the answer-by-answer reasoning, so it can't tell you which way the disagreement leaned. ${copy.tradeoff}${scale}`,
     };
   }
-  const lean = posB - posA; // sign picks the direction; magnitude picks the phrasing
   // A vanishing lean means the pair's shared dimension carries no usable
   // direction from these two answers (e.g. q53/q54, whose channel tags live
   // outside the weight system) — render directionless rather than invent one.
@@ -817,7 +841,11 @@ function pairTensionCard(c: ConsistencyPair, p: ScoredProfile): Blueprint['tensi
     };
   }
   const dir = lean > 0 ? copy.highIs : copy.lowIs;
-  const gap = Math.abs(lean);
+  // Magnitude ladder — evaluated on the QUANTIZED lean in both paths (the
+  // owner's raw lean is quantized here, the share code stores it quantized),
+  // so owner and shared documents always pick the same qualifier.
+  const leanQ = Math.round(lean * 70) / 70;
+  const gap = Math.abs(leanQ);
   // Magnitude ladder: the size of the disagreement changes the reading.
   const qualifier = gap >= 1.0
     ? 'That is a wide split — two of your operating values are in open conflict here, and one of them is currently winning by default.'

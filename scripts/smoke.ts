@@ -60,7 +60,7 @@ if (a.profile.state !== undefined) { console.error('FAIL: state survey retired b
 // Full-session restore (import path): encode answers → decode → re-score must
 // reproduce the EXACT profile. No reconstruction, no drift — this is the
 // property that replaced reconstruct.ts.
-import { encodeFullSession, decodeFullSession, buildShareLink, parseShareUrl } from '../src/domain/share';
+import { encodeFullSession, decodeFullSession, buildShareLink, parseShareUrl, profileToCode5, decodeProfile } from '../src/domain/share';
 import { buildSessionFile, importSessionJson } from '../src/domain/session';
 import { BONUS_POOL } from '../src/domain/questions';
 {
@@ -129,6 +129,33 @@ import { BONUS_POOL } from '../src/domain/questions';
   }
 
   // Share LINKS: name + intent ride in the URL, never in the code.
+  // BP5 derived-evidence parity: a share-code profile must render a document
+  // byte-identical to the owner's — same variance gates, same tension-card
+  // directions, same alignment branch — while carrying no raw answers.
+  {
+    const code5 = profileToCode5(a.profile);
+    if (!code5.startsWith('BP5')) { console.error('FAIL: expected BP5 code for a full profile'); process.exit(1); }
+    const shared = decodeProfile(code5);
+    if (!shared) { console.error('FAIL: BP5 code failed to decode'); process.exit(1); }
+    if (code5.includes('q01') || code5.includes('optionId')) { console.error('FAIL: BP5 leaks answer-shaped data'); process.exit(1); }
+    const ownerDoc = JSON.stringify(generateBlueprint(a.profile));
+    const sharedDoc = JSON.stringify(generateBlueprint(shared));
+    if (ownerDoc !== sharedDoc) {
+      console.error('FAIL: BP5 parity broken — shared document differs from owner document');
+      const oa = JSON.parse(ownerDoc), sa = JSON.parse(sharedDoc);
+      for (let si = 0; si < Math.max(oa.sections.length, sa.sections.length); si++) {
+        const osp = oa.sections[si]?.paragraphs ?? [], ssp = sa.sections[si]?.paragraphs ?? [];
+        for (let pi = 0; pi < Math.max(osp.length, ssp.length); pi++) {
+          if (osp[pi] !== ssp[pi]) console.error(`  first diff — section ${si} para ${pi}:\n    owner : ${String(osp[pi]).slice(0, 140)}\n    shared: ${String(ssp[pi]).slice(0, 140)}`);
+        }
+      }
+      process.exit(1);
+    }
+    // Checksum integrity: flip the final byte (checksum) → decode must fail.
+    const raw = atob(code5.slice(3).replace(/-/g, '+').replace(/_/g, '/'));
+    const corrupted = 'BP5' + btoa(String.fromCharCode(raw.charCodeAt(0), 0, 0)).replace(/\+/g, '-').replace(/\//g, '_').replace(/=+$/, '');
+    if (decodeProfile(corrupted) !== null) { console.error('FAIL: corrupted BP5 must not decode'); process.exit(1); }
+  }
   const bp = profileToCode(a.profile);
   const l1 = buildShareLink(bp, { name: 'Maya', intent: 'invite' });
   const p1 = parseShareUrl(l1);

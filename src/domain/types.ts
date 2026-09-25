@@ -121,6 +121,8 @@ export interface DimensionScore {
   evidence: number;
   /** True when this score is a neutral placeholder (legacy code with no data for this dimension). */
   unmeasured?: boolean;
+  /** Quantized variance shape reconstructed from a BP5 share code — enough to gate variance prose identically to the owner's document, without carrying any raw answer. */
+  varianceShape?: { count: number; posCount: number; cancellation: number };
 }
 
 /**
@@ -177,6 +179,8 @@ export interface ScoredProfile {
   channels: { express: string | null; receive: string | null };
   /** Distinct receiving channels named (present only when raw answers were scored). A high value with a null modal channel means breadth, not absence. */
   receiveBreadth?: number;
+  /** Per-pair disagreement direction (lean = positionB − positionA), carried by BP5 share codes so shared documents can resolve tension cards exactly like the owner's. Values: −1, 0, or +1 (lean sign, 0 when |lean| < 0.05). Keyed 'qa|qb' in CONSISTENCY_PAIRS order. */
+  pairLeans?: Record<string, number>;
   /** Questions answered / total, for confidence framing. */
   answered: number;
   total: number;

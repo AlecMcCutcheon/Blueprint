@@ -149,7 +149,11 @@ function varianceFor(id: DimensionId, contributions: number[]): DimensionVarianc
     typical: totalAbs / contributions.length,
     peak: sorted[0],
     posShare: totalAbs > 0 ? pos / totalAbs : 0.5,
-    cancellation: Math.min(pos, totalAbs - pos) / totalAbs,
+    // Quantized to 1/200 at the SOURCE so every consumer (isInternallyDivided,
+    // variance notes, and the BP5 share-code reconstruction) sees the exact
+    // same value — a share code stores this number losslessly, and owner and
+    // shared documents gate their prose identically.
+    cancellation: Math.round((Math.min(pos, totalAbs - pos) / totalAbs) * 200) / 200,
     peakShare: sorted.slice(0, topN).reduce((s, x) => s + x, 0) / totalAbs,
   };
 }

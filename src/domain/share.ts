@@ -26,6 +26,15 @@ import { QUESTIONS } from './questions';
 //   v4 (BP4) — 28 dimensions, adds desire_initiation, intimacy_attunement
 //              (closeness), feedback_receiving (processing),
 //              external_processing (boundaries) — keeping every domain even.
+//   v5 (BP5) — derived-evidence parity code: everything BP4 carries, plus a
+//              QUANTIZED VARIANCE SHAPE per dimension (answering count,
+//              positive count, cancellation — exactly what the variance-prose
+//              gates consume), per-pair disagreement DIRECTION, and the
+//              receiving-channel breadth. Deliberately still far short of the
+//              raw answers: the policy is that the code may carry exactly what
+//              the shared document reveals, and nothing more. Billions of
+//              answer-sets collapse into the same aggregates, so nothing here
+//              is invertible back to how anyone answered any specific question.
 // Legacy codes decode with newer dimensions marked "unmeasured" (score 50,
 // evidence 0) rather than guessed — the document renders the gap explicitly.
 
@@ -112,6 +121,103 @@ function b64decode(str: string): Uint8Array {
 
 const clamp = (n: number) => Math.max(0, Math.min(100, Math.round(n)));
 
+const quintize = (v: number) => Math.max(0, Math.min(200, Math.round(v * 200)));
+
+/** Reconstructable variance shape for one dimension. */
+interface VarShape { count: number; posCount: number; cancellation: number }
+
+function shapeOf(p: ScoredProfile, d: DimensionId): VarShape | null {
+  const v = p.variance?.[d];
+  if (!v) return null;
+  return { count: v.contributions.length, posCount: v.contributions.filter((c) => c > 0).length, cancellation: v.cancellation };
+}
+
+/** The BP4 body bytes (everything after the prefix). */
+function bp4Body(p: ScoredProfile): number[] {
+  const bytes: number[] = [4]; // version
+  for (const d of ALL_DIMENSIONS) bytes.push(clamp(p.dimensions[d].score));
+  bytes.push(clamp(p.consistencyIndex));
+  for (const [a, b] of CONSISTENCY_PAIRS) {
+    const found = p.consistency.find((x) => x.a === a && x.b === b);
+    bytes.push(found ? clamp(found.agreement) : 0);
+  }
+  bytes.push(Math.max(0, Math.min(255, p.answered)));
+  const ch = (c: string | null) => (c ? CHANNELS.indexOf(c as (typeof CHANNELS)[number]) + 1 : 0);
+  bytes.push(((ch(p.channels.express) & 0xf) << 4) | (ch(p.channels.receive) & 0xf));
+  return bytes;
+}
+
+/**
+ * BP5 — the derived-evidence share code. Payload: [5][BP4 body][per-dimension
+ * count/posCount/cancellation][per-pair lean signs, 2 bits each][receiving
+ * breadth][FNV checksum]. Carries exactly what the shared document reveals and
+ * nothing more — the variance gates and tension directions the prose consumes,
+ * quantized so nothing is invertible back to specific answers.
+ */
+export function profileToCode5(p: ScoredProfile): string {
+  const bytes: number[] = [5, ...bp4Body(p)];
+  let anyShape = false;
+  for (const d of ALL_DIMENSIONS) {
+    const s = shapeOf(p, d);
+    if (s) {
+      anyShape = true;
+      bytes.push(Math.min(255, s.count), Math.min(255, s.posCount), quintize(s.cancellation));
+    } else {
+      bytes.push(0, 0, 0);
+    }
+  }
+  const leanByte = (qa: string, qb: string): number => {
+    const c = p.consistency.find((x) => x.a === qa && x.b === qb) ?? p.consistency.find((x) => x.a === qb && x.b === qa);
+    const pa = c?.positionA;
+    const pb = c?.positionB;
+    if (pa === undefined || pb === undefined) return 0xff; // unknown
+    const lean = c!.a === qa ? pb - pa : pa - pb;
+    return Math.max(0, Math.min(252, Math.round((lean + 1.8) * 70)));
+  };
+  for (const [a, b] of CONSISTENCY_PAIRS) bytes.push(leanByte(a, b));
+  bytes.push(Math.min(255, Math.max(0, p.receiveBreadth ?? 0)));
+  bytes.push(fnv1aLow(new Uint8Array(bytes)));
+  if (!anyShape) return profileToCode(p); // no variance data at all → plain BP4
+  return 'BP5' + b64encode(new Uint8Array(bytes));
+}
+
+/**
+ * Decode BP5: reconstruct the BP4 profile from its embedded body, then layer
+ * the derived evidence (varianceShape per dimension, pairLeans, breadth) so
+ * prose gates evaluate exactly as they do for the owner. A checksum failure
+ * or malformed tail returns null → the caller falls back to legacy handling.
+ */
+function decodeProfile5(bytes: Uint8Array): ScoredProfile | null {
+  const bodyLen = expectedBytes(VERSIONS[3]);
+  if (bytes.length < 1 + bodyLen + ALL_DIMENSIONS.length * 3 + 3 + 1 + 1) return null;
+  if (bytes[bytes.length - 1] !== fnv1aLow(bytes.slice(0, bytes.length - 1))) return null;
+  const base = decodeVersion(VERSIONS[3], bytes.slice(1, 1 + bodyLen));
+  if (!base) return null;
+  let i = 1 + bodyLen;
+  const shapes = new Map<DimensionId, VarShape>();
+  for (const d of ALL_DIMENSIONS) {
+    const count = bytes[i], posCount = bytes[i + 1], canc = bytes[i + 2];
+    i += 3;
+    if (count > 0) shapes.set(d, { count, posCount, cancellation: canc / 200 });
+  }
+  const leans: number[] = [];
+  for (let k = 0; k < CONSISTENCY_PAIRS.length && i < bytes.length - 2; k++, i++) {
+    const b = bytes[i];
+    leans.push(b === 0xff || b > 252 ? NaN : b / 70 - 1.8); // NaN = unknown
+  }
+  const receiveBreadth = bytes[i];
+  const dimensions = { ...base.dimensions };
+  for (const [d, s] of shapes) {
+    dimensions[d] = { ...dimensions[d], varianceShape: s };
+  }
+  const pairLeans: Record<string, number> = {};
+  CONSISTENCY_PAIRS.forEach(([a, b], idx) => {
+    const lean = leans[idx];
+    if (lean !== undefined && !Number.isNaN(lean)) pairLeans[`${a}|${b}`] = lean;
+  });
+  return { ...base, dimensions, pairLeans, receiveBreadth: receiveBreadth > 0 ? receiveBreadth : undefined };
+}
+
 export function profileToCode(p: ScoredProfile): string {
   // Refuse to encode a profile with unmeasured dimensions — the document built
   // from such a code would look complete while silently guessing.
@@ -182,9 +288,10 @@ export function decodeProfile(code: string): ScoredProfile | null {
     const trimmed = code.trim();
     const prefix = trimmed.slice(0, 3).toUpperCase();
     const payload = trimmed.slice(3);
+    const bytes = b64decode(payload);
+    if (prefix === 'BP5') return decodeProfile5(bytes);
     const version = VERSIONS.find((v) => v.prefix === prefix);
     if (!version) return null;
-    const bytes = b64decode(payload);
     if (bytes.length !== expectedBytes(version)) return null;
     if (bytes[0] !== Number(prefix[2])) return null;
     return decodeVersion(version, bytes);
@@ -400,7 +507,7 @@ export function parseShareUrl(input: string | URLSearchParams): ParsedShareUrl |
     const params = typeof input === 'string' ? new URL(input, 'http://x.invalid').searchParams : input;
     const code = (params.get('bp') ?? '').trim();
     if (!code) return null;
-    if (!/^BP[1-4]/i.test(code)) return null; // metric codes only
+    if (!/^BP[1-5]/i.test(code)) return null; // metric codes only
     const decoded = decodeProfile(code);
     if (!decoded) return null;
     const meta = decodeMetaSegment(code, (params.get('m') ?? '').trim());

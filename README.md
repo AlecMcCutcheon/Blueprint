@@ -49,10 +49,15 @@ agreed with themselves.
 
 Two carriers, two privacy levels:
 
-- **For other people** — a share link carrying a `BP4` code: 28 derived scores in
-  62 characters, raw answers never leave your machine. The optional name and intent
-  (`show` vs `invite`) live in the link, not the code. Recipients get a visitor view,
-  never a UI that assumes they answered anything.
+- **For other people** — a share link carrying a `BP5` code: 28 derived scores plus
+  quantized variance shape (per-dimension answer counts and cancellation), tension
+  directions, and channel breadth — exactly what the document reveals and nothing
+  more. Raw answers never leave your machine, and the aggregates are not invertible
+  back to how any specific question was answered. The optional name and intent
+  (`show` vs `invite`) ride in a checksummed segment: a modified link degrades to
+  the generic "somebody shared this" presentation. The shared document is byte-
+  identical to the owner's (smoke-tested), so sharing no longer costs the reader
+  any of the reading.
 - **For yourself** — a full-session JSON export (raw answers + question-order seed).
   Importing one restores the *real* session: the review shows actual choices and the
   blueprint rebuilds from evidence. Codes and files from older bank versions import
@@ -105,7 +110,7 @@ node /tmp/smoke.cjs
 
 The smoke test answers every question three different ways and asserts the scoring
 engine and blueprint generator produce complete, distinct, non-empty output for each;
-that `BP1`–`BP4` share codes round-trip, with legacy codes marking newer dimensions
+that `BP1`–`BP5` share codes round-trip, with legacy codes marking newer dimensions
 unmeasured rather than guessed; that full-session codes and JSON exports restore
 bit-identical profiles; that clarifiers score in the main pass without inflating the
 answered count; and that share links carry name/intent without ever leaking into the code.

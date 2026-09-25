@@ -41,7 +41,7 @@ export default function Intro({
     const c = sessionCode.trim();
     if (!c) return;
     setSessionError(null);
-    if (/^BP[1-4]/i.test(c)) {
+    if (/^BP[1-5]/i.test(c)) {
       setSessionError('That\'s a blueprint code, not a session code — paste it under "Open someone else\'s blueprint" instead.');
       return;
     }

@@ -1,6 +1,6 @@
 import { useEffect, useMemo, useState } from 'react';
 import type { Blueprint, ScoredProfile } from '../../domain/types';
-import { profileToCode, buildShareLink, type ShareIntent } from '../../domain/share';
+import { profileToCode5, buildShareLink, type ShareIntent } from '../../domain/share';
 import Icon from './icons';
 import type { IconName } from './icons';
 import { useTheme } from './theme';
@@ -70,7 +70,7 @@ export default function BlueprintView({
   // box explains the upgrade path instead of crashing.
   const code = useMemo(() => {
     try {
-      return profileToCode(profile);
+      return profileToCode5(profile);
     } catch {
       return null;
     }
