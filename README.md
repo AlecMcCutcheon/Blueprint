@@ -1,0 +1,119 @@
+# Blueprint
+
+**A relationship-instincts questionnaire that writes your document for you.**
+
+Not "what's your love language." Not a compatibility score. Blueprint measures how you
+*actually* tend to love — through 119 situational questions where the measurement is
+hidden inside scenarios, forced choices, and behavioral agreement scales — then generates
+a personalized narrative document about how you appear to love, built entirely from your
+own answer pattern.
+
+The output is a mirror, not a verdict: *here is how you appear to love, based on dozens
+of small decisions you made when you didn't know what was being measured.*
+
+**Take it:** [alecmccutcheon.github.io/Blueprint](https://alecmccutcheon.github.io/Blueprint/)
+
+## What it measures
+
+119 scored questions across **28 hidden dimensions** — from everyday affection and
+desire to repair after conflict, invisible household effort, money-as-teamwork, and
+the boundary around the relationship itself. No dimension is ever shown as a bare
+number first; every score arrives as prose.
+
+On top of the dimensions, a derived-pattern engine reads the *interactions between*
+scores: what a high reassurance need means next to high benefit-of-the-doubt, what
+wide receiving next to a touch-first giving channel implies, where two strong scores
+quietly create a risk neither would create alone. Within-dimension variance detection
+catches the averages that are actually tug-of-wars and says so.
+
+The run ends with 3 clarifying questions, generated from echo pairs — scenarios that
+came back wearing different clothes — and the document reports how often your answers
+agreed with themselves.
+
+## How a run works
+
+1. **Intro** — the honesty contract: answer fast, first instinct, there are no
+   "good partner" answers, and some scenarios come back later wearing different clothes.
+2. **Quiz** — the 119-item core in a randomized-but-stable order that never places
+   same-dimension items back-to-back, then the 3 clarifiers once the engine knows
+   which territories need a closer look. Progress checkpoints to localStorage after
+   every answer.
+3. **Review** — two tabs: *What each answer revealed* (your choice plus what every
+   alternative would have revealed) and *What was actually measured* (the 28 dimensions).
+4. **Blueprint** — the narrative document: everyday affection → understanding →
+   communication → safety → reciprocity → hard days → closeness → independence →
+   privacy → crosscurrents (your top cross-dimension patterns) → tensions → closing.
+   Downloadable as Markdown; the full session exports as JSON.
+
+## Sharing & privacy
+
+Two carriers, two privacy levels:
+
+- **For other people** — a share link carrying a `BP4` code: 28 derived scores in
+  62 characters, raw answers never leave your machine. The optional name and intent
+  (`show` vs `invite`) live in the link, not the code. Recipients get a visitor view,
+  never a UI that assumes they answered anything.
+- **For yourself** — a full-session JSON export (raw answers + question-order seed).
+  Importing one restores the *real* session: the review shows actual choices and the
+  blueprint rebuilds from evidence. Codes and files from older bank versions import
+  partially and report exactly what was dropped.
+
+Everything stays in the browser. Answers live in localStorage; exports are local file
+downloads. No network calls, no accounts, no analytics.
+
+## Run it locally
+
+```bash
+npm install
+npm run dev        # http://localhost:5173
+npm run build      # typecheck + production build to dist/
+npm run preview    # serve the production build
+```
+
+## Deploy (GitHub Pages)
+
+The site deploys automatically: every push to `main` runs
+[`.github/workflows/deploy.yml`](.github/workflows/deploy.yml), which builds with the
+Pages base path (`/Blueprint/`) and publishes via the official Pages actions. Enable it
+once under **Settings → Pages → Source: GitHub Actions**. Manual runs: the **Actions**
+tab → *Deploy to GitHub Pages* → *Run workflow*.
+
+For a self-hosted build at a domain root, just `npm run build` — no env var needed;
+the base path is applied only when the workflow sets it.
+
+## Design & evidence
+
+- [`PROJECT_NOTES.md`](PROJECT_NOTES.md) — the full design document: dimension map,
+  question-design principles (indirect measurement, social-desirability countermeasures,
+  echo pairs, forced-choice mirrors), the scoring model, and the document generator.
+- [`PSYCHOMETRIC_AUDIT.md`](PSYCHOMETRIC_AUDIT.md) — the evidence audit: research
+  grounding (Gottman's bids and repair, Clark & Mills' communal orientation, ECR-R
+  attachment dimensions, Mallory 2021 on sexual communication, Gable on capitalization,
+  Rusbult's investment model, Petronio's privacy management), known limitations, and
+  the heuristics-vs-validated-instrument boundary.
+- [`PSYCHOLOGY_REFERENCE.md`](PSYCHOLOGY_REFERENCE.md) — the research citations behind
+  each construct, written into the document's own claims.
+- [`PATTERN_CATALOG.md`](PATTERN_CATALOG.md) — every derived pattern, interplay rule,
+  and variance note the engine can produce, generated from the source of truth.
+
+## Testing
+
+```bash
+npx esbuild scripts/smoke.ts --bundle --platform=node --format=cjs --outfile=/tmp/smoke.cjs
+node /tmp/smoke.cjs
+```
+
+The smoke test answers every question three different ways and asserts the scoring
+engine and blueprint generator produce complete, distinct, non-empty output for each;
+that `BP1`–`BP4` share codes round-trip, with legacy codes marking newer dimensions
+unmeasured rather than guessed; that full-session codes and JSON exports restore
+bit-identical profiles; that clarifiers score in the main pass without inflating the
+answered count; and that share links carry name/intent without ever leaking into the code.
+
+Additional tooling under `scripts/`: `harness.ts` (pattern fire rates across 540 seeded
+profiles), `auditmine.ts` (per-dimension evidence contributions), `catalog.ts`
+(regenerates the pattern catalog).
+
+## License
+
+[MIT](LICENSE)

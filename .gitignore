@@ -1,0 +1,22 @@
+# Dependencies / build
+node_modules/
+dist/
+*.local
+
+# Tooling state
+.freebuff/
+
+# Private personal documents — the founding document, private cross-readings,
+# raw session data, and ideation notes. These stay local by design; the app
+# ships without them.
+Me.md
+me-but-more-datelike.md
+my-relationship-blueprint.md
+blueprint-vs-me.md
+blueprint-session-*.json
+ dissection.txt
+questions-idea.md
+
+# OS noise
+.DS_Store
+Thumbs.db
