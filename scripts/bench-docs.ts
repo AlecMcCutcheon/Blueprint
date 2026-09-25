@@ -110,6 +110,12 @@ for (let run = 0; run < RUNS; run++) {
   docParas.push(paras);
 }
 
+// Regression gates — set GATE=1 to exit non-zero when a metric regresses
+// past its threshold. Gates: accidental echo clusters, mechanical defects,
+// cross-run overlap ceiling.
+const GATE = process.env.GATE === '1';
+const fail = (msg: string) => { if (GATE) { console.error(`GATE FAIL: ${msg}`); process.exit(1); } };
+
 console.log(`═ Benchmark over ${RUNS} seeded random full-bank runs ═\n`);
 console.log(`total paragraphs generated: ${totalParas} · "lightly held" chips: ${lightlyHeld} (${((lightlyHeld / (RUNS * 28)) * 100).toFixed(1)}% of all band chips)\n`);
 
@@ -124,11 +130,17 @@ console.log('═ B. Cross-run paragraph overlap (random doc pairs) ═');
     const shared = a.filter((p) => setB.has(p)).length;
     sum += shared / a.length;
   }
-  console.log(`mean shared-paragraph rate between two random docs: ${((sum / PAIRS) * 100).toFixed(1)}%`);
+  const overlap = (sum / PAIRS) * 100;
+  console.log(`mean shared-paragraph rate between two random docs: ${overlap.toFixed(1)}%`);
+  if (overlap > 50) fail(`cross-run overlap ${overlap.toFixed(1)}% > 50%`);
 }
 
 console.log('\n═ C. Stitch defects: echoed clauses inside one paragraph ═');
 console.log(`instances: ${defectEcho.length}`);
+// The three intentional anaphora figures account for the expected baseline
+// (~1.17 clusters/run across the corpus); anything above 1.3×RUNS means a new
+// accidental echo.
+if (defectEcho.length > Math.ceil(RUNS * 1.3)) fail(`accidental echo clusters ${defectEcho.length} > ${Math.ceil(RUNS * 1.3)}`);
 const byKey = new Map<string, number>();
 for (const d of defectEcho) for (const h of d.hits) byKey.set(h, (byKey.get(h) ?? 0) + 1);
 for (const [k, n] of [...byKey.entries()].sort((x, y) => y[1] - x[1]).slice(0, 10)) {
@@ -148,6 +160,7 @@ console.log('\n═ C2. Adjacent-paragraph opener collisions within sections ═'
 
 console.log('\n═ D. Mechanical defects ═');
 console.log(`instances: ${defectMech.length}`);
+if (defectMech.length > 0) fail(`${defectMech.length} mechanical defects`);
 const mechKinds = new Map<string, number>();
 for (const d of defectMech) mechKinds.set(d.defect.replace(/"[^"]*"/, '"…"'), (mechKinds.get(d.defect.replace(/"[^"]*"/, '"…"')) ?? 0) + 1);
 for (const [k, n] of [...mechKinds.entries()].sort((x, y) => y[1] - x[1]).slice(0, 6)) console.log(`  ×${n} ${k}`);

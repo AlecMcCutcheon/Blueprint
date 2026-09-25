@@ -24,6 +24,7 @@
 
 import type { DimensionId, ScoredProfile } from './types';
 import { DIMENSIONS, TIERS, tierOf } from './dimensions';
+import { seededPick, hash } from './scoring';
 
 type Cond = (p: ScoredProfile) => boolean;
 
@@ -87,6 +88,8 @@ export interface DerivedPattern {
   frame: string;
   /** The interpretation itself; every variant must stand alone. */
   narrative: string[];
+  /** Optional alternate telling of the same pattern (seeded rotation). */
+  narrativeAlt?: string[];
   /** Where section-mode patterns render. Synthesis patterns render in Crosscurrents. */
   placement?: { section: string; after: DimensionId };
   /** When this pattern is eligible, the named coarser (tier-level) pattern is dropped. */
@@ -140,6 +143,9 @@ export const PATTERNS: DerivedPattern[] = [
     frame: 'The want underneath: to be noticed without being managed.',
     narrative: [
       'Three scores point at the same appetite from different directions. You can say what you need — you believe asking is how love stays honest. You also know people are not mind-readers, and you mean it. And yet the care that lands hardest in your answers is the kind that arrived before the asking. That is not a demand for telepathy. It is a demand for attentiveness: "tell me what you need" is the requirement, "I noticed before you had to" is the reward. The practical translation: a partner who asks is doing it right, and a partner who occasionally notices first is doing something extra — and you will feel the difference even if you never name it.',
+    ],
+    narrativeAlt: [
+      'Underneath several of your scores runs a single appetite: being seen clearly, without being handled. The asking, you can do — you believe saying what you need is how love stays honest, and you do not expect anyone to read your mind. But the care that lands hardest in your answers is the kind that arrived before the asking. That is not a contradiction and not a demand for telepathy — it is a demand for attentiveness. The requirement is "tell me what you need"; the reward is "I noticed before you had to". A partner who asks is doing it right. A partner who occasionally notices first is doing something extra — and you will feel it, even if neither of you ever names it.',
     ],
   },
   {
@@ -284,6 +290,9 @@ export const PATTERNS: DerivedPattern[] = [
     narrative: [
       'Two strong scores point at one quiet risk. You notice what needs doing, and you do it — much of it before anyone knows it was done. That competence is a gift, but it has a known cost: work that goes unseen reads, to the person doing it, as work that does not count. People who carry this way usually also want the carrying to be seen — worth checking whether that is true of you. If it is, the warning is not "carry less": self-sufficiency can mute the very recognition you want. "I\'ve got this" is true, and it can still cost you the acknowledgment that would make the having-it worth more.',
     ],
+    narrativeAlt: [
+      'Two strong scores point at one quiet risk: the competence you carry, and the recognition you want, can quietly cancel each other. You notice what needs doing and you do it — much of it before anyone knows it was done — and people who carry this way usually also want the carrying to be seen. Worth checking whether that is true of you. If it is, the warning is not "carry less"; it is that "I\'ve got this" is a sentence that can cost you the very acknowledgment that would make the having-it worth more.',
+    ],
     placement: { section: 'hard_days', after: 'shared_home_effort' },
   },
 
@@ -335,6 +344,9 @@ export const PATTERNS: DerivedPattern[] = [
     frame: 'Not more reassurance — better information.',
     narrative: [
       'Your reassurance need is real, and your answers are precise about what would actually meet it: not repeated comforting, but proportionate, reality-based information — "I\'m having a bad day; it isn\'t about you" lands where ten "are we sure?"s would not. You even ask what reassurance looks like for someone rather than guessing, which is exactly the right instinct. And you know the flip side from the inside: a partner who needs constant reassuring would exhaust you — which is why what you want to be met with is information, not volume. Clarity, not more.',
+    ],
+    narrativeAlt: [
+      'When your steadiness is threatened, what meets it is not comfort — it is information. Your answers are precise about the difference: repeated reassuring does little for you, while one proportionate, reality-based sentence — "I am having a bad day; it is not about you" — lands where ten "are we sure?"s would not. You even ask people what reassurance looks like for them rather than guessing, which is the right instinct turned outward. And you know the exhaustion side from the inside: a partner who needs constant steadying would drain you — which is why you want clarity, not volume.',
     ],
     placement: { section: 'safety', after: 'reassurance_security' },
   },
@@ -486,6 +498,9 @@ export const PATTERNS: DerivedPattern[] = [
     narrative: [
       'The compounding effect is worth naming on its own: because your celebrating is also curious, joy told to you tends to grow a second life — the win becomes a conversation, the conversation becomes an invitation, and the person learns their happiness has somewhere to go. That combination could make you someone people naturally want to bring their good news to.',
     ],
+    narrativeAlt: [
+      'Your celebrating is also curious, and that combination compounds: joy told to you grows a second life — the win becomes a conversation, the conversation becomes an invitation, and the person learns their happiness has somewhere to go. Over time that routing is visible: people bring you their good news first, not because you ask, but because they have learned what happens to it there. Being where joy lands is not a passive trait; in your answers it reads as something you actively hold.',
+    ],
     placement: { section: 'understanding', after: 'capitalization' },
   },
   {
@@ -534,6 +549,9 @@ export const PATTERNS: DerivedPattern[] = [
     narrative: [
       'Your generosity runs on a long ledger: individual gestures are not billed, seasons of imbalance are expected to bend back, and the accounting that matters happens at the scale of years. That is the communal form of fairness — rarer than people claim. Its one failure mode is silent: because every individual imbalance is explainable, a chronic one can normalize before you ever say it. The long horizon still needs an occasional voice — name the pattern when it becomes a season, not a history.',
     ],
+    narrativeAlt: [
+      'Your account-keeping operates on a horizon of years, not days: a single gesture is never billed, a season of imbalance is expected to bend back, and fairness is measured at the scale of the whole story. That is the communal form of generosity — rarer than people claim. Its failure mode is quiet rather than loud: because each individual imbalance has an explanation, a chronic one can become the weather before anyone names it. The long ledger still needs an occasional voice — the moment to speak is when a stretch becomes a pattern, not when it has become a history.',
+    ],
     placement: { section: 'reciprocity', after: 'scorekeeping' },
   },
   {
@@ -550,6 +568,9 @@ export const PATTERNS: DerivedPattern[] = [
     narrative: [
       'Your instinct under load is to work it through alone first and arrive with the plan — competence offered as care, sparing them the raw worry. The cost hides inside the kindness: a partner who only ever sees the finished plan cannot participate in the decision, only ratify it. The upgrade is small: bring the fork instead of the conclusion — "here is what I found, here is where I am leaning, where do you see it differently." Letting someone into the unsolved version is its own form of intimacy.',
     ],
+    narrativeAlt: [
+      'When trouble comes, your first move is to go quiet and build — you work the problem through privately and reappear holding a solution, competence offered as care so the people you love are spared the raw worry. What that kindness costs is their participation: someone handed only the finished plan is left to ratify it, not to shape it. The bridge is small and it works — arrive with the fork instead of the conclusion, and let the people who love you into the version of the problem that is still unsolved.',
+    ],
     placement: { section: 'hard_days', after: 'shared_home_effort' },
   },
   {
@@ -564,6 +585,9 @@ export const PATTERNS: DerivedPattern[] = [
     frame: 'Your privacy wall faces outward only.',
     narrative: [
       'The boundary in your answers protects the two-person room from the world — it does not seal the room off from itself. The violation that stings is not a friend hearing too much; it is learning something about your person late, through someone else. Which makes the rule simple to state: a partner telling nobody is not the same as telling you first. Your privacy stance is a claim about audiences, never a license for distance inside.',
+    ],
+    narrativeAlt: [
+      'There are two rooms in your answers, and the boundary draws them correctly. Inside the two-person room: unusually full disclosure, nothing curated. Outside it: the relationship\'s contents are not public property — a trusted voice may be consulted when counsel is genuinely needed, but there is no audience and no jury. The stinging violation is specific: not a friend hearing too much, but learning something about your person late, through someone else. A partner telling nobody is not the same as a partner telling you first. This is audience control, not avoidance — and it is why the people close to you can risk being imperfect without becoming someone else\'s story.',
     ],
     placement: { section: 'privacy', after: 'relational_privacy' },
   },
@@ -922,12 +946,18 @@ export function buildPatternPlan(p: ScoredProfile): PatternPlan {
 }
 
 /** Render one hit as blueprint paragraphs. Soft hits get hedged lead-ins. */
-export function renderPattern(hit: PatternHit, context: 'headline' | 'section'): string[] {
+export function renderPattern(hit: PatternHit, context: 'headline' | 'section', runSeed = 0): string[] {
   const { pattern: pat, soft } = hit;
+  // Second-narrative rotation: the highest-fire patterns now carry an alternate
+  // telling (same frame, same claims, different sentence path). Seeded from the
+  // run seed, so a given session always renders the same variant and two
+  // different people stop sharing these paragraphs verbatim.
+  const alt = pat.narrativeAlt;
+  const narrative = alt ? seededPick([pat.narrative, alt], hash(pat.id) + runSeed) : pat.narrative;
   if (context === 'headline') {
     const lead = soft ? 'This reads as a lean, not a verdict — ' : '';
-    return [`**${pat.frame}** ${lead}${pat.narrative.join(' ')}`];
+    return [`**${pat.frame}** ${lead}${narrative.join(' ')}`];
   }
-  if (soft) return [`Hold this one lightly — it is a lean, not a verdict. ${pat.narrative[0]}`, ...pat.narrative.slice(1)];
-  return [...pat.narrative];
+  if (soft) return [`Hold this one lightly — it is a lean, not a verdict. ${narrative[0]}`, ...narrative.slice(1)];
+  return [...narrative];
 }

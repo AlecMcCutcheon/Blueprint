@@ -398,7 +398,7 @@ export function generateBlueprint(p: ScoredProfile): Blueprint {
       // changes this paragraph's meaning), then legacy interplay covers
       // combinations the pattern library doesn't reach.
       const spotKey = `${spec.id}:${dim}`;
-      for (const h of plan.sections.get(spotKey) ?? []) paragraphs.push(...renderPattern(h, 'section'));
+      for (const h of plan.sections.get(spotKey) ?? []) paragraphs.push(...renderPattern(h, 'section', runSeed));
       const ip = interplayFor(dim, p);
       if (ip) paragraphs.push(varyInterplayOpener(ip, hash(dim + 'ip')));
       // Variance note last: after the tier prose and its contextual reads,
@@ -426,7 +426,7 @@ export function generateBlueprint(p: ScoredProfile): Blueprint {
     sections.push({
       id: '__crosscurrents',
       heading: 'Crosscurrents',
-      paragraphs: plan.headline.flatMap((h) => renderPattern(h, 'headline')),
+      paragraphs: plan.headline.flatMap((h) => renderPattern(h, 'headline', runSeed)),
     });
   }
 
@@ -447,7 +447,7 @@ export function generateBlueprint(p: ScoredProfile): Blueprint {
         body: 'When your partner said "I\'m fine" once, and when they said it all week, your answers told different stories. That isn\'t hypocrisy — it\'s information about your thresholds. It\'s worth knowing at what point a quiet partner stops being "having an off day" and starts being, in your private accounting, something that needs a response.',
       });
     } else if (c.agreement < 40 && c.dimension !== 'ambiguity_update') {
-      const card = pairTensionCard(c, p);
+      const card = pairTensionCard(c, p, runSeed);
       if (card) tensions.push(card);
     }
   }
@@ -805,7 +805,7 @@ const PAIR_TENSION_LIBRARY: Record<string, PairCardCopy> = {
  * direction-aware when raw answers are available, honest about what is
  * unknown when they are not.
  */
-function pairTensionCard(c: ConsistencyPair, p: ScoredProfile): Blueprint['tensions'][number] | null {
+function pairTensionCard(c: ConsistencyPair, p: ScoredProfile, runSeed = 0): Blueprint['tensions'][number] | null {
   const copy = PAIR_TENSION_LIBRARY[c.a + '|' + c.b] ?? PAIR_TENSION_LIBRARY[c.b + '|' + c.a];
   if (!copy) return null;
   const dimScore = p.dimensions[c.dimension as DimensionId]?.score;
@@ -852,8 +852,16 @@ function pairTensionCard(c: ConsistencyPair, p: ScoredProfile): Blueprint['tensi
     : gap >= 0.6
       ? 'That is not a wobble — a real fork in how you operate.'
       : 'That is a narrow disagreement — close to the threshold, worth knowing, not worth over-reading.';
+  // Lead-in rotation (seeded): same finding, different sentence path, so two
+  // people's documents don't open every tension card identically.
+  const leads = [
+    `Two scenarios probed ${copy.territory} from different angles — ${copy.a}, then ${copy.b} — and your instincts disagreed. Read together, they suggest ${dir}.`,
+    `The same territory looked different twice: ${copy.a} in one scenario, then ${copy.b} — and your answers split. Read side by side, they point to ${dir}.`,
+    `${copy.a[0].toUpperCase() + copy.a.slice(1)} — and then, from the other side, ${copy.b}. On ${copy.territory}, your instincts pulled apart, and the split reads as ${dir}.`,
+  ];
+  const lead = leads[Math.floor(Math.abs(Math.sin(hash(c.a + c.b) + runSeed) * 10000)) % leads.length];
   return {
     title: `Two readings of ${copy.territory}`,
-    body: `Two scenarios probed ${copy.territory} from different angles — ${copy.a}, then ${copy.b} — and your instincts disagreed. Read together, they suggest ${dir}. ${qualifier} ${copy.tradeoff}${scale}`,
+    body: `${lead} ${qualifier} ${copy.tradeoff}${scale}`,
   };
 }
