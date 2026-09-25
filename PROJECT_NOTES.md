@@ -190,6 +190,16 @@ and the taker never sees dimension names during the quiz.
   thin-evidence hedges when a synthesis claim rests on ≤3 answers, and a permanent corpus audit
   (`scripts/synthesis-audit.ts`: signal fire rates, no-highs/legacy-code/three-answer edge
   cases, mechanical defects).
+- **The final word is a relational inference, not a disclaimer** (second user review of the
+  closer: "I'd imagine you'd be able to come up with a better, more detailed conclusion about
+  certain relationship dynamics that would work well with me"). The "none of this is a
+  verdict" boilerplate was deleted. The document now ends with a partner-dynamics paragraph
+  authored per synthesis pattern — what works WITH the architecture (naming the partner
+  behavior), what fails against it (naming the failure mode), and which scores paid for the
+  reading (the pattern's own dimensions) — keyed to the dominant Crosscurrents pattern, with an
+  honest fallback for headline-less runs. Every entry must be earnable from that pattern's
+  conditions, so the conclusion is derived from the taker's choices rather than universal
+  advice.
 - **Tensions**: dimensions whose *paired* questions disagree (e.g. expresses affection through acts
   but wants to receive words) surface as explicit "where your answers suggest some tension" sections.
 - **Alternatives, per the brief**: for every question, the app stores a full description of what each

@@ -810,30 +810,40 @@ export function generateBlueprint(p: ScoredProfile): Blueprint {
     );
   }
 
-  // The closer earns its place or gets out of the way: when tensions rendered,
-  // it points at them as the unsettled part; when nothing disagreed, the
-  // keep-or-argue line stands on its own.
-  const closer =
-    tensions.length > 0
-      ? 'None of this is a verdict — and where your answers disagreed with themselves, the tensions above hold the honest version. The rest of the reading is yours to test: the parts that ring true are worth saying out loud to the people close to you, and the parts that don\'t are worth arguing with.'
-      : 'None of this is a verdict. It\'s a description of a pattern — drawn from dozens of small decisions you made about imaginary people, which is usually where real instincts live. Some of it will land as obviously you. Some of it will feel slightly off. Both reactions are useful: the parts that ring true are worth saying out loud to the people close to you, and the parts that don\'t are worth arguing with.';
+  // ── The final word: the partnership dynamic the answers point to ──
+  // This is the document's actual conclusion, not a disclaimer: the relational
+  // inference — what works WITH this architecture, what fails against it, and
+  // which scores paid for the reading. Keyed to the dominant Crosscurrents
+  // pattern (the derived finding with the strongest claim on the profile);
+  // every entry must be earnable from that pattern's own conditions. The
+  // fallback exists for runs that produced no headline to key on.
+  const fallbackWord =
+    'What this run cannot yet do is name the partnership dynamic your full pattern points to — that reading needs at least two strong signals crossing, and this one did not produce them. What it can say honestly: almost every dimension above reads better with information than with guessing, which is a principle, not a compliment. Take this document to someone and trade dictionaries — what lands for you, what lands for them — and let the specific dynamic name itself.';
+  const PATTERN_DYNAMICS: Record<string, string> = {
+    space_and_certainty:
+      'The relationship that works with this is one where distance is never silent. The person who fits you is not the one who needs the least space or the most togetherness — it is the one who narrates: gone for the evening, and here is what that evening is; quiet today, and it is the work, not you. What fails against you is not distance but ambiguity — a partner who goes dark and calls it normal will convert your security into surveillance, slowly, without anyone deciding to. Your answers fund that reading in two places: the space you can genuinely afford, and the checking you do when the story goes missing.',
+    noticed_not_managing:
+      'The dynamic that works with you is a partner who treats your needs as information rather than tasks — someone who asks well, and then occasionally beats the ask. What they cannot do is manage you: solving before hearing, reassuring before understanding — care that arrives pre-decided reads to you as not being seen, even when it is generous. The failure mode to watch is yours: a partner who asks every time is doing nothing wrong, and part of you will still register the missing anticipation as a shortage of love. That is the appetite your care, reassurance, and directness scores build toward together — which is why this document could name it at all.',
+    team_of_two:
+      'You are built for the partnership model where two sovereign people form one front: separate weekends that cost nothing, and a crisis that gets both of you instantly. The person who fits that is not someone who merges with you — it is someone who reports to you, and lets you report back: what happened in their world, what changed in yours. What fails is drift — two independent lives that stop filing to each other, not from conflict but from nobody being asked. Your space-without-fear and your us-versus-it instinct are the same finding viewed from two ends; a partner who carries both will feel rare, because they are.',
+    independent_but_connected:
+      'The dynamic that works with you is density over constancy: a partner who wants the days apart and the evenings together — full contact when you share time, no deficit accounting when you don\'t. What fails against you is a partner who reads your need for room as cooling, or your warmth as a promise of merged schedules; both misreadings end with someone trying to convert the other. The tell your answers give is structural: your affection and your space are both high without contradiction — so the right partner experiences your distance and your touch as the same signal, not competing ones.',
+    shared_reality:
+      'The relationship that works with you runs on shared information: a partner who says the true thing while it is small, and asks before concluding. With you, the fight is survivable and the curation is not. What fails is the slow editorial version — a partner deciding what you can handle, even kindly, is manufacturing the exact concealment your answers punish hardest. Watch your own half too: your charity is genuine, but it gets spent faster when the facts arrive late. Your directness and your benefit-of-the-doubt built this reading together; neither alone would predict that concealment outranks conflict as your dealbreaker.',
+    separate_worlds_curious:
+      'You are suited to the visiting arrangement: two people with their own worlds who keep touring each other\'s. The partner who fits you has a life you find interesting and room for you inside it — not as a guest wing, but as a reader. What fails is the drift into polite strangers: invitations that stop, tours that end, not from conflict but from nobody booking the next visit. Your answers pay for this reading on both sides — the space you keep and the second question you ask — and that combination is rarer than either trait alone.',
+  };
+  const finalWord = domPattern ? PATTERN_DYNAMICS[domPattern.id] : fallbackWord;
 
   sections.push({
     id: '__synthesis',
     heading: seededPick(SYNTHESIS_HEADINGS, hash('synthesis' + String(p.consistencyIndex) + String(p.answered))),
-    paragraphs: [leadIn, ...shapeSentences, closer],
+    paragraphs: [leadIn, ...shapeSentences, finalWord],
   });
-  // (The closing/“Short Version” block was removed by design: its three
-  // meta-branch summaries read as boilerplate against the per-profile prose
-  // everywhere else, and its sign-off was a direct lift from the founding
-  // values document — a mirror shouldn't end by quoting the original it
-  // was built from. The document now ends on the synthesis section.)
-
-  // (The closing/“Short Version” block was removed by design: its three
-  // meta-branch summaries read as boilerplate against the per-profile prose
-  // everywhere else, and its sign-off was a direct lift from the founding
-  // values document — a mirror shouldn't end by quoting the original it
-  // was built from. The document now ends on the synthesis section.)
+  // (The founding-values “Short Version” closing block was removed by design:
+  // its meta-branch summaries read as boilerplate, and its sign-off was a
+  // direct lift from the document the blueprint was built from. The document
+  // now ends on the synthesis section's final word.)
 
   const bands = (Object.values(p.dimensions) as { id: DimensionId; score: number; unmeasured?: boolean }[]).map((d) => {
     const nContrib = p.variance?.[d.id]?.contributions.length ?? p.dimensions[d.id]?.varianceShape?.count;

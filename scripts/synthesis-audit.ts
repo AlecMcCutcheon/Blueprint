@@ -29,7 +29,7 @@ function randomAnswers(): Answers {
 }
 
 const RUNS = Number(process.argv[2] ?? 300);
-let noHighs = 0, withLow = 0, withSpine = 0, withDivided = 0, withChannel = 0, tensionCloser = 0;
+let noHighs = 0, withLow = 0, withSpine = 0, withDivided = 0, withChannel = 0, fallbackWord = 0;
 let minShape = 99, maxShape = 0;
 const defects: string[] = [];
 let sampleNoHighs: string | null = null;
@@ -51,7 +51,7 @@ for (let run = 0; run < RUNS; run++) {
   if (/spine of this document|has a spine|doing the most work/.test(all)) withSpine += 1;
   if (/two-valued rather than settled|still negotiating rather than settled|negotiating than settled/.test(all)) withDivided += 1;
   if (all.includes('two different languages')) withChannel += 1;
-  if (all.includes('the tensions above hold the honest version')) tensionCloser += 1;
+  if (all.includes('cannot yet do is name')) fallbackWord += 1;
   for (const p of syn.paragraphs) {
     if (p.includes('undefined') || p.includes('[object')) defects.push(`render leak: ${p.slice(0, 70)}`);
     if (/  +/.test(p)) defects.push(`double space: ${p.slice(0, 70)}`);
@@ -67,7 +67,7 @@ console.log(`low bound ("would not ask of you"): ${withLow} (${((100 * withLow) 
 console.log(`spine sentence (dominant interaction): ${withSpine} (${((100 * withSpine) / RUNS).toFixed(0)}%)`);
 console.log(`divided-dimension sentence: ${withDivided} (${((100 * withDivided) / RUNS).toFixed(0)}%)`);
 console.log(`channel-asymmetry sentence: ${withChannel} (${((100 * withChannel) / RUNS).toFixed(0)}%)`);
-console.log(`tensions-aware closer: ${tensionCloser} (${((100 * tensionCloser) / RUNS).toFixed(0)}%)`);
+console.log(`fallback final word (no headline to key on): ${fallbackWord} (${((100 * fallbackWord) / RUNS).toFixed(0)}%)`);
 if (sampleNoHighs) console.log(`\n— sample no-highs closer —\n${sampleNoHighs.slice(0, 600)}`);
 
 // Edge case: legacy share codes (BP1–BP3) — many dimensions unmeasured, so
