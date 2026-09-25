@@ -152,6 +152,11 @@ function AppInner() {
   // forward). The frozen order IS the mode: setting it back to null retires
   // catch-up, and the permanent seed governs the full bank again.
   const [catchUpOrderIds, setCatchUpOrderIds] = useState<string[] | null>(null);
+  // Count of restored answers the current bank can no longer read (format
+  // changed after the run). Threaded into the profile so the partial-run card
+  // can say "your answers, outgrown by the instrument" instead of implying
+  // the taker skipped. Cleared on any fresh run.
+  const [restoredStaleFormat, setRestoredStaleFormat] = useState(0);
   const catchUpMode = catchUpOrderIds !== null;
   const order = useMemo(
     () => catchUpOrderIds ?? computeOrder(seed),
@@ -219,7 +224,13 @@ function AppInner() {
     }
   }, [stage, answers, visitor]);
 
-  const profile = useMemo(() => scoreProfile(answers), [answers]);
+  // Restored sessions may carry answers the current bank cannot read (the
+  // item's format changed after the run). They exist in state for honesty
+  // counts only — scoreProfile never sees them (it would drop them anyway).
+  const profile = useMemo(
+    () => (restoredStaleFormat > 0 ? { ...scoreProfile(answers), invalidated: restoredStaleFormat } : scoreProfile(answers)),
+    [answers, restoredStaleFormat],
+  );
 
   // ── Clarifying questions: appended at the END of the normal flow. ──
   // Once the core bank is fully answered, echo-pair analysis picks which
@@ -253,6 +264,7 @@ function AppInner() {
 
   const startFresh = useCallback(() => {
     setAnswers({});
+    setRestoredStaleFormat(0);
     setBlueprint(null);
     setVisitor(null);
     setClarifierQueue([]);
@@ -264,6 +276,7 @@ function AppInner() {
 
   const startOver = useCallback(() => {
     setAnswers({});
+    setRestoredStaleFormat(0);
     setBlueprint(null);
     setVisitor(null);
     setClarifierQueue([]);
@@ -329,8 +342,9 @@ function AppInner() {
   }, [answers, seed, myName]);
 
   // ── Restore paths: the REAL session, answers and all. ──
-  const adoptRestored = useCallback((restored: { answers: Answers; orderSeed: number; name: string | null }) => {
+  const adoptRestored = useCallback((restored: { answers: Answers; orderSeed: number; name: string | null; staleFormat?: number }) => {
     setAnswers(restored.answers);
+    setRestoredStaleFormat(restored.staleFormat ?? 0);
     adoptSeed(restored.orderSeed);
     // Same bank-growth check as local resume: an imported session whose
     // answered items are not a prefix of its seed's current order predates a

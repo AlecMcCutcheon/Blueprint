@@ -3511,6 +3511,14 @@ const WAVE6_QUESTIONS: Question[] = [
 
 export const QUESTIONS: Question[] = [...CORE_QUESTIONS, ...WAVE4_QUESTIONS, ...WAVE5_QUESTIONS, ...WAVE6_QUESTIONS];
 
+/**
+ * Bank history, oldest wave first. Lets the profile distinguish "you skipped
+ * questions" from "these questions did not exist when you took the run" — a
+ * partial-run card that blames the taker for the bank's growth is reading
+ * fraud. Every future wave must be appended here AND to QUESTIONS.
+ */
+export const QUESTION_WAVES: Question[][] = [CORE_QUESTIONS, WAVE4_QUESTIONS, WAVE5_QUESTIONS, WAVE6_QUESTIONS];
+
 export const QUESTION_BY_ID: Record<string, Question> = Object.fromEntries(
   QUESTIONS.map((q) => [q.id, q]),
 );

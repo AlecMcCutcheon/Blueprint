@@ -59,6 +59,8 @@ export interface ImportResult {
   name: string | null;
   /** Answer ids that failed validation (stale option ids, retired questions…). */
   dropped: string[];
+  /** Subset of `dropped` whose question still exists but whose format changed (the answer predates a redesign). */
+  staleFormat: number;
 }
 
 /**
@@ -87,6 +89,11 @@ export function importSessionFile(data: unknown): ImportResult {
   const byId = new Map([...QUESTIONS, ...BONUS_POOL].map((q) => [q.id, q]));
   const answers: Answers = {};
   const dropped: string[] = [];
+  // Present-but-unreadable answers (the item's format changed after this run —
+  // e.g. an agreement item later converted to a scenario) are counted apart
+  // from unknown questions: the taker answered honestly; the instrument
+  // outgrew their answer. The blueprint card names the difference.
+  let staleFormat = 0;
   for (const [id, v] of Object.entries(rawAnswers as Record<string, unknown>)) {
     const q = byId.get(id);
     if (!q || !v || typeof v !== 'object') {
@@ -99,15 +106,18 @@ export function importSessionFile(data: unknown): ImportResult {
         answers[id] = { kind: 'option', optionId: a.optionId };
       } else {
         dropped.push(id);
+        staleFormat += 1;
       }
     } else if (a.kind === 'scale' && typeof a.value === 'number' && q.format === 'agreement') {
       if (q.options.some((o) => 'value' in o && (o as { value: number }).value === a.value)) {
         answers[id] = { kind: 'scale', value: a.value };
       } else {
         dropped.push(id);
+        staleFormat += 1;
       }
     } else {
       dropped.push(id);
+      staleFormat += 1;
     }
   }
 
@@ -115,7 +125,7 @@ export function importSessionFile(data: unknown): ImportResult {
   const seedRaw = typeof f.orderSeed === 'number' ? f.orderSeed : Number(String(f.orderSeed ?? '').replace(/"/g, ''));
   const orderSeed = Number.isFinite(seedRaw) && seedRaw > 0 ? Math.floor(seedRaw) : 1;
 
-  return { answers, orderSeed, name: cleanName(f.name as string | null), dropped };
+  return { answers, orderSeed, name: cleanName(f.name as string | null), dropped, staleFormat };
 }
 
 /** Parse + validate a JSON string (the file-reader path). */

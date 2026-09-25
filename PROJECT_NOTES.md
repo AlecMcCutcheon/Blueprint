@@ -210,7 +210,17 @@ and the taker never sees dimension names during the quiz.
 - **Alternatives, per the brief**: for every question, the app stores a full description of what each
   *other* option would have revealed. The review screen shows your choice plus what the alternatives
   would have meant — this is what makes the system "deeply interwoven": the meaning of any answer
-  depends on, and is explained through, every other possible answer.## 4. Question design principles (from questions-idea.md)
+  depends on, and is explained through, every other possible answer.- **Partial-run honesty distinguishes three causes** (user review: "the card said I skipped
+  questions but I answered all of them"): `QUESTION_WAVES` records the bank's growth history,
+  and scoring derives `bankGrewBy` (fully-missing waves postdate the run) and `invalidated`
+  (present answers the bank can no longer read because an item's format changed — e.g. the
+  q89/q90/q93 agreement→scenario conversion invalidated older runs' scale answers). The
+  partial-run card names each cause: complete-for-its-time, earlier-shorter-run (with the
+  invalidated answers honored as answered-with-honesty), or genuinely partial. Session import
+  classifies stale-format drops apart from unknown-question drops so the count survives to the
+  profile.
+
+## 4. Question design principles (from questions-idea.md)
 
 1. **Behavior under competing demands** beats stated values ("project due tomorrow AND partner has
    a bad night" beats "do you support your partner?").

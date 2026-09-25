@@ -184,6 +184,10 @@ export interface ScoredProfile {
   /** Questions answered / total, for confidence framing. */
   answered: number;
   total: number;
+  /** Questions the run COULD NOT have answered because the bank grew afterward (absent when none). Skipped questions — the taker's doing — are just answered < total. */
+  bankGrewBy?: number;
+  /** Present answers the current bank can no longer read — the item's format changed after this run (absent when none). These are the taker's honest answers; the instrument outgrew them. */
+  invalidated?: number;
 }
 
 export interface BlueprintSection {

@@ -745,10 +745,40 @@ export function generateBlueprint(p: ScoredProfile): Blueprint {
     });
   }
   if (p.answered < p.total) {
-    tensions.push({
-      title: 'This blueprint is built from a partial run',
-      body: `You answered ${p.answered} of ${p.total} questions. Everything here is still valid — it\'s built from what you did answer — but the quieter dimensions had less evidence to work from.`,
-    });
+    // "You skipped" vs "the instrument grew": a run that answered everything
+    // its wave contained but predates newer questions is not a partial run —
+    // it is a complete run of an earlier instrument, and the card must say so.
+    const grewBy = p.bankGrewBy ?? 0;
+    const skipped = p.total - p.answered - grewBy;
+    const invalidated = p.invalidated ?? 0;
+    const invNote =
+      invalidated > 0
+        ? ` ${invalidated === 1 ? 'One answer' : String(invalidated) + ' answers'} from this run can no longer be read — the ${invalidated === 1 ? 'question was' : 'questions were'} re-designed since, and the old format no longer exists. They still count as answered-with-honesty; they just cannot speak in the current scoring.`
+        : '';
+    if (grewBy > 0 && skipped === 0) {
+      tensions.push({
+        title: 'The questionnaire has grown since this run',
+        body: `You answered every question this run contained — all ${String(p.answered)} of them. The bank has since gained ${String(grewBy)} newer ${grewBy === 1 ? 'question' : 'questions'} this document does not use. Nothing here is missing because of you; the newer questions would sharpen the quieter dimensions whenever you feel like answering them — everything already answered is kept, and the document completes itself.${invNote}`, 
+      });
+    } else if (grewBy > 0) {
+      const missed = p.total - p.answered - grewBy - invalidated;
+      tensions.push({
+        title: 'This blueprint is built from an earlier, shorter run',
+        body:
+          `You answered ${String(p.answered)} of the ${String(p.total - grewBy)} questions this run contained, and the bank has since added ${String(grewBy)} more. ` +
+          (invalidated > 0
+            ? `${invalidated === 1 ? 'One of those answers' : String(invalidated) + ' of those answers'} can no longer be read — the ${invalidated === 1 ? 'question was' : 'questions were'} re-designed since, so they no longer feed the scoring at all. ` +
+              (missed > 0
+                ? `The other ${String(missed)} were skipped at the time. Answering the remaining (and newer) questions completes the picture; nothing already answered is lost.`
+                : 'Everything else this run contained was answered. Answering the newer questions completes the picture; nothing already answered is lost.')
+            : `Everything here is valid — it's built from what you did answer — but the quieter dimensions had less evidence to work from. Answering the remaining (and newer) questions completes the picture; nothing already answered is lost.`),
+      });
+    } else {
+      tensions.push({
+        title: 'This blueprint is built from a partial run',
+        body: `You answered ${String(p.answered)} of ${String(p.total)} questions. Everything here is still valid — it's built from what you did answer — but the quieter dimensions had less evidence to work from.`,
+      });
+    }
   }
   const unmeasuredCount = (Object.values(p.dimensions) as { unmeasured?: boolean }[]).filter((d) => d.unmeasured).length;
   if (unmeasuredCount > 0) {

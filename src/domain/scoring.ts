@@ -10,7 +10,7 @@ import type {
   ConsistencyPair,
   Weight,
 } from './types';
-import { QUESTIONS, QUESTION_BY_ID, BONUS_POOL } from './questions';
+import { QUESTIONS, QUESTION_BY_ID, BONUS_POOL, QUESTION_WAVES } from './questions';
 
 export const CHANNEL_LABELS: Record<string, string> = {
   words: 'words — being told',
@@ -169,18 +169,25 @@ export function scoreProfile(input: Answers): ScoredProfile {
   // scored in the main pass below, so a session file rebuilds everything —
   // including the clarifier adjustments — from raw answers alone.
   const answers: Answers = {};
+  let invalidated = 0;
   const byId = new Map([...QUESTIONS, ...BONUS_POOL].map((q) => [q.id, q]));
   for (const [id, v] of Object.entries(input)) {
     const q = byId.get(id);
     if (!q) continue;
     if (v.kind === 'option') {
       if (q.options.some((o) => 'label' in o && o.id === v.optionId)) answers[id] = v;
+      else invalidated += 1;
     } else if (
       v.kind === 'scale' &&
       q.format === 'agreement' &&
       q.options.some((o) => 'value' in o && String(o.value) === String(v.value))
     ) {
       answers[id] = v;
+    } else {
+      // Present and unreadable in the current bank — the item's format changed
+      // after this run (e.g. an agreement item converted to a scenario). The
+      // taker answered honestly; the instrument outgrew the answer.
+      invalidated += 1;
     }
   }
 
@@ -345,7 +352,40 @@ export function scoreProfile(input: Answers): ScoredProfile {
     // answered all core + 2 clarifiers would claim 117/115.
     answered: QUESTIONS.reduce((n, q) => n + (answers[q.id] !== undefined ? 1 : 0), 0),
     total: QUESTIONS.length,
+    // "You skipped" vs "the instrument grew": a run that answered everything
+    // its wave contained but lacks newer-wave items is not the taker's fault —
+    // the partial-run card must not imply it was. Walk the bank history and
+    // count only waves the run COULD have contained (the earliest wave it
+    // missed something from marks the frontier).
+    bankGrewBy: computeBankGrowth(answers),
+    // Present-but-unreadable answers: the item's format changed after this
+    // run (e.g. an agreement item later converted to a scenario). The taker
+    // answered honestly; the instrument outgrew the answer.
+    invalidated: invalidated > 0 ? invalidated : undefined,
   };
+}
+
+/**
+ * How many questions this run could not have answered because they were added
+ * to the bank afterward: walking from the newest wave down, fully-missing
+ * waves postdate the run (the flow requires answering everything presented,
+ * so absent items mean the run never saw them); the frontier stops at the
+ * first fully-answered wave, and a PARTIALLY missing wave is the taker's gap,
+ * not the bank's. Wave 0 (the original core) never counts as growth.
+ */
+function computeBankGrowth(answers: Record<string, unknown>): number {
+  let grown = 0;
+  for (let w = QUESTION_WAVES.length - 1; w >= 0; w--) {
+    const wave = QUESTION_WAVES[w];
+    const missing = wave.filter((q) => answers[q.id] === undefined).length;
+    if (missing === 0) break; // frontier: this wave was fully available and answered
+    if (missing === wave.length && w > 0) {
+      grown += wave.length; // the entire wave postdates this run
+      continue;
+    }
+    break; // partial wave (or the core itself): a skip, not growth
+  }
+  return grown;
 }
 
 export function topSignatureDimensions(p: ScoredProfile, count = 3): DimensionId[] {
