@@ -287,6 +287,40 @@ function headingBlockers(paragraphs: string[], epigraph: string, frames: string[
   return b;
 }
 
+// ── Paragraph stitching ──
+// The section walk emits one block per reading (tier prose, inline pattern,
+// interplay, variance note) and the synthesis composes one-sentence shape
+// signals — correct machinery that renders as a stack of sentence-or-two
+// fragments. This pass greedily packs consecutive SHORT paragraphs into full
+// ones (hard cap below, so no wall of text), while structural blocks stay
+// standalone: frame-led pattern paragraphs (they open their own reading),
+// italic placeholders (the unmeasured notice), and anything already long.
+// Pure concatenation with a space — deterministic and parity-safe.
+const STITCH_MAX = 820;
+const isStandalonePara = (t: string): boolean =>
+  t.startsWith('**') || t.startsWith('*') || t.length > STITCH_MAX * 0.75;
+
+function stitchParagraphs(paras: string[], protect?: Set<number>): string[] {
+  // Protected indices (pattern renders, variance notes) keep their own block:
+  // downstream tooling identifies them by their opening text / exact content,
+  // and the "reveal" beat of a variance note reads better unstitched.
+  const out: string[] = [];
+  const outProtected: boolean[] = [];
+  paras.forEach((p, i) => {
+    const prevIdx = out.length - 1;
+    const prev = prevIdx >= 0 ? out[prevIdx] : undefined;
+    const prot = protect?.has(i) ?? false;
+    const prevProt = prevIdx >= 0 ? outProtected[prevIdx] : false;
+    if (prev !== undefined && !prot && !prevProt && !isStandalonePara(p) && !isStandalonePara(prev) && prev.length + p.length + 1 <= STITCH_MAX) {
+      out[prevIdx] = `${prev} ${p}`;
+    } else {
+      out.push(p);
+      outProtected.push(prot);
+    }
+  });
+  return out;
+}
+
 /**
  * First non-echoing heading candidate: pattern-keyed pools first (most specific
  * signal — what actually fired in Crosscurrents), then tier pools, then static.
@@ -565,6 +599,7 @@ export function generateBlueprint(p: ScoredProfile): Blueprint {
 
   for (const spec of SECTION_SPECS) {
     const paragraphs: string[] = [];
+    const protectedIdx = new Set<number>();
     if (spec.intro) paragraphs.push(spec.intro(p));
     for (const dim of spec.dims) {
       const s = p.dimensions[dim]?.score;
@@ -590,13 +625,18 @@ export function generateBlueprint(p: ScoredProfile): Blueprint {
       // changes this paragraph's meaning), then legacy interplay covers
       // combinations the pattern library doesn't reach.
       const spotKey = `${spec.id}:${dim}`;
-      for (const h of plan.sections.get(spotKey) ?? []) paragraphs.push(...renderPattern(h, 'section', runSeed));
+      for (const h of plan.sections.get(spotKey) ?? []) {
+        const startIdx = paragraphs.length;
+        paragraphs.push(...renderPattern(h, 'section', runSeed));
+        for (let k = startIdx; k < paragraphs.length; k++) protectedIdx.add(k);
+      }
       const ip = interplayFor(dim, p);
       if (ip) paragraphs.push(varyInterplayOpener(ip, hash(dim + 'ip')));
       // Variance note last: after the tier prose and its contextual reads,
       // reveal what the average was hiding (mid scores built from opposites).
       const vn = varianceNoteFor(dim, p);
       if (vn) {
+        protectedIdx.add(paragraphs.length);
         paragraphs.push(vn);
         dividedDims.push(dim);
       }
@@ -610,12 +650,16 @@ export function generateBlueprint(p: ScoredProfile): Blueprint {
         'Taken together, your directness and your curiosity suggest something specific: you don\'t just want honesty about problems — you want the relationship to be a place where enthusiasm is also spoken out loud. Not only "this bothered me," but "look at this thing I love."',
       );
     }
+    // Stitch the section's accumulated readings into full paragraphs before
+    // anything downstream sees them (heading echo guard works on content
+    // words, so separator changes are invisible to it).
+    const stitched = stitchParagraphs(paragraphs, protectedIdx);
     // Content-aware heading, picked from the matched pool with seeded rotation,
     // skipping candidates that would re-say what this section (or the epigraph
     // or the inline pattern frames) is about to say.
     const frames = spec.dims.flatMap((d) => (plan.sections.get(`${spec.id}:${d}`) ?? []).map((h) => h.pattern.frame));
-    const heading = pickHeading(spec, p, runSeed, headingBlockers(paragraphs, epigraph, frames), firedHeadline, frameById);
-    sections.push({ id: spec.id, heading, paragraphs, headingAdaptive: heading !== spec.heading });
+    const heading = pickHeading(spec, p, runSeed, headingBlockers(stitched, epigraph, frames), firedHeadline, frameById);
+    sections.push({ id: spec.id, heading, paragraphs: stitched, headingAdaptive: heading !== spec.heading });
   }
 
   // ── Crosscurrents: the headline layer of derived patterns ──
@@ -870,7 +914,11 @@ export function generateBlueprint(p: ScoredProfile): Blueprint {
   sections.push({
     id: '__synthesis',
     heading: seededPick(SYNTHESIS_HEADINGS, hash('synthesis' + String(p.consistencyIndex) + String(p.answered))),
-    paragraphs: [leadIn, ...shapeSentences, finalWord],
+    // The shape sentences compose into full paragraphs (they were the worst
+    // one-liner stack in the document); the lead-in keeps its own paragraph
+    // because it answers a different question (how this was assembled), and
+    // the final word is the conclusion.
+    paragraphs: [leadIn, ...stitchParagraphs(shapeSentences), finalWord],
   });
   // (The founding-values “Short Version” closing block was removed by design:
   // its meta-branch summaries read as boilerplate, and its sign-off was a
