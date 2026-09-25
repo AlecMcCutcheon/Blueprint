@@ -2,7 +2,7 @@ import type { Blueprint, BlueprintSection, ConsistencyPair, DimensionId, ScoredP
 import { DIMENSION_LABELS } from './types';
 import { DIMENSIONS, TIERS, TIER_BOUNDS, TIER_LABELS, tierOf, TIER_VARIANTS, VARIANCE_LIBRARY, genericVarianceFor } from './dimensions';
 import { seededPick, hash, CHANNEL_LABELS } from './scoring';
-import { buildPatternPlan, renderPattern } from './patterns';
+import { buildPatternPlan, renderPattern, PATTERNS } from './patterns';
 
 /**
  * Evidence-distance calibration (calibration review §2): the farther an
@@ -233,6 +233,15 @@ interface SectionSpec {
    * two profiles with the same shape rarely share every heading.
    */
   headings?: { when: (p: ScoredProfile) => boolean; texts: string[] }[];
+  /**
+   * Pattern-keyed heading pools — checked BEFORE the tier conditions. `anyOf`
+   * lists Crosscurrents (headline) pattern ids; the first entry where any
+   * listed pattern actually fired wins. Keyed only on plan.headline, so a
+   * title never references a pattern the document didn't show. The keyed
+   * pattern's own frame vocabulary is exempt from the echo guard: naming the
+   * section after the finding is the point, not a stutter.
+   */
+  patternHeadings?: { anyOf: string[]; texts: string[] }[];
   dims: DimensionId[];
   /** Opening line woven before the dimension paragraphs. */
   intro?: (p: ScoredProfile) => string;
@@ -278,13 +287,34 @@ function headingBlockers(paragraphs: string[], epigraph: string, frames: string[
   return b;
 }
 
-/** First non-echoing heading candidate; seeded rotation inside the matched pool. */
-function pickHeading(spec: SectionSpec, p: ScoredProfile, runSeed: number, blockers: Set<string>): string {
-  const pool = spec.headings?.find((h) => h.when(p));
+/**
+ * First non-echoing heading candidate: pattern-keyed pools first (most specific
+ * signal — what actually fired in Crosscurrents), then tier pools, then static.
+ */
+function pickHeading(
+  spec: SectionSpec,
+  p: ScoredProfile,
+  runSeed: number,
+  blockers: Set<string>,
+  firedHeadline: Set<string>,
+  frameById: Map<string, string>,
+): string {
+  const patternChoice = spec.patternHeadings?.find((h) => h.anyOf.some((id) => firedHeadline.has(id)));
+  const pool = patternChoice ?? spec.headings?.find((h) => h.when(p));
   const texts = pool?.texts ?? [];
   const rot = texts.length > 0 ? Math.floor(Math.abs(Math.sin(hash(spec.id + '::heading') + runSeed) * 10000)) % texts.length : 0;
+  // The pattern a keyed heading NAMES may share its vocabulary — the title
+  // deliberately carries the frame's theme. Every other blocker (tier
+  // paragraphs, sibling pattern frames, the epigraph) still applies.
+  const guard = new Set(blockers);
+  if (patternChoice) {
+    for (const id of patternChoice.anyOf) {
+      const frame = frameById.get(id);
+      if (frame && firedHeadline.has(id)) for (const w of contentWords(frame)) guard.delete(w);
+    }
+  }
   const candidates = [...texts.slice(rot), ...texts.slice(0, rot), spec.heading];
-  for (const c of candidates) if (!titlesCollide(c, blockers)) return c;
+  for (const c of candidates) if (!titlesCollide(c, guard)) return c;
   return candidates[0];
 }
 
@@ -300,6 +330,10 @@ const SECTION_SPECS: SectionSpec[] = [
       { when: (p) => ti(p, 'perspective_taking') <= 3 && ti(p, 'listening_first') <= 3, texts: ['The Work of Interpretation', 'Reading and Being Read', 'Attention and Its Aims', 'The Bridge Between Two Minds'] },
     ],
     dims: ['perspective_taking', 'listening_first', 'logic_emotion_integration', 'capitalization', 'feedback_receiving'],
+    patternHeadings: [
+      { anyOf: ['shared_reality'], texts: ['Keeping One Reality', 'The Same Map of the World', 'Two Halves of Not-Guessing'] },
+      { anyOf: ['separate_worlds_curious'], texts: ['Two Worlds, Both Visited', 'Curiosity as Compatibility', 'Touring Each Other'] },
+    ],
     intro: () =>
       'One of the biggest things for you appears to be how interpretation happens — what you do in the space between someone\'s behavior and your conclusion about it.',
   },
@@ -313,6 +347,10 @@ const SECTION_SPECS: SectionSpec[] = [
       { when: (p) => ti(p, 'direct_communication') <= 3, texts: ['Truth Without Tactics', 'How You Say the Real Thing', 'Words, Handled With Care', 'Between Nothing Held Back and Nothing Forced'] },
     ],
     dims: ['direct_communication', 'curiosity_worlds'],
+    patternHeadings: [
+      { anyOf: ['shared_reality'], texts: ['Honesty as Shared Reality', 'Concealment Costs More Than Conflict', 'Information Stays Flowing'] },
+      { anyOf: ['separate_worlds_curious'], texts: ['Interest You Can Say Out Loud', 'The Visit-and-Return Model', 'Curious About You, Out Loud'] },
+    ],
     intro: () =>
       'Your answers describe a specific contract you tend to make with the people you love about how truth travels between you.',
   },
@@ -323,6 +361,10 @@ const SECTION_SPECS: SectionSpec[] = [
       { when: (p) => ti(p, 'vulnerability_safety') >= 4, texts: ['The Vault, and Who It Opens For', 'Being Seen Without Bracing', 'Where the Armor Comes Off', 'What It Takes to Be Seen'] },
       { when: (p) => ti(p, 'reassurance_security') >= 4, texts: ['Being Safe, Being Steadied', 'What Calm Is Made Of', 'The Information That Steadies You'] },
       { when: (p) => ti(p, 'vulnerability_safety') <= 2, texts: ['The Vault and Its Keeper', 'Private by Default', 'What Stays Behind the Door'] },
+    ],
+    patternHeadings: [
+      { anyOf: ['space_and_certainty'], texts: ['Space, With a Signal Attached', 'Distance You Can Read', 'Room Is Fine; Silence Is Not'] },
+      { anyOf: ['noticed_not_managing'], texts: ['Noticed, Not Managed', 'Care That Arrives Early', 'Before the Asking'] },
     ],
     dims: ['vulnerability_safety', 'reassurance_security'],
     intro: () =>
@@ -338,6 +380,9 @@ const SECTION_SPECS: SectionSpec[] = [
       { when: (p) => ti(p, 'care_initiation') >= 4 && ti(p, 'receiving_comfort') >= 4, texts: ['Care, Full Circle', 'Moving First, Landing Softly', 'Both Directions, Fully Open'] },
     ],
     dims: ['care_initiation', 'receiving_comfort', 'scorekeeping'],
+    patternHeadings: [
+      { anyOf: ['noticed_not_managing'], texts: ['The Ask Is Easy; the Noticing Is Love', 'Beyond Being Asked', 'Noticed Without Being Managed'] },
+    ],
     intro: () =>
       'This is where your answers were most consistent: what you do with care — giving it, receiving it, and whether it turns into an accounting problem.',
   },
@@ -351,6 +396,9 @@ const SECTION_SPECS: SectionSpec[] = [
       { when: (p) => ti(p, 'shared_home_effort') >= 4, texts: ['Carrying More Than Gets Noticed', 'Load-Bearing', 'Who Notices the Carrier'] },
     ],
     dims: ['same_side_problems', 'conflict_engagement', 'repair_orientation', 'shared_home_effort'],
+    patternHeadings: [
+      { anyOf: ['team_of_two'], texts: ['The Team Under Load', 'Us Against It, Especially Then', 'Two Against the Day'] },
+    ],
     intro: () =>
       'Every relationship eventually meets exhaustion, breakage, and bad luck. Your answers describe what those days bring out in you.',
   },
@@ -365,6 +413,9 @@ const SECTION_SPECS: SectionSpec[] = [
       { when: (p) => ti(p, 'positivity_play') >= 4, texts: ['Lightness, Tended', 'Fun as Infrastructure', 'The Recess Clause'] },
     ],
     dims: ['affection_daily', 'desire', 'desire_initiation', 'intimacy_attunement', 'sexual_communication', 'positivity_play', 'express_receive_alignment'],
+    patternHeadings: [
+      { anyOf: ['independent_but_connected'], texts: ['Close in the Time You Share', 'Density, Not Distance', 'The Time You Share, Dense'] },
+    ],
     intro: () =>
       'Your answers sketch how closeness actually travels in and out of you — through what channel, at what volume, how you keep attraction alive, and how much of the relationship\'s lightness is tended.',
   },
@@ -378,6 +429,12 @@ const SECTION_SPECS: SectionSpec[] = [
       { when: (p) => ti(p, 'money_coordination') <= 2, texts: ['Money, Mostly Unmentioned', 'The Quiet Economy', 'Fairness Without a Meeting'] },
     ],
     dims: ['autonomy_connection', 'commitment_sacrifice', 'money_coordination'],
+    patternHeadings: [
+      { anyOf: ['space_and_certainty'], texts: ['Room, With the Story Attached', 'Space That Reports Back', 'Freedom With a Signal'] },
+      { anyOf: ['team_of_two'], texts: ['Own Orbits, One Gravity', 'Separate Weekends, Shared Fronts', 'The Alliance Model'] },
+      { anyOf: ['independent_but_connected'], texts: ['Wide Space, High Contact', 'Independent, and Still Warm', 'Far Apart, Close On Purpose'] },
+      { anyOf: ['separate_worlds_curious'], texts: ['A Life Worth Visiting', 'Room to Roam, Reasons to Return', 'Two Lives, Cross-Referenced'] },
+    ],
     intro: () =>
       'Finally, the shape of the life itself: how much of you stays yours inside a relationship, and how the two of you carry the costs of a shared life.',
   },
@@ -496,6 +553,11 @@ export function generateBlueprint(p: ScoredProfile): Blueprint {
   // Synthesis patterns headline the Crosscurrents section; the rest render
   // inline where their placement says the reading belongs.
   const plan = buildPatternPlan(p);
+  // What actually headlined Crosscurrents, by id and by frame text — the
+  // pattern-keyed headings react to this set, and the echo guard needs the
+  // frame vocabulary of the pattern a keyed title names.
+  const firedHeadline = new Set(plan.headline.map((h) => h.pattern.id));
+  const frameById = new Map(PATTERNS.map((pat) => [pat.id, pat.frame] as const));
 
   for (const spec of SECTION_SPECS) {
     const paragraphs: string[] = [];
@@ -545,7 +607,7 @@ export function generateBlueprint(p: ScoredProfile): Blueprint {
     // skipping candidates that would re-say what this section (or the epigraph
     // or the inline pattern frames) is about to say.
     const frames = spec.dims.flatMap((d) => (plan.sections.get(`${spec.id}:${d}`) ?? []).map((h) => h.pattern.frame));
-    const heading = pickHeading(spec, p, runSeed, headingBlockers(paragraphs, epigraph, frames));
+    const heading = pickHeading(spec, p, runSeed, headingBlockers(paragraphs, epigraph, frames), firedHeadline, frameById);
     sections.push({ id: spec.id, heading, paragraphs, headingAdaptive: heading !== spec.heading });
   }
 

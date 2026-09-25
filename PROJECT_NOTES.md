@@ -159,11 +159,15 @@ and the taker never sees dimension names during the quiz.
 - **Adaptive section headings**: each section carries condition-keyed heading POOLS — the first
   matching condition (a dimension's tier, or a combination like "capitalization low AND listening
   high") selects a pool of 3–5 content-matched tellings, and a seeded pick rotates inside it, so
-  two profiles rarely share a full set of titles (97 distinct texts observed across 300 random
-  runs; titles never repeat within one document). A render-time echo guard drops any candidate
-  that shares too much vocabulary with what the section actually renders — tier paragraphs, fired
-  pattern frames, or the epigraph — falling back to the static title if everything collides.
-  `headingAdaptive` records which were chosen.
+  two profiles rarely share a full set of titles (126 distinct texts observed across 300 random
+  runs; titles never repeat within one document). PATTERN-keyed pools are checked first: when one
+  of the six synthesis patterns headlined Crosscurrents, sections keyed to that pattern take
+  titles written from its frame (e.g. `noticed_not_managing` firing titles the safety and
+  reciprocity sections as "Noticed, Not Managed" / "Beyond Being Asked") — keyed only on what
+  actually rendered, with the named pattern's frame vocabulary exempt from the echo guard. A
+  render-time echo guard otherwise drops any candidate that shares too much vocabulary with what
+  the section renders — tier paragraphs, fired pattern frames, or the epigraph — falling back to
+  the static title if everything collides. `headingAdaptive` records which were chosen.
 - **Epigraph pools**: the opening line is keyed to the most distinctive dimension signal (score
   ≤ 36 or ≥ 70), with 3–4 tellings per keyed dimension and a seeded fallback pool — seeds derive
   only from profile content (dimension + score), never from owner-vs-share state, so BP5 share
