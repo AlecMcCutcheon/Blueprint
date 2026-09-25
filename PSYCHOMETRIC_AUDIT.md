@@ -20,7 +20,7 @@ evidence actually says, and what remains undone. Re-read whenever the instrument
 
 ## 2. Coverage: what the numbers actually are (recomputed after the expansion — `scripts/audit.ts`)
 
-133 questions across 28 dimensions; 114 of the 133 questions carry weights on 2+ dimensions (the
+137 questions across 28 dimensions; 118 of the 137 questions carry weights on 2+ dimensions (the
 interwoven design working as intended).
 
 | dimension | touching | | dimension | touching |

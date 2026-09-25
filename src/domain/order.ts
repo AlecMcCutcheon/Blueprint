@@ -68,7 +68,7 @@ export function computeCatchUpOrder(seed: number, answeredIds: Iterable<string>)
 }
 
 /**
- * Constrained seeded order of the 133 scored core questions. The three state
+ * Constrained seeded order of the 137 scored core questions. The three state
  * items live in the end-of-run survey and the bonus questions are
  * conflict-triggered — neither belongs to the core presentation order.
  */
