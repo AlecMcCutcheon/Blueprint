@@ -199,7 +199,12 @@ and the taker never sees dimension names during the quiz.
   reading (the pattern's own dimensions) — keyed to the dominant Crosscurrents pattern, with an
   honest fallback for headline-less runs. Every entry must be earnable from that pattern's
   conditions, so the conclusion is derived from the taker's choices rather than universal
-  advice.
+  advice. The final word is COMPOSED, not selected: the authored core is the spine, and up to
+  three conditional modules integrate the other signals — a channel-integration complication
+  (mismatch or wide-dictionary variants), a second current (headline pattern #2's own frame
+  line, so the partner must make sense under both readings), and a negotiation layer when one
+  of the dominant pattern's own dimensions is the divided one. 50 distinct endings observed
+  across 300 runs (was max 6 under select-one).
 - **Tensions**: dimensions whose *paired* questions disagree (e.g. expresses affection through acts
   but wants to receive words) surface as explicit "where your answers suggest some tension" sections.
 - **Alternatives, per the brief**: for every question, the app stores a full description of what each

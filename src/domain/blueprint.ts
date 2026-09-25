@@ -833,7 +833,39 @@ export function generateBlueprint(p: ScoredProfile): Blueprint {
     separate_worlds_curious:
       'You are suited to the visiting arrangement: two people with their own worlds who keep touring each other\'s. The partner who fits you has a life you find interesting and room for you inside it — not as a guest wing, but as a reader. What fails is the drift into polite strangers: invitations that stop, tours that end, not from conflict but from nobody booking the next visit. Your answers pay for this reading on both sides — the space you keep and the second question you ask — and that combination is rarer than either trait alone.',
   };
-  const finalWord = domPattern ? PATTERN_DYNAMICS[domPattern.id] : fallbackWord;
+  // The final word is COMPOSED, not selected: the authored core dynamic is
+  // the spine, and up to three conditional modules deepen it with other
+  // signals — so two profiles sharing a dominant pattern still get different
+  // endings when their channel reality, second headline, or internal
+  // negotiation differ. Every module must earn its place from a signal the
+  // document actually rendered.
+  const CHANNEL_INTEGRATION =
+    'One complication this dynamic has to survive: the care you give and the care that reaches you travel in different registers. The partner described here has to learn your receiving language rather than assume it mirrors your giving — and telling them what it is falls to you, because the answers above say watching you will not reveal it.';
+  let finalWord: string;
+  if (!domPattern || !PATTERN_DYNAMICS[domPattern.id]) {
+    finalWord = fallbackWord;
+  } else {
+    const parts: string[] = [PATTERN_DYNAMICS[domPattern.id]];
+    if (p.channels.express && p.channels.receive && p.channels.express !== p.channels.receive) {
+      parts.push(CHANNEL_INTEGRATION);
+    } else if ((p.receiveBreadth ?? 0) >= 3) {
+      // Wide-dictionary receiving: care lands in every register — the
+      // integration risk is not translation but attention (a partner never
+      // learns which gesture mattered most).
+      parts.push('One complication this dynamic has to survive: care reaches you in almost any register it is offered — a wide dictionary, not a narrow one. That is generous, and it hides a cost: a partner may never learn which gesture mattered most, because you never single it out. The dynamic above works better once you do.');
+    }
+    const secondPattern = plan.headline[1]?.pattern;
+    const secondFrame = secondPattern ? frameById.get(secondPattern.id) : undefined;
+    if (secondFrame) {
+      parts.push(`A second current held in your answers too — "${secondFrame}" — and the partner described above has to make sense under both readings, not just the dominant one.`);
+    }
+    const dividedCore = domPattern.dims.find((d) => dividedDims.includes(d));
+    if (dividedCore) {
+      const dl = DIMENSION_LABELS[dividedCore]?.toLowerCase() ?? dividedCore;
+      parts.push(`Worth one more layer: ${dl} — one of the dimensions doing the work in this dynamic — is itself the divided reading named above. The partner who fits you will meet whichever side of that negotiation is on duty that week, which makes naming the back-and-forth to them part of making the dynamic work.`);
+    }
+    finalWord = parts.join(' ');
+  }
 
   sections.push({
     id: '__synthesis',

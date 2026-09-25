@@ -31,6 +31,8 @@ function randomAnswers(): Answers {
 const RUNS = Number(process.argv[2] ?? 300);
 let noHighs = 0, withLow = 0, withSpine = 0, withDivided = 0, withChannel = 0, fallbackWord = 0;
 let minShape = 99, maxShape = 0;
+const finalWords = new Map<string, number>();
+let moduleSum = 0, moduleMax = 0;
 const defects: string[] = [];
 let sampleNoHighs: string | null = null;
 
@@ -43,6 +45,11 @@ for (let run = 0; run < RUNS; run++) {
   minShape = Math.min(minShape, shape.length);
   maxShape = Math.max(maxShape, shape.length);
   const all = syn.paragraphs.join('\n');
+  const fw = syn.paragraphs[syn.paragraphs.length - 1] ?? '';
+  finalWords.set(fw, (finalWords.get(fw) ?? 0) + 1);
+  const nMod = (fw.match(/One complication this dynamic|A second current held|Worth one more layer/g) ?? []).length;
+  moduleSum += nMod;
+  moduleMax = Math.max(moduleMax, nMod);
   if (/is still more assembly than inheritance/.test(all)) {
     noHighs += 1;
     if (!sampleNoHighs) sampleNoHighs = shape.join('\n\n');
@@ -68,6 +75,7 @@ console.log(`spine sentence (dominant interaction): ${withSpine} (${((100 * with
 console.log(`divided-dimension sentence: ${withDivided} (${((100 * withDivided) / RUNS).toFixed(0)}%)`);
 console.log(`channel-asymmetry sentence: ${withChannel} (${((100 * withChannel) / RUNS).toFixed(0)}%)`);
 console.log(`fallback final word (no headline to key on): ${fallbackWord} (${((100 * fallbackWord) / RUNS).toFixed(0)}%)`);
+console.log(`composed endings: ${finalWords.size} distinct across ${RUNS} docs · modules per ending avg ${(moduleSum / RUNS).toFixed(2)} max ${moduleMax} · top: ${[...finalWords.entries()].sort((a, b) => b[1] - a[1])[0]?.[1]}×`);
 if (sampleNoHighs) console.log(`\n— sample no-highs closer —\n${sampleNoHighs.slice(0, 600)}`);
 
 // Edge case: legacy share codes (BP1–BP3) — many dimensions unmeasured, so
