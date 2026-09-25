@@ -752,12 +752,16 @@ export function generateBlueprint(p: ScoredProfile): Blueprint {
   // thin.
   const topSyn = dimsArr.filter((d) => d.score >= 62).sort((a, b) => b.score - a.score).slice(0, 2);
   const lowSyn = dimsArr.filter((d) => d.score <= 40).sort((a, b) => a.score - b.score)[0];
+  // Thin-evidence guard, matching the band chips: a synthesis claim carried
+  // by ≤3 answers gets the same "held lightly" hedge the readouts show.
+  const evidenceOf = (id: DimensionId): number => p.variance?.[id]?.contributions.length ?? p.dimensions[id]?.varianceShape?.count ?? 99;
   const shapeSentences: string[] = [];
   if (topSyn.length > 0) {
     const notes = topSyn.map((d) => noteFor(d.id, d.score).toLowerCase());
     const joined = notes.length === 2 ? notes[0] + ' and ' + notes[1] : notes.join('; and ');
+    const thin = topSyn.every((d) => evidenceOf(d.id) <= 3);
     shapeSentences.push(
-      'Based on your answers, a relationship that may feel natural to you would probably involve ' + joined + '.',
+      (thin ? 'Held lightly, since few answers carry these readings: a relationship that may feel natural to you would probably involve ' : 'Based on your answers, a relationship that may feel natural to you would probably involve ') + joined + '.',
     );
   } else {
     shapeSentences.push(
@@ -765,7 +769,8 @@ export function generateBlueprint(p: ScoredProfile): Blueprint {
     );
   }
   if (lowSyn) {
-    shapeSentences.push('What it would not ask of you: ' + noteFor(lowSyn.id, lowSyn.score).toLowerCase() + '.');
+    const thinLow = evidenceOf(lowSyn.id) <= 3;
+    shapeSentences.push('What it would not ask of you' + (thinLow ? ' — lightly held, few answers carry this read —' : '') + ': ' + noteFor(lowSyn.id, lowSyn.score).toLowerCase() + '.');
   }
   const domPattern = plan.headline[0]?.pattern;
   if (domPattern && domPattern.dims.length >= 2) {
@@ -779,11 +784,25 @@ export function generateBlueprint(p: ScoredProfile): Blueprint {
     shapeSentences.push(seededPick(spineLeads, hash('spine') + runSeed));
   }
   if (dividedDims.length > 0) {
-    const d0 = dividedDims[0];
-    const dl = DIMENSION_LABELS[d0]?.toLowerCase() ?? d0;
-    shapeSentences.push(
-      `And one part of this picture is genuinely two-valued rather than settled: your ${dl} reads as a back-and-forth still in negotiation — the sections above name what the average was hiding.`,
-    );
+    // Phrasing tracks the count — "one part" is a lie when eight dimensions
+    // are divided, and a sentence that fires identically on every document
+    // starts reading as boilerplate.
+    if (dividedDims.length === 1) {
+      const d0 = dividedDims[0];
+      const dl = DIMENSION_LABELS[d0]?.toLowerCase() ?? d0;
+      shapeSentences.push(
+        `And one part of this picture is genuinely two-valued rather than settled: your ${dl} reads as a back-and-forth still in negotiation — the sections above name what the average was hiding.`,
+      );
+    } else if (dividedDims.length <= 3) {
+      const names = dividedDims.slice(0, 2).map((d) => DIMENSION_LABELS[d]?.toLowerCase() ?? d).join(' and ');
+      shapeSentences.push(
+        `And parts of this picture are still negotiating rather than settled — ${names}${dividedDims.length === 3 ? ', and one more' : ''} read as live back-and-forths above, where the averages hid the tug-of-war.`,
+      );
+    } else {
+      shapeSentences.push(
+        `And more of this picture is still negotiating than settled: ${String(dividedDims.length)} of your dimensions read as live back-and-forths above — the averages hide more than they show, which makes the sections worth reading as negotiations, not verdicts.`,
+      );
+    }
   }
   if (p.channels.express && p.channels.receive && p.channels.express !== p.channels.receive) {
     shapeSentences.push(

@@ -185,7 +185,11 @@ and the taker never sees dimension names during the quiz.
   dominant Crosscurrents interaction, a divided dimension when one exists, the channel
   asymmetry when present, and a tensions-aware closing — every clause gated on its signal
   existing, so thin profiles get honest silence instead of filler (replaced the old four-tier-
-  note semicolon list, which read as fortune-cookie).
+  note semicolon list, which read as fortune-cookie). Count-aware phrasing for the divided
+  reading ("one part" / "parts" / "more than settled" by how many dimensions qualify),
+  thin-evidence hedges when a synthesis claim rests on ≤3 answers, and a permanent corpus audit
+  (`scripts/synthesis-audit.ts`: signal fire rates, no-highs/legacy-code/three-answer edge
+  cases, mechanical defects).
 - **Tensions**: dimensions whose *paired* questions disagree (e.g. expresses affection through acts
   but wants to receive words) surface as explicit "where your answers suggest some tension" sections.
 - **Alternatives, per the brief**: for every question, the app stores a full description of what each
