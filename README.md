@@ -115,7 +115,11 @@ profiles), `auditmine.ts` (per-dimension evidence contributions), `catalog.ts`
 (regenerates the pattern catalog), and `opposite-session.ts` (builds a session that
 answers every question maximally against a source session — the divergence stress test:
 23/28 dimensions move >15 points and the generated documents share under 10% of
-paragraphs).
+paragraphs). `reachability.ts` proves from the bank's weights which score bands each
+dimension can actually reach (26/28 hit all 7 tiers exactly; `logic_emotion_integration`
+has a structural floor of 70 because no option in the bank weights it negatively — the
+only known dead prose), enumerates the channel-derived alignment dimension exactly, and
+lower-bounds the document space at ~10^26 distinct tier-paragraph combinations.
 
 ## License
 
