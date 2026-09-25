@@ -522,8 +522,10 @@ function AppInner() {
       onSaveName={handleSaveName}
       onStartCompare={() => setStage('compare')}
       onRetake={startOver}
+      unansweredCount={QUESTIONS.filter((q) => answers[q.id] === undefined).length}
       onStartUpgrade={
-        Object.values(profile.dimensions).some((d) => d.unmeasured)
+        Object.values(profile.dimensions).some((d) => d.unmeasured) ||
+        QUESTIONS.some((q) => answers[q.id] === undefined)
           ? () => {
               setVisitor(null);
               setStage('quiz');

@@ -21,6 +21,8 @@ interface Props {
   onRetake: () => void;
   /** Present when any dimension is unmeasured: jump back into the questionnaire. */
   onStartUpgrade?: () => void;
+  /** Core questions this session never answered (the bank grew after the run began). */
+  unansweredCount?: number;
   /** Present when the user's own answers exist: open the answers-summary (Review) page. */
   onOpenReview?: () => void;
 }
@@ -50,6 +52,7 @@ export default function BlueprintView({
   onStartTest,
   onRetake,
   onStartUpgrade,
+  unansweredCount = 0,
   onOpenReview,
 }: Props) {
   const { theme, toggle } = useTheme();
@@ -150,6 +153,7 @@ export default function BlueprintView({
             {`Built from ${profile.answered} answers · `}
             answers agreed with themselves {profile.consistencyIndex}% of the time · not a
             diagnosis, a mirror.
+            {unansweredCount > 0 && ` · ${unansweredCount} newer questions unanswered.`}
           </p>
         </header>
       )}
@@ -204,17 +208,27 @@ export default function BlueprintView({
 
       </article>
 
-      {!isVisitor && code === null && onStartUpgrade && (
+      {!isVisitor && (code === null || unansweredCount > 0) && onStartUpgrade && (
         <section className="bp__upgrade">
           <h2>
             <Icon name="door" size={17} className="bp__secicon" />
             <span>A few newer questions are waiting for you</span>
           </h2>
-          <p>
-            One section of this document is empty — the questions about what stays between two
-            people were added after your run began. It's five questions; everything you've already
-            answered is kept, and the document completes itself when you're done.
-          </p>
+          {code === null ? (
+            <p>
+              One section of this document is empty — the questions about what stays between two
+              people were added after your run began. It's five questions; everything you've already
+              answered is kept, and the document completes itself when you're done.
+            </p>
+          ) : (
+            <p>
+              The questionnaire has grown since your run began — {unansweredCount}{' '}
+              questions you were never asked. Nothing here is wrong: this document is complete for
+              what you answered. But those questions sharpen the traits they measure, and answering
+              them keeps everything you've already done — the new ones come first, then you're back
+              here.
+            </p>
+          )}
           <button className="btn btn--primary btn--small" onClick={onStartUpgrade}>
             Finish the newer questions →
           </button>
