@@ -146,12 +146,16 @@ function AppInner() {
   const { seed, resetSeed, adoptSeed } = useOrderSeed();
   // Catch-up mode: a saved run started before the bank grew. New questions
   // shuffle into their own pile and present first; answered ones keep the
-  // original seed's relative order. Retired automatically once every core
-  // question is answered — the permanent seed then governs the full bank.
-  const [catchUpMode, setCatchUpMode] = useState(false);
+  // original seed's relative order. The two-pile order is computed ONCE at
+  // detection and FROZEN — answering a question must never reshuffle the
+  // remaining pile under the user's cursor (Continue is the only step
+  // forward). The frozen order IS the mode: setting it back to null retires
+  // catch-up, and the permanent seed governs the full bank again.
+  const [catchUpOrderIds, setCatchUpOrderIds] = useState<string[] | null>(null);
+  const catchUpMode = catchUpOrderIds !== null;
   const order = useMemo(
-    () => (catchUpMode ? computeCatchUpOrder(seed, Object.keys(answers)) : computeOrder(seed)),
-    [catchUpMode, seed, answers],
+    () => catchUpOrderIds ?? computeOrder(seed),
+    [catchUpOrderIds, seed],
   );
 
   // ── Mount: visitor link takes precedence, then the user's own session. ──
@@ -193,7 +197,11 @@ function AppInner() {
         if (answeredCore < QUESTIONS.length) {
           const ord = computeOrder(seed);
           const isPrefix = ord.slice(0, answeredCore).every((id) => answeredIds.has(id));
-          if (!isPrefix) setCatchUpMode(true);
+          if (!isPrefix) {
+            // Freeze the pile at detection — it must not re-shuffle as
+            // answers land during the session.
+            setCatchUpOrderIds(computeCatchUpOrder(seed, answeredIds));
+          }
         }
       }
     }
@@ -240,7 +248,7 @@ function AppInner() {
   useEffect(() => {
     if (!catchUpMode) return;
     const complete = QUESTIONS.every((q) => answers[q.id] !== undefined);
-    if (complete) setCatchUpMode(false);
+    if (complete) setCatchUpOrderIds(null);
   }, [catchUpMode, answers]);
 
   const startFresh = useCallback(() => {
@@ -248,7 +256,7 @@ function AppInner() {
     setBlueprint(null);
     setVisitor(null);
     setClarifierQueue([]);
-    setCatchUpMode(false);
+    setCatchUpOrderIds(null);
     resetSeed(); // retake → genuinely fresh question order
     clearShareUrl();
     setStage('quiz');
@@ -259,7 +267,7 @@ function AppInner() {
     setBlueprint(null);
     setVisitor(null);
     setClarifierQueue([]);
-    setCatchUpMode(false);
+    setCatchUpOrderIds(null);
     try {
       localStorage.removeItem(STORAGE_KEY);
     } catch {
@@ -334,7 +342,7 @@ function AppInner() {
       computeOrder(restored.orderSeed)
         .slice(0, answeredCore)
         .every((id) => answeredIds.has(id));
-    setCatchUpMode(!isPrefix);
+    setCatchUpOrderIds(isPrefix ? null : computeCatchUpOrder(restored.orderSeed, answeredIds));
     if (restored.name) handleSaveName(restored.name);
     setVisitor(null);
     setClarifierQueue([]);
