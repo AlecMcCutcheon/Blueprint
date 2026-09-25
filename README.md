@@ -119,7 +119,11 @@ paragraphs). `reachability.ts` proves from the bank's weights which score bands 
 dimension can actually reach (26/28 hit all 7 tiers exactly; `logic_emotion_integration`
 has a structural floor of 70 because no option in the bank weights it negatively — the
 only known dead prose), enumerates the channel-derived alignment dimension exactly, and
-lower-bounds the document space at ~10^26 distinct tier-paragraph combinations.
+lower-bounds the document space at ~10^26 distinct tier-paragraph combinations. `sensitivity.ts`
+measures what one answer is worth: exact balanced-baseline single-flip swings per dimension
+(worst-case 37–68 pts on the thinnest constructs vs 1.5–4 pts on the well-evidenced core),
+effective independent evidence counts (n_eff), and cross-dimension couplings — the empirical
+basis for knowing where the instrument's 7-tier resolution is earned and where it is borrowed.
 
 ## License
 
