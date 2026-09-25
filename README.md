@@ -3,7 +3,7 @@
 **A relationship-instincts questionnaire that writes your document for you.**
 
 Not "what's your love language." Not a compatibility score. Blueprint measures how you
-*actually* tend to love — through 137 situational questions where the measurement is
+*actually* tend to love — through 145 situational questions where the measurement is
 hidden inside scenarios, forced choices, and behavioral agreement scales — then generates
 a personalized narrative document about how you appear to love, built entirely from your
 own answer pattern.
@@ -15,7 +15,7 @@ of small decisions you made when you didn't know what was being measured.*
 
 ## What it measures
 
-137 scored questions across **28 hidden dimensions** — from everyday affection and
+141 scored questions across **30 hidden dimensions** — from everyday affection and
 desire to repair after conflict, invisible household effort, money-as-teamwork, and
 the boundary around the relationship itself. No dimension is ever shown as a bare
 number first; every score arrives as prose.
@@ -26,7 +26,7 @@ wide receiving next to a touch-first giving channel implies, where two strong sc
 quietly create a risk neither would create alone. Within-dimension variance detection
 catches the averages that are actually tug-of-wars and says so.
 
-The run ends with 3 clarifying questions (140 items total), generated from echo pairs — scenarios that
+The run ends with 3 clarifying questions (145 items total), generated from echo pairs — scenarios that
 came back wearing different clothes — and the document reports how often your answers
 agreed with themselves.
 
@@ -34,12 +34,12 @@ agreed with themselves.
 
 1. **Intro** — the honesty contract: answer fast, first instinct, there are no
    "good partner" answers, and some scenarios come back later wearing different clothes.
-2. **Quiz** — the 137-item core in a randomized-but-stable order that never places
+2. **Quiz** — the 141-item scored core in a randomized-but-stable order that never places
    same-dimension items back-to-back, then the 3 clarifiers once the engine knows
    which territories need a closer look. Progress checkpoints to localStorage after
    every answer.
 3. **Review** — two tabs: *What each answer revealed* (your choice plus what every
-   alternative would have revealed) and *What was actually measured* (the 28 dimensions).
+   alternative would have revealed) and *What was actually measured* (the 30 dimensions).
 4. **Blueprint** — the narrative document: everyday affection → understanding →
    communication → safety → reciprocity → hard days → closeness → independence →
    privacy → crosscurrents (your top cross-dimension patterns) → tensions → closing.
@@ -119,12 +119,12 @@ Additional tooling under `scripts/`: `harness.ts` (pattern fire rates across 540
 profiles), `auditmine.ts` (per-dimension evidence contributions), `catalog.ts`
 (regenerates the pattern catalog), and `opposite-session.ts` (builds a session that
 answers every question maximally against a source session — the divergence stress test:
-23/28 dimensions move >15 points and the generated documents share under 10% of
+25/30 dimensions move >15 points and the generated documents share under 10% of
 paragraphs). `reachability.ts` proves from the bank's weights which score bands each
-dimension can actually reach (26/28 hit all 7 tiers exactly; `logic_emotion_integration`
-has a structural floor of 70 because no option in the bank weights it negatively — the
-only known dead prose), enumerates the channel-derived alignment dimension exactly, and
-lower-bounds the document space at ~10^26 distinct tier-paragraph combinations. `sensitivity.ts`
+dimension can actually reach (all 29 bank dimensions hit all 7 tiers exactly; the
+derived channel-alignment dimension enumerates 6 of 7), enumerates the channel-derived
+alignment dimension exactly, and lower-bounds the document space at ~10^29 distinct
+tier-paragraph combinations. `sensitivity.ts`
 measures what one answer is worth: exact balanced-baseline single-flip swings per dimension
 (worst-case 37–68 pts on the thinnest constructs vs 1.5–4 pts on the well-evidenced core),
 effective independent evidence counts (n_eff), and cross-dimension couplings — the empirical

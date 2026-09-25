@@ -14,7 +14,7 @@ Rendered: 2026-09-25
 - Selection: ranked confidence × priority; 3 headline max (Crosscurrents), 2 per placement spot, 1 tension / 2 augments per section; dedup drops patterns whose combination an interplay passage owns, whose frame echoes a section heading, or whose opener stutters on the tier paragraph
 - Gap conditions additionally require the leading dimension to clear 55 raw (a gap from a non-high base is not a finding)
 
-## Derived patterns (36)
+## Derived patterns (40)
 
 ### space_and_certainty
 
@@ -47,6 +47,38 @@ Rendered: 2026-09-25
 - **Placement:** Crosscurrents (headline)
 - **Frame:** Honesty as shared reality, not as weapon or ritual.
 - **Claims:** “Your directness and your benefit-of-the-doubt belong to the same project: keeping the two of you standing in the same reality. You say the true thing while it is small, and you give other people room to explain themselves before you conclude — which means information stays flowing in both directions. In your model, honesty is not bluntness and charity is not denial; they are two halves of not-making-each-other-guess. The tell that this is load-bearing for you: concealment bothers you more than disagreement. A partner can fight with you and be fine; a partner who curates what you know is harder to forgive.”
+
+### care_loop_open
+
+- **Type:** synthesis · **Priority:** 88
+- **Trigger:** Care Roles — Giving and Receiving tier mhigh+ (≥62 raw) AND Receiving Care tier mid+ (≥48 raw)
+- **Placement:** Crosscurrents (headline)
+- **Frame:** The care loop runs both ways — and that is rarer than it sounds.
+- **Claims:** “Your care-role flexibility and your receiving comfort point at the same architecture from two sides: you give gestures freely, and the same gestures arriving back land as care rather than as costume. That combination is the thing the founding document keeps calling mutual — not both people performing identical roles, but neither person's role being a wall. Its practical value is quiet but large: partners who feel they can take care of you actually take care of you, which means the loop feeds itself instead of running on one motor. The watch-item is the outside world: people sometimes read role-flexibility as rolelessness, and it is worth naming that the flexibility IS the commitment, not a lack of shape.”
+
+### one_way_care
+
+- **Type:** tension · **Priority:** 80
+- **Trigger:** Care Roles — Giving and Receiving tier mlow− (≤47 raw) AND Instinct to Care tier mid+ (≥48 raw)
+- **Placement:** reciprocity section, after Instinct to Care
+- **Frame:** You take care of people masterfully — and being taken care of has a locked door.
+- **Claims:** “The giving side of your care runs freely — you anticipate, you carry, you make people feel precious. The receiving side of the SAME gestures is the locked room: being pampered, planned-for, or waited on registers as a role violation rather than as love, and you will sometimes actively reclaim the gesture by doing something for them before it settles. Often that comes from what taking care has meant, or from what receiving it once cost. The practical shape of it: a partner learns within months which door is closed, and stops offering — so the only care you get is the care you cannot receive, and the hunger goes unnamed in both directions. The unlock is small and specific rather than global: name the one or two reversals you COULD receive, and let those run first.”
+
+### mismatch_audit
+
+- **Type:** tension · **Priority:** 76
+- **Trigger:** Grace Around Mismatched Want tier mlow− (≤47 raw) AND Being Wanted tier mid+ (≥48 raw)
+- **Placement:** closeness section, after Being Wanted
+- **Frame:** Want runs hot in you — and every mismatch files a report.
+- **Claims:** “Your answers hold wanting and bookkeeping in the same hand: the desire is real and alive, but a partner's no, an off night, or your own deflection gets recorded somewhere — read into the relationship, weighed, kept. That combination usually means want has been tied to evidence: being wanted proved the bond, so not-being-wanted-in-this-moment started disproving it. The cost is invisible at first — a partner who has to perform availability stops telling the truth about their body, and the performance is precisely what makes their yes feel less like desire. The repair is the grace side of the same trait you already have: want allowed to exist in the room without an answer required, in both directions.”
+
+### grace_architecture
+
+- **Type:** synthesis · **Priority:** 84
+- **Trigger:** Grace Around Mismatched Want tier mhigh+ (≥62 raw) AND Reading Each Other in the Dark tier mid+ (≥48 raw)
+- **Placement:** Crosscurrents (headline)
+- **Frame:** Mismatch does not become a story in your answers — that is an architecture.
+- **Claims:** “Two scores describe the same room from different corners: your attunement catches the drift and your grace lets it pass without a verdict. Together they mean a partner's no can be a plain no, an off night can be an off night, and want can exist in the room without either person being put on trial for it. This is the specific trait the research ties to desire surviving the years — not constant appetite, but the absence of a performance review. The watch-item is your own no: people this graceful about receiving a refusal are sometimes terrible at voicing one, and the grace has to run both directions or it curdles into self-erasure.”
 
 ### separate_worlds_curious
 
@@ -397,6 +429,8 @@ Gate: mid/leaning tier AND cancellation ≥ 0.4 AND ≥2 opposing answers among 
 - **intimacy_attunement — Reading Each Other in the Dark:** Your attunement score sits near the middle because reading-the-moment and following-your-own-current both answered. You likely track well in calm moments and lose the thread in charged ones — the condition, not the midpoint, is the finding.
 - **feedback_receiving — Hearing It Without Armor:** Your feedback score lands near the middle, but the underneath is contested: genuine curiosity about the point next to a reflex of defense. Which one wins probably depends on how exposed the feedback finds you — knowing your trigger beats defending the average.
 - **external_processing — Outside Voices, On Purpose:** Your processing score sits near the middle because thinking-out-loud and working-it-through-alone both got real votes. What decides is probably the size of the tangle and whether you already know your own mind — the average hides that your method has states, not a level.
+- **care_role_flexibility — Care Roles — Giving and Receiving:** Your care-role score lands near the middle, but the middle here is a permission slip with conditions: some reversals read as love and others as costume. The map of which is which is worth more than the average — a partner can work with a list, not with a vibe.
+- **desire_grace — Grace Around Mismatched Want:** Your grace score sits near the middle because easy and charged both answered: most mismatches land clean, some versions of the conversation still carry a price. Which ones charge you is the actual finding — the average smooths a map into a mood.
 - **generic (seeded, 2 variants):** Your score here sits near the middle, but the answers underneath it were not all mild ones — pulls in both directions canceled into the average. That is a different situation from genuinely moderate feelings: you likely run strong in one context and opposite in another. The middle number will mislead a partner more than the pattern will.
 
 ## Band-variant paragraphs (alternate prose for the mhigh/high bands)

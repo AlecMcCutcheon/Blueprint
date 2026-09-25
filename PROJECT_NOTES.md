@@ -280,9 +280,10 @@ and the taker never sees dimension names during the quiz.
    ("if something wasn't working for me in bed, I'd say so out loud").
 6. **Formats mixed**: multiple-choice scenario, forced-choice pairs (A/B), 1–5 agreement scales
    (used sparingly, framed behaviorally), "which affects you most" vs. "which would you do".
-7. **~137 questions, 25–40 minutes.** Every dimension gets multiple questions; the thinnest constructs (intimacy attunement, outside-voice processing, feedback reception) get dedicated evidence-depth waves.
-   (q63–q67 privacy Sep 2026; q68–q95 Sep 2026 expansion: 3 curiosity_worlds + 3 relational_privacy
-   coverage debt, then 6 new dimensions. New questions always append to ORDER so existing local
+7. **~145 questions, 25–45 minutes.** Every dimension gets multiple questions; the thinnest constructs (intimacy attunement, outside-voice processing, feedback reception) get dedicated evidence-depth waves.
+   (q63–q67 privacy Sep 2026; q68–q95 Sep 2026 expansion; q96–q144 + q113–q114 Sep 2026 waves 4–6;
+   q145–q152 Sep 2026 wave 7: care_role_flexibility + desire_grace — the founding document's two
+   most under-visible constructs. New questions always append to ORDER so existing local
    runs resume unchanged and simply gain the newer questions.)
 
 ## 5. Architecture
@@ -291,23 +292,23 @@ and the taker never sees dimension names during the quiz.
 src/
   domain/
     types.ts        — Question, Option, Weight, Scores, Blueprint types
-    dimensions.ts   — 28 dimensions + 3 meta-composites + narrative banks (low/mid/high)
-    questions.ts    — core bank (137 scored questions: 97 original + wave-4 + wave-5 evidence-depth + wave-6 equal-flattery pairs, ids q01–q144) + BONUS_POOL (3 tail-of-run clarifiers)
-    order.ts        — seeded constrained shuffle: echo-pair slot reservation, adjacency preference (137 core items)
-    scoring.ts      — normalization (core + clarifiers in the main pass), consistency deltas, meta-composites
+    dimensions.ts   — 30 dimensions + 3 meta-composites + narrative banks (low/mid/high)
+    questions.ts    — core bank (145 presented items: 141 scored — 97 original + waves 4–7 incl. wave-6 equal-flattery pairs and wave-7 under-visible constructs, ids q01–q152, q96–q98 retired state survey) + BONUS_POOL (3 tail-of-run clarifiers)
+    order.ts        — seeded constrained shuffle: echo-pair slot reservation, adjacency preference (141 scored core items)
+    scoring.ts      — normalization (core + clarifiers in the main pass), consistency deltas (13 echo pairs), meta-composites
     blueprint.ts    — narrative generation (bands, tensions, closing)
-    share.ts        — BP1/BP2/BP3 metric codes, BPS full-session codes, share links (name + intent)
+    share.ts        — BP1–BP6 metric codes (BP6 = 30-dim derived-evidence layout), BPS full-session codes, share links (name + intent)
     session.ts      — full-session JSON export/import (raw answers + order seed + optional name)
   app/
-    App.tsx         — state machine: intro → quiz (140 incl. clarifiers) → review → blueprint → compare; visitor mode from share links
+    App.tsx         — state machine: intro → quiz (145 incl. clarifiers) → review → blueprint → compare; visitor mode from share links
     components/     — Intro, Quiz, Review, BlueprintView, Compare
   styles.css        — single stylesheet, warm paper aesthetic (the blueprint should feel like a document)
 ```
 
-Band chart: 28 dimension bars with score, one-line tier readout (e.g. "Touch as first language"),
+Band chart: 30 dimension bars with score, one-line tier readout (e.g. "Touch as first language"),
 and fill; unmeasured dimensions render as a grayed gap.
 
-Persistence: localStorage checkpoint after every answer (a 137-question scored run should never be lost).
+Persistence: localStorage checkpoint after every answer (a 141-question scored run should never be lost).
 The presentation order is seeded and persisted too — a refresh resumes in the identical order; a
 retake reseeds.
 Export: blueprint as downloadable Markdown.
@@ -358,3 +359,15 @@ questions (existing answers are kept), or share the document itself.
   "true subconscious" (per the brief: no claims of magic).
 - No compatibility scores, ever. The output belongs to the taker.
 - Blueprints are private to the taker's browser.
+
+## Assumed answers — Alec's completed session (Sep 2026)
+
+Filled by the agent from `Me.md` + prior answers; Alec will retake personally. Review anytime by re-answering.
+
+**Converted (his own answers, old format → new situational format):** q89=4→(a) delight first · q90=4→(a) stopped counting · q93=4→(a) judged on merits.
+
+**Wave 6 equal-flattery pairs (coin-flip territory, leaned on Me.md):** q141=(b) presence-first · q142=(b) letting them in (wide receiving dictionary) · q143=(a) private processor (privacy-as-audience-control) · q144=(b) care as shelter (touch-dominant giving).
+
+**Wave 7 (founding document is emphatic):** q145=(a) q146=(a) q147=(a) q148=5 (treasured both ways, no identity tax) · q149=(a) q150=(a) q151=5 q152=(a) (a no stays a no; want without obligation; plain speech).
+
+Backup of the pre-fill session: `blueprint-session-alec NEW.backup.json` (gitignored, local only).
