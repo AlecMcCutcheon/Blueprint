@@ -1,7 +1,7 @@
 import { useCallback, useEffect, useMemo, useState } from 'react';
 import type { Answers, Blueprint, Question, ScoredProfile } from '../domain/types';
 import { QUESTIONS, QUESTION_BY_ID } from '../domain/questions';
-import { computeOrder } from '../domain/order';
+import { computeOrder, computeCatchUpOrder } from '../domain/order';
 import { bonusQuestionsFor } from '../domain/bonus';
 import { decodeProfile, decodeFullSession, parseShareUrl, type ShareIntent } from '../domain/share';
 import { scoreProfile } from '../domain/scoring';
@@ -144,7 +144,15 @@ function AppInner() {
   // Randomized-but-stable presentation order for this run (order-effects
   // countermeasure). Retakes reseed for a genuinely fresh order.
   const { seed, resetSeed, adoptSeed } = useOrderSeed();
-  const order = useMemo(() => computeOrder(seed), [seed]);
+  // Catch-up mode: a saved run started before the bank grew. New questions
+  // shuffle into their own pile and present first; answered ones keep the
+  // original seed's relative order. Retired automatically once every core
+  // question is answered — the permanent seed then governs the full bank.
+  const [catchUpMode, setCatchUpMode] = useState(false);
+  const order = useMemo(
+    () => (catchUpMode ? computeCatchUpOrder(seed, Object.keys(answers)) : computeOrder(seed)),
+    [catchUpMode, seed, answers],
+  );
 
   // ── Mount: visitor link takes precedence, then the user's own session. ──
   useEffect(() => {
@@ -175,6 +183,18 @@ function AppInner() {
       if (count > 0) {
         setAnswers(saved.answers);
         setStage(saved.stage);
+        // Bank-growth detection. A session started before the bank grew does
+        // NOT have its answered questions forming a prefix of the current
+        // seeded order (the new items interleave into it) — while a run
+        // started on the CURRENT bank always answers the seeded order's
+        // prefix, so a normal mid-run pause never trips catch-up mode.
+        const answeredIds = new Set(Object.keys(saved.answers));
+        const answeredCore = QUESTIONS.filter((q) => answeredIds.has(q.id)).length;
+        if (answeredCore < QUESTIONS.length) {
+          const ord = computeOrder(seed);
+          const isPrefix = ord.slice(0, answeredCore).every((id) => answeredIds.has(id));
+          if (!isPrefix) setCatchUpMode(true);
+        }
       }
     }
   }, []);
@@ -214,11 +234,21 @@ function AppInner() {
     return clarifierQueue.length > 0 ? [...core, ...clarifierQueue] : core;
   }, [order, clarifierQueue]);
 
+  // Retire catch-up mode the moment the core bank is complete: the two-pile
+  // order is a temporary bridge, and a completed run reverts to the
+  // seed-governed order for the whole bank.
+  useEffect(() => {
+    if (!catchUpMode) return;
+    const complete = QUESTIONS.every((q) => answers[q.id] !== undefined);
+    if (complete) setCatchUpMode(false);
+  }, [catchUpMode, answers]);
+
   const startFresh = useCallback(() => {
     setAnswers({});
     setBlueprint(null);
     setVisitor(null);
     setClarifierQueue([]);
+    setCatchUpMode(false);
     resetSeed(); // retake → genuinely fresh question order
     clearShareUrl();
     setStage('quiz');
@@ -229,6 +259,7 @@ function AppInner() {
     setBlueprint(null);
     setVisitor(null);
     setClarifierQueue([]);
+    setCatchUpMode(false);
     try {
       localStorage.removeItem(STORAGE_KEY);
     } catch {
@@ -293,6 +324,17 @@ function AppInner() {
   const adoptRestored = useCallback((restored: { answers: Answers; orderSeed: number; name: string | null }) => {
     setAnswers(restored.answers);
     adoptSeed(restored.orderSeed);
+    // Same bank-growth check as local resume: an imported session whose
+    // answered items are not a prefix of its seed's current order predates a
+    // bank change and gets the catch-up flow if the quiz is entered.
+    const answeredIds = new Set(Object.keys(restored.answers));
+    const answeredCore = QUESTIONS.filter((q) => answeredIds.has(q.id)).length;
+    const isPrefix =
+      answeredCore === QUESTIONS.length ||
+      computeOrder(restored.orderSeed)
+        .slice(0, answeredCore)
+        .every((id) => answeredIds.has(id));
+    setCatchUpMode(!isPrefix);
     if (restored.name) handleSaveName(restored.name);
     setVisitor(null);
     setClarifierQueue([]);
@@ -393,11 +435,13 @@ function AppInner() {
   if (stage === 'quiz') {
     return (
       <Quiz
+        key={catchUpMode ? 'catchup' : 'full'}
         questions={orderedQuestions}
         answers={answers}
         onAnswer={handleAnswer}
         onFinish={() => setStage('review')}
         onStartOver={startOver}
+        catchUpActive={catchUpMode}
       />
     );
   }

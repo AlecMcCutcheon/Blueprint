@@ -11,9 +11,11 @@ interface Props {
   onAnswer: (questionId: string, optionId: string | number) => void;
   onFinish: () => void;
   onStartOver: () => void;
+  /** Two-pile catch-up order active (bank grew since this run started). */
+  catchUpActive?: boolean;
 }
 
-export default function Quiz({ questions, answers, onAnswer, onFinish, onStartOver }: Props) {
+export default function Quiz({ questions, answers, onAnswer, onFinish, onStartOver, catchUpActive }: Props) {
   // Resume where the user left off: land on the first unanswered question.
   // (After a refresh, `answers` is already the restored set by the time the
   // quiz mounts, so this picks up exactly where they stopped.)
@@ -33,6 +35,15 @@ export default function Quiz({ questions, answers, onAnswer, onFinish, onStartOv
     [questions, answers],
   );
   const pct = Math.round((answeredCount / questions.length) * 100);
+  // Catch-up notice shows only while in catch-up mode AND standing on an
+  // unanswered question — i.e. exactly when the user is on fresh material.
+  // (The through-history pass reviews already-answered questions; App retires
+  // catch-up mode automatically once every core question is answered.)
+  const showCatchUpNotice = catchUpActive === true && answers[q.id] === undefined;
+  const countFresh = useMemo(
+    () => questions.filter((x) => answers[x.id] === undefined).length,
+    [questions, answers],
+  );
 
   const advance = () => {
     if (!answeredCurrent) return;
@@ -195,6 +206,12 @@ export default function Quiz({ questions, answers, onAnswer, onFinish, onStartOv
       </main>
 
       <footer className="dock">
+        {showCatchUpNotice && (
+          <p className="dock__catchup">
+            The questionnaire grew since you started — {countFresh} new questions first;
+            your previous answers carry over, and ← Back can revisit any of them.
+          </p>
+        )}
         <p className="dock__message">{messageFor(index)}</p>
         <div className="dock__actions">
           {confirmingReset ? (

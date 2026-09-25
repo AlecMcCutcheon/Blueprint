@@ -595,6 +595,14 @@ button { font: inherit; cursor: pointer; }
   max-width: 52ch;
   animation: msgIn 0.4s ease;
 }
+.dock__catchup {
+  margin: 0;
+  color: var(--ink-faint);
+  font-size: 0.85rem;
+  text-align: center;
+  max-width: 52ch;
+  padding: 0 16px;
+}
 @keyframes msgIn { from { opacity: 0; transform: translateY(4px); } to { opacity: 1; transform: none; } }
 .dock__actions { display: flex; gap: 10px; align-items: center; flex-wrap: wrap; justify-content: center; }
 .dock__confirm { font-size: 0.92rem; color: var(--ink-soft); font-style: italic; }

@@ -33,6 +33,41 @@ function questionDims(qId: string): Set<DimensionId> {
 }
 
 /**
+ * Catch-up order for sessions resumed against a bank that grew since they
+ * were started: the never-answered questions are shuffled into their own
+ * seeded pile and presented FIRST, while already-answered questions keep
+ * the original order seed's relative sequence behind them. Temporary by
+ * design — once the run is complete, the permanent seed governs the whole
+ * bank again; this exists only so a returning user answers new material
+ * first instead of flipping through their own history.
+ *
+ * Detection of "bank grew" is NOT done here — callers compare the persisted
+ * question count to QUESTIONS.length (a normal mid-run resume has answered
+ * items forming a prefix of the seeded order, and the first-unanswered
+ * walk handles it with no special casing).
+ */
+export function computeCatchUpOrder(seed: number, answeredIds: Iterable<string>): string[] {
+  const answered = new Set(answeredIds);
+  const fresh = QUESTIONS.map((q) => q.id).filter((id) => !answered.has(id));
+  // The answered pile preserves the ORIGINAL SEEDED relative order (not bank
+  // order) — the through-history pass replays the run's designed pacing.
+  const old = computeOrder(seed).filter((id) => answered.has(id));
+
+  let s = (seed ^ 0x9e3779b9) >>> 0; // decorrelated from the run seed
+  const rand = () => {
+    s = (s + 0x6d2b79f5) | 0;
+    let t = Math.imul(s ^ (s >>> 15), 1 | s);
+    t = (t + Math.imul(t ^ (t >>> 7), 61 | t)) ^ t;
+    return ((t ^ (t >>> 14)) >>> 0) / 4294967296;
+  };
+  for (let i = fresh.length - 1; i > 0; i--) {
+    const j = Math.floor(rand() * (i + 1));
+    [fresh[i], fresh[j]] = [fresh[j], fresh[i]];
+  }
+  return [...fresh, ...old];
+}
+
+/**
  * Constrained seeded order of the 133 scored core questions. The three state
  * items live in the end-of-run survey and the bonus questions are
  * conflict-triggered — neither belongs to the core presentation order.
