@@ -142,12 +142,41 @@ export function importSessionJson(text: string): ImportResult {
 /** Trigger a browser download of the session file. Returns the chosen filename. */
 export function downloadSessionFile(file: SessionFile): string {
   const filename = sessionFileName(file.name);
-  const blob = new Blob([JSON.stringify(file, null, 2)], { type: 'application/json' });
+  saveBlob(new Blob([JSON.stringify(file, null, 2)], { type: 'application/json' }), filename);
+  return filename;
+}
+
+/**
+ * Save a blob to the user's device, working around iOS Safari: anchor downloads
+ * are unreliable there (the download attribute is often ignored and the tap
+ * silently does nothing), so on iOS we prefer the share sheet first — it offers
+ * "Save to Files", AirDrop, Mail, Messages, all of which get a session file to
+ * another person. Elsewhere (and as a fallback everywhere) the plain anchor
+ * download runs.
+ */
+export async function saveBlob(blob: Blob, filename: string): Promise<'downloaded' | 'shared' | 'cancelled'> {
+  const file = new File([blob], filename, { type: blob.type || 'application/octet-stream' });
+  // iPadOS masquerades as Macintosh with touch points; catch both.
+  const isIOS =
+    /iP(hone|ad|od)/.test(navigator.userAgent) ||
+    (navigator.platform === 'MacIntel' && navigator.maxTouchPoints > 1);
+  if (isIOS && typeof navigator.canShare === 'function' && navigator.canShare({ files: [file] })) {
+    try {
+      await navigator.share({ files: [file], title: filename });
+      return 'shared';
+    } catch {
+      // User closed the share sheet — treat as cancelled, not an error, and
+      // do NOT force the raw download on top of it.
+      return 'cancelled';
+    }
+  }
   const url = URL.createObjectURL(blob);
   const a = document.createElement('a');
   a.href = url;
   a.download = filename;
+  document.body.appendChild(a);
   a.click();
+  a.remove();
   URL.revokeObjectURL(url);
-  return filename;
+  return 'downloaded';
 }

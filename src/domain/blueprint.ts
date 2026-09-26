@@ -116,6 +116,13 @@ function proseLabel(dim: DimensionId): string {
   return (label.split(/ [—–:] /)[0] ?? label).toLowerCase();
 }
 
+/** Capitalize the first letter of sentences — chip labels get lowercased for
+ * prose, then restored to sentence case so "want as thermometer" reads as a
+ * clause rather than a fragment. */
+function sentenceCase(s: string): string {
+  return s.replace(/(^|[.!?]\s+)([a-z])/g, (_m, pre: string, c: string) => pre + c.toUpperCase());
+}
+
 /**
  * The express/receive alignment score measures BREADTH (how similar the spread
  * of your giving and receiving channels is); the tension card keys on the
@@ -862,7 +869,9 @@ export function generateBlueprint(p: ScoredProfile): Blueprint {
   if (topSyn.length > 0) {
     // Same chrome-strip as the low-synthesis sentence below: "(leaning up)"
     // is band-chart chip language and reads as a fragment inside prose.
-    const notes = topSyn.map((d) => noteFor(d.id, d.score).replace(/ \(leaning (up|down)\)/g, '').toLowerCase());
+    // The short labels are title-case chips ("Want as thermometer") — lowercasing
+    // alone leaves them mid-sentence fragments, so restore sentence case after.
+    const notes = topSyn.map((d) => sentenceCase(noteFor(d.id, d.score).replace(/ \(leaning (up|down)\)/g, '').toLowerCase()));
     const joined = notes.length === 2 ? notes[0] + ' and ' + notes[1] : notes.join('; and ');
     const thin = topSyn.every((d) => evidenceOf(d.id) <= 3);
     shapeSentences.push(
@@ -876,9 +885,13 @@ export function generateBlueprint(p: ScoredProfile): Blueprint {
   if (lowSyn) {
     const thinLow = evidenceOf(lowSyn.id) <= 3;
     // Band-chart chrome ("(leaning up)") is chip language, not prose — strip
-    // it before the note is dropped into a sentence.
-    const lowNote = noteFor(lowSyn.id, lowSyn.score).replace(/ \(leaning (up|down)\)/g, '').toLowerCase();
-    shapeSentences.push('What it would not ask of you' + (thinLow ? ' — lightly held, few answers carry this read —' : '') + ': ' + lowNote + '.');
+    // it before the note is dropped into a sentence; restore sentence case for
+    // the title-case chip labels.
+    const lowNote = sentenceCase(noteFor(lowSyn.id, lowSyn.score).replace(/ \(leaning (up|down)\)/g, '').toLowerCase());
+    // The hedged form must not end in a dash right before the colon —
+    // "— lightly held, few answers carry this read —: want waits" collided
+    // punctuation-wise. Parenthetical, then a single colon.
+    shapeSentences.push('What it would not ask of you' + (thinLow ? ' (lightly held; few answers carry this read): ' : ': ') + lowNote + '.');
   }
   const domPattern = plan.headline[0]?.pattern;
   if (domPattern && domPattern.dims.length >= 2) {

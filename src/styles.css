@@ -316,17 +316,49 @@ button { font: inherit; cursor: pointer; }
   font-size: 0.72rem; text-transform: uppercase; letter-spacing: 0.12em;
   color: var(--accent); margin: 18px 0 6px;
 }
-.anscard__tag--alt { color: var(--ink-faint); }
-.anscard__label { margin: 0; font-size: 1rem; }
-.anscard__desc { margin: 4px 0 0; color: var(--ink-soft); font-size: 0.95rem; }
 .anscard__chosen {
   border-left: 3px solid var(--accent);
   padding-left: 14px;
 }
-.anscard__alts { border-left: 3px solid var(--line); padding-left: 14px; margin-top: 6px; }
-.anscard__alt { padding: 10px 0; border-bottom: 1px dotted var(--line); }
-.anscard__alt:last-child { border-bottom: none; }
+.anscard__label { margin: 0; font-size: 1rem; }
+.anscard__desc { margin: 4px 0 0; color: var(--ink-soft); font-size: 0.95rem; }
 .anscard__channel { color: var(--ink-faint); font-size: 0.85rem; margin: 6px 0 0; }
+
+/* ── Export dialog (session file: view / copy / save-or-share) ────────── */
+.export-dlg {
+  position: fixed; inset: 0; z-index: 60;
+  background: rgba(30, 25, 18, 0.45);
+  display: flex; align-items: center; justify-content: center;
+  padding: 18px;
+}
+.export-dlg__panel {
+  background: var(--card);
+  border: 1px solid var(--line);
+  border-radius: var(--radius);
+  box-shadow: var(--shadow);
+  padding: 22px 24px;
+  width: min(560px, 100%);
+  max-height: min(85vh, 720px);
+  overflow: auto;
+}
+.export-dlg__panel h2 { display: flex; align-items: center; gap: 8px; margin: 0 0 8px; font-size: 1.15rem; }
+.export-dlg__panel p { color: var(--ink-soft); margin: 0 0 12px; }
+.export-dlg__code {
+  width: 100%;
+  box-sizing: border-box;
+  font-family: ui-monospace, 'SF Mono', Menlo, Consolas, monospace;
+  font-size: 0.78rem;
+  line-height: 1.45;
+  background: var(--paper-deep);
+  color: var(--ink);
+  border: 1px solid var(--line);
+  border-radius: 10px;
+  padding: 12px;
+  resize: vertical;
+  user-select: all;
+}
+.export-dlg__btns { display: flex; gap: 10px; flex-wrap: wrap; margin-top: 12px; }
+.export-dlg__note { color: var(--ink-faint); font-size: 0.88rem; margin: 10px 0 0 !important; }
 
 .review__measures { display: grid; gap: 28px; }
 .measures__domain h2 {

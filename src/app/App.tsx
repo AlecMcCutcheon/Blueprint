@@ -6,7 +6,7 @@ import { bonusQuestionsFor } from '../domain/bonus';
 import { decodeProfile, decodeFullSession, parseShareUrl, type ShareIntent } from '../domain/share';
 import { scoreProfile } from '../domain/scoring';
 import { generateBlueprint, blueprintToMarkdown } from '../domain/blueprint';
-import { buildSessionFile, downloadSessionFile, importSessionJson } from '../domain/session';
+import { importSessionJson } from '../domain/session';
 import { loadPeople, savePeople, upsertPerson, renamePerson, removePerson, type Person } from './people';
 import { ThemeProvider } from './components/theme';
 import Intro from './components/Intro';
@@ -333,13 +333,9 @@ function AppInner() {
     }
   }, []);
 
-  const handleExportSession = useCallback(() => {
-    try {
-      downloadSessionFile(buildSessionFile(answers, seed, myName));
-    } catch {
-      // download blocked — nothing else to do here
-    }
-  }, [answers, seed, myName]);
+  // Session-file export now lives in BlueprintView's popup (view / copy /
+  // save-or-share), which builds the file itself from the answers prop.
+  // handleExportSession removed — the old anchor-download was silent-noop on iOS.
 
   // ── Restore paths: the REAL session, answers and all. ──
   const adoptRestored = useCallback((restored: { answers: Answers; orderSeed: number; name: string | null; staleFormat?: number }) => {
@@ -532,7 +528,8 @@ function AppInner() {
       profile={profile}
       myName={myName}
       onExport={handleExport}
-      onExportSession={handleExportSession}
+      answers={answers}
+      orderSeed={seed}
       onSaveName={handleSaveName}
       onStartCompare={() => setStage('compare')}
       onRetake={startOver}

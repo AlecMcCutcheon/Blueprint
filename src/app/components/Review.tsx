@@ -158,7 +158,6 @@ function AnswerCard({ q, number, answers }: { q: Question; number: number; answe
       : q.options.find((o) => 'value' in o && (o as { value: number }).value === v.value);
   if (!chosen) return null;
 
-  const alternatives = q.options.filter((o) => o.id !== chosen.id);
   const channel = 'channel' in chosen ? (chosen as { channel?: string }).channel : undefined;
 
   return (
@@ -188,15 +187,6 @@ function AnswerCard({ q, number, answers }: { q: Question; number: number; answe
                 Channel: {CHANNEL_LABELS[channel] ?? channel}
               </p>
             )}
-          </div>
-          <div className="anscard__alts">
-            <span className="anscard__tag anscard__tag--alt">What the others would have said about you</span>
-            {alternatives.map((o) => (
-              <div key={o.id} className="anscard__alt">
-                <p className="anscard__label">{o.label}</p>
-                <p className="anscard__desc">{o.description}</p>
-              </div>
-            ))}
           </div>
         </div>
       )}
