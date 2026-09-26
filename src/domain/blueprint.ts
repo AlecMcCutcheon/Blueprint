@@ -853,7 +853,9 @@ export function generateBlueprint(p: ScoredProfile): Blueprint {
   const evidenceOf = (id: DimensionId): number => p.variance?.[id]?.contributions.length ?? p.dimensions[id]?.varianceShape?.count ?? 99;
   const shapeSentences: string[] = [];
   if (topSyn.length > 0) {
-    const notes = topSyn.map((d) => noteFor(d.id, d.score).toLowerCase());
+    // Same chrome-strip as the low-synthesis sentence below: "(leaning up)"
+    // is band-chart chip language and reads as a fragment inside prose.
+    const notes = topSyn.map((d) => noteFor(d.id, d.score).replace(/ \(leaning (up|down)\)/g, '').toLowerCase());
     const joined = notes.length === 2 ? notes[0] + ' and ' + notes[1] : notes.join('; and ');
     const thin = topSyn.every((d) => evidenceOf(d.id) <= 3);
     shapeSentences.push(
@@ -866,15 +868,18 @@ export function generateBlueprint(p: ScoredProfile): Blueprint {
   }
   if (lowSyn) {
     const thinLow = evidenceOf(lowSyn.id) <= 3;
-    shapeSentences.push('What it would not ask of you' + (thinLow ? ' — lightly held, few answers carry this read —' : '') + ': ' + noteFor(lowSyn.id, lowSyn.score).toLowerCase() + '.');
+    // Band-chart chrome ("(leaning up)") is chip language, not prose — strip
+    // it before the note is dropped into a sentence.
+    const lowNote = noteFor(lowSyn.id, lowSyn.score).replace(/ \(leaning (up|down)\)/g, '').toLowerCase();
+    shapeSentences.push('What it would not ask of you' + (thinLow ? ' — lightly held, few answers carry this read —' : '') + ': ' + lowNote + '.');
   }
   const domPattern = plan.headline[0]?.pattern;
   if (domPattern && domPattern.dims.length >= 2) {
     const label1 = proseLabel(domPattern.dims[0]);
     const label2 = proseLabel(domPattern.dims[1]);
     const spineLeads = [
-      `The most specific work in your answers happens where ${label1} meets ${label2} — that interaction is the spine of this document.`,
-      `If this document has a spine, it is where ${label1} meets ${label2}: each one changes what the other means for you.`,
+      `The most specific work in your answers happens at the meeting of ${label1} and ${label2} — that interaction is the spine of this document.`,
+      `If this document has a spine, it is the meeting of ${label1} and ${label2} — each one changes what the other means for you.`,
       `${label1} and ${label2} are the pair doing the most work in your answers — neither reading is complete without the other.`,
     ];
     shapeSentences.push(seededPick(spineLeads, hash('spine') + runSeed));
@@ -1267,12 +1272,14 @@ function pairTensionCard(c: ConsistencyPair, p: ScoredProfile, runSeed = 0): Blu
     : gap >= 0.6
       ? 'That is not a wobble — a real fork in how you operate.'
       : 'That is a narrow disagreement — close to the threshold, worth knowing, not worth over-reading.';
-  // Lead-in rotation (seeded): same finding, different sentence path, so two
-  // people's documents don't open every tension card identically.
+  // Lead-ins avoid any frame that assumes dir's grammatical shape — some pair
+  // directions are "you …" clauses, others are noun phrases ("the attention
+  // you extend…"). A colon frame reads cleanly with either; "they point to
+  // you seal…" and "the split reads as you seal…" do not.
   const leads = [
-    `Two scenarios probed ${copy.territory} from different angles — ${copy.a}, then ${copy.b} — and your instincts disagreed. Read together, they suggest ${dir}.`,
-    `The same territory looked different twice: ${copy.a} in one scenario, then ${copy.b} — and your answers split. Read side by side, they point to ${dir}.`,
-    `${copy.a[0].toUpperCase() + copy.a.slice(1)} — and then, from the other side, ${copy.b}. On ${copy.territory}, your instincts pulled apart, and the split reads as ${dir}.`,
+    `Two scenarios probed ${copy.territory} from different angles — ${copy.a}, then ${copy.b} — and your instincts disagreed. Read together, the finding: ${dir}.`,
+    `The same territory looked different twice: ${copy.a} in one scenario, then ${copy.b} — and your answers split. Read side by side, the reading: ${dir}.`,
+    `${copy.a[0].toUpperCase() + copy.a.slice(1)} — and then, from the other side, ${copy.b}. On ${copy.territory}, your instincts pulled apart, and the split says — ${dir}.`,
   ];
   const lead = leads[Math.floor(Math.abs(Math.sin(hash(c.a + c.b) + runSeed) * 10000)) % leads.length];
   return {
