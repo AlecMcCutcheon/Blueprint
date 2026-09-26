@@ -70,12 +70,29 @@ export default function Quiz({ questions, answers, onAnswer, onFinish, onStartOv
   // toast anchored to the dock's top edge: it slides up from behind the bar,
   // holds ten seconds while its clock bar drains, then sinks back out.
   const [ttsToast, setTtsToast] = useState(false);
+  const [ttsMounted, setTtsMounted] = useState(false);
   useEffect(() => {
     if (!failedReason) return;
-    setTtsToast(true);
+    // Mount first, then flip the class a couple of frames later so the
+    // slide-in transition actually plays.
+    setTtsMounted(true);
+    const raf = requestAnimationFrame(() => requestAnimationFrame(() => setTtsToast(true)));
     const t = window.setTimeout(() => setTtsToast(false), 10000);
-    return () => window.clearTimeout(t);
+    return () => {
+      cancelAnimationFrame(raf);
+      window.clearTimeout(t);
+    };
   }, [failedReason]);
+  // After the slide-out finishes, remove the toast from the DOM entirely.
+  // Its parked position hangs below the bar; a mounted-but-parked box there
+  // extends the page's scroll area on mobile (phantom space around the nav
+  // bar) and can peek out whenever the dock isn't flush with the viewport
+  // bottom.
+  useEffect(() => {
+    if (ttsToast) return;
+    const t = window.setTimeout(() => setTtsMounted(false), 500);
+    return () => window.clearTimeout(t);
+  }, [ttsToast]);
   const countFresh = useMemo(
     () => questions.filter((x) => answers[x.id] === undefined).length,
     [questions, answers],
@@ -278,11 +295,15 @@ export default function Quiz({ questions, answers, onAnswer, onFinish, onStartOv
         </div>
         </div>
 
-        {/* Read-aloud failure toast. A CHILD of the dock (this was the bug:
-            as a sibling, its percentages resolved against the viewport and
-            it flew off the top of the page). Inside, it rests just above the
-            bar's edge and parks translated down BEHIND .dock__in's opaque
-            surface — an overlay that never pushes layout. */}
+        {/* Read-aloud failure toast. A CHILD of the dock (an earlier bug put
+            it outside, where its percentages resolved against the viewport).
+            It rests just above the bar's edge and parks translated down
+            behind .dock__in's opaque surface — overlay, never layout push.
+            It is UNMOUNTED while parked: a parked box hanging below the bar
+            extends the page's scroll area on mobile (phantom space around
+            the nav bar) and can peek out when the dock isn't flush with the
+            visual viewport bottom. */}
+        {ttsMounted && (
         <div className={`tts-toast${ttsToast ? ' is-in' : ''}`} role="status" aria-live="polite">
           <p>
             {failedReason === 'no-voices' ? (
@@ -296,6 +317,7 @@ export default function Quiz({ questions, answers, onAnswer, onFinish, onStartOv
             )}
           </p>
         </div>
+        )}
       </footer>
     </div>
   );
