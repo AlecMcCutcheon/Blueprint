@@ -12,7 +12,7 @@ export type IconName =
   | 'compass' | 'chat' | 'shield' | 'loop' | 'umbrella' | 'heart' | 'home'
   | 'tension' | 'sparkle' | 'feather'
   | 'copy' | 'check' | 'import' | 'close'
-  | 'volume' | 'stop' | 'door';
+  | 'volume' | 'stop' | 'door' | 'code' | 'download';
 
 const PATHS: Record<IconName, React.ReactNode> = {
   sun: (
@@ -23,6 +23,12 @@ const PATHS: Record<IconName, React.ReactNode> = {
   ),
   moon: (
     <path d="M21 12.8A9 9 0 1 1 11.2 3a7 7 0 0 0 9.8 9.8z" />
+  ),
+  code: (
+    <path d="m8 6-6 6 6 6M16 6l6 6-6 6" />
+  ),
+  download: (
+    <path d="M12 3v11M7 9l5 5 5-5M4 20h16" />
   ),
   compass: (
     <>

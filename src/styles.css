@@ -371,6 +371,7 @@ button { font: inherit; cursor: pointer; }
   margin-top: 14px;
 }
 .export-dlg__spacer { flex: 1; }
+.export-dlg__iconbtn.is-active { border-color: var(--accent); color: var(--accent); }
 .export-dlg__note { color: var(--ink-faint); font-size: 0.88rem; margin: 10px 0 0 !important; }
 
 .review__measures { display: grid; gap: 28px; }
@@ -405,10 +406,17 @@ button { font: inherit; cursor: pointer; }
 .measures__meta h2 { margin-top: 0; font-size: 1.1rem; }
 .measures__meta p { color: var(--ink-soft); }
 
+/* Review footer: the same bottom-bar language as the blueprint footer. */
 .review__footer {
+  position: sticky; bottom: 0; z-index: 30;
+  background: var(--paper);
+  border-top: 1px solid var(--line);
   display: flex; justify-content: space-between; align-items: center;
-  margin-top: 36px; gap: 14px; flex-wrap: wrap;
+  margin: 32px calc(50% - 50vw) 0;
+  gap: 14px;
+  padding: 10px max(16px, calc(50vw - 380px)) calc(10px + env(safe-area-inset-bottom, 0px));
 }
+.screen:has(> .review__footer) { padding-bottom: 0; }
 
 /* ─── Blueprint ──────────────────────────────────────────────────────────── */
 .bp__header { text-align: center; margin-bottom: 36px; }
@@ -464,8 +472,12 @@ button { font: inherit; cursor: pointer; }
   margin-bottom: 44px;
 }
 .bp__band-head {
-  display: flex; justify-content: space-between;
+  display: flex; justify-content: space-between; gap: 8px;
   font-size: 0.88rem; color: var(--ink-soft);
+}
+.bp__band-label {
+  overflow: hidden; text-overflow: ellipsis; white-space: nowrap;
+  min-width: 0;
 }
 .bp__band-score { font-variant-numeric: tabular-nums; color: var(--ink); }
 .bp__band-tier { font-size: 0.72rem; font-style: italic; color: var(--ink-faint); margin-top: 1px; }
@@ -496,19 +508,36 @@ button { font: inherit; cursor: pointer; }
   padding-bottom: 10px;
   margin-bottom: 18px;
 }
-.bp__section p { font-size: 1.02rem; color: var(--ink); margin: 0 0 16px; max-width: 68ch; }
+/* Footer action labels: full text on desktop. */
+/* Blueprint footer: one bottom bar at every size — primary action as a text
+   button, secondary actions as icon circles, expanding to full text as the
+   window grows. */
+.bp__footer {
+  position: sticky; bottom: 0; z-index: 30;
+  background: var(--paper);
+  border-top: 1px solid var(--line);
+  margin: 32px calc(50% - 50vw) 0;
+  padding: 10px max(16px, calc(50vw - 380px)) calc(10px + env(safe-area-inset-bottom, 0px));
+}
+.screen:has(> .bp__footer) { padding-bottom: 0; }
+.bp__footer-actions { display: flex; align-items: center; justify-content: space-between; gap: 8px; }
+.bp__footer .btn { flex: 0 0 auto; min-height: 44px; white-space: nowrap; }
+.bp__footer .btn--primary { flex: 1 1 auto; min-width: 0; justify-content: center; }
+.bp__footer .btn.bp__fbtn-round { width: 44px; min-height: 44px; height: 44px; padding: 0; }
+.bp__footer .btn.bp__fbtn-round .bp__fbtn-label,
+.bp__footer .btn.bp__fbtn-round .bp__fbtn-mini { display: none; }
+/* Condensation ladder, stage 1: primary shows its short label. */
+.bp__footer .btn--primary .bp__fbtn-label { display: none; }
+.bp__footer .btn--primary .bp__fbtn-mini { display: inline; }
+/* One axis: headings center on the page; paragraphs are a centered 68ch
+   column (ragged-right inside), so text and titles share the same midline. */
+.bp__section p { font-size: 1.02rem; color: var(--ink); margin: 0 auto 16px; max-width: 68ch; }
 
 .bp__tension > h3 { text-align: center; }
 
-.bp__section--tension {
-  background: var(--paper-deep);
-  border-radius: var(--radius);
-  padding: 18px 22px;
-  border: 1px dashed var(--accent-soft);
-}
 .bp__tension h3 { font-size: 1.05rem; margin: 18px 0 6px; }
 .bp__tension:first-of-type h3 { margin-top: 0; }
-.bp__tension p { font-size: 1rem; color: var(--ink-soft); margin: 0; }
+.bp__tension p { font-size: 1rem; color: var(--ink-soft); margin: 0 auto; max-width: 68ch; }
 
 .bp__section--closing {
   text-align: center;
@@ -521,20 +550,9 @@ button { font: inherit; cursor: pointer; }
   font-size: 1.15rem; letter-spacing: 0.02em;
 }
 
-.bp__footer {
-  margin: 48px auto 0;
-  display: flex; gap: 14px; flex-wrap: wrap;
-  justify-content: center;
-  border-top: 1px solid var(--line);
-  padding-top: 32px;
-}
-.bp__share {
-  width: 100%;
-  text-align: center;
-  color: var(--ink-faint);
-  font-size: 0.92rem;
-  max-width: 56ch;
-  margin: 12px auto 0;
+/* Session/Restart/Review render as icon circles; they expand to full text on wide windows. */
+.bp__fbtn-round {
+  border-radius: 999px;
 }
 
 /* ─── Theme toggle ───────────────────────────────────────────────────── */
@@ -679,7 +697,7 @@ button { font: inherit; cursor: pointer; }
   padding: 26px 30px;
   box-shadow: var(--shadow);
 }
-.bp__sharebox > h2 { justify-content: center; }
+.bp__sharebox > h2 { justify-content: flex-start; }
 .bp__sharebox h2 { display: flex; align-items: center; gap: 10px; margin: 0 0 12px; font-size: 1.2rem; }
 .bp__sharebox p { color: var(--ink-soft); margin: 0 0 16px; }
 .bp__codebox { display: flex; flex-direction: column; gap: 12px; }
@@ -695,7 +713,10 @@ button { font: inherit; cursor: pointer; }
   color: var(--ink);
   user-select: all;
 }
-.bp__codebtns { display: flex; gap: 10px; flex-wrap: wrap; }
+.bp__codebtns { display: flex; gap: 10px; flex-wrap: wrap; align-items: center; }
+/* Bare-code show/hide toggle beside Copy link (normal button padding — the
+   label makes it a text button; only the active tint is special). */
+.bp__icontoggle.is-active { border-color: var(--accent); color: var(--accent); }
 
 /* ── Visitor panel (someone else's blueprint) ─────────────────────────── */
 .bp__visitor {
@@ -706,15 +727,13 @@ button { font: inherit; cursor: pointer; }
   box-shadow: var(--shadow);
   padding: 20px 22px;
   margin-bottom: 36px;
-  text-align: left;
+  text-align: center;
 }
 .bp__visitor .bp__kicker { display: inline-flex; align-items: center; gap: 6px; }
-/* Body text fills the panel flush left; the title and action row share the
-   same left edge so the panel reads as one aligned block. */
-.bp__visitor-title { font-size: clamp(1.4rem, 3.5vw, 2rem); margin: 10px 0 12px; text-align: left; }
+.bp__visitor-title { font-size: clamp(1.4rem, 3.5vw, 2rem); margin: 10px 0 12px; }
 .bp__visitor-body { color: var(--ink-soft); margin: 0 0 10px; }
 .bp__visitor-body--soft { color: var(--ink-faint); font-size: 0.95rem; font-style: italic; }
-.bp__visitor-actions { display: flex; gap: 12px; justify-content: flex-start; flex-wrap: wrap; margin-top: 16px; }
+.bp__visitor-actions { display: flex; gap: 12px; justify-content: center; flex-wrap: wrap; margin-top: 16px; }
 
 /* ── Share panel: name + intent + link ───────────────────────────────── */
 .bp__sharepanel { display: flex; flex-direction: column; gap: 14px; }
@@ -725,15 +744,17 @@ button { font: inherit; cursor: pointer; }
   border: 1px solid var(--line); background: var(--paper-deep); color: var(--ink);
 }
 .bp__nameinput:focus { outline: 2px solid var(--accent-soft); border-color: var(--accent-soft); }
-.bp__intent { border: none; padding: 0; margin: 0; display: grid; gap: 8px; grid-template-columns: 1fr 1fr; }
-@media (max-width: 640px) { .bp__intent { grid-template-columns: 1fr; } }
+.bp__intent { border: none; padding: 0; margin: 0; }
 .bp__intent legend { padding: 0; margin-bottom: 8px; }
+/* Two compact chips side by side — Show | Invite — not stacked explanation cards. */
+.bp__intentopts { display: flex; gap: 8px; }
 .bp__intentopt {
-  display: flex; gap: 10px; align-items: flex-start; cursor: pointer;
-  border: 1px solid var(--line); border-radius: 12px; padding: 12px 14px;
+  display: inline-flex; gap: 8px; align-items: center; cursor: pointer;
+  border: 1px solid var(--line); border-radius: 999px; padding: 8px 16px;
   background: var(--paper-deep);
+  font-size: 0.92rem;
 }
-.bp__intentopt input { margin-top: 4px; accent-color: var(--accent); }
+.bp__intentopt input { margin: 0; accent-color: var(--accent); }
 .bp__intentopt.is-active { border-color: var(--accent); box-shadow: inset 0 0 0 1px var(--accent); background: #fdf1ea; }
 .bp__intentopt strong { display: block; font-size: 0.95rem; }
 .bp__intentopt em { display: block; font-style: italic; color: var(--ink-faint); font-size: 0.85rem; margin-top: 2px; }
@@ -966,6 +987,19 @@ button { font: inherit; cursor: pointer; }
 [data-theme='dark'] .compare__col,
 [data-theme='dark'] .compare__score { box-shadow: none; }
 
+/* Stage 2 (comfortable width): primary earns its full label back. */
+@media (min-width: 640px) {
+  .bp__footer .btn--primary .bp__fbtn-label { display: inline; }
+  .bp__footer .btn--primary .bp__fbtn-mini { display: none; }
+}
+
+/* Stage 3 (wide window): the circles become short text pills — never
+   icon-only on a desktop, never so long they crowd the primary. */
+@media (min-width: 1100px) {
+  .bp__footer .btn.bp__fbtn-round { width: auto; height: auto; min-height: 44px; padding: 8px 14px; }
+  .bp__footer .btn.bp__fbtn-round .bp__fbtn-mini { display: inline; }
+}
+
 /* Mobile refinements — the desktop layout translates, sizes don't. */
 @media (max-width: 640px) {
   /* Type scale: the 1.15–1.35rem heads and prompts fill a phone screen.
@@ -1009,16 +1043,29 @@ button { font: inherit; cursor: pointer; }
   .bp__bands { grid-template-columns: repeat(2, minmax(0, 1fr)); padding: 16px 14px; gap: 12px 16px; }
   .bp__band-head { font-size: 0.8rem; }
   .bp__band-tier { display: none; }
-  .bp__section h2 { font-size: 1.12rem; }
+  .bp__section h2 { font-size: 1.1rem; }
   .bp__section p { font-size: 0.96rem; margin-bottom: 13px; }
   .bp__epigraph { font-size: clamp(1.35rem, 6.5vw, 1.7rem); max-width: none; padding: 0 6px; }
-  .bp__section--tension { padding: 14px 12px; }
-  .bp__share--mobile { text-align: center; }
-  .bp__share-toggle { background: none; border: none; color: var(--ink-faint); font: inherit; font-size: 0.9rem; font-style: italic; text-decoration: underline; padding: 0; }
+  .bp__tension h3 { font-size: 0.98rem; }
+  .bp__tension p { font-size: 0.94rem; }
 
-  /* Export dialog becomes a full temporary page instead of a floating box. */
+  /* Export dialog becomes a full temporary page; the action row is a bar:
+     Copy stretches, file actions collapse to icons, Done docks right. */
   .export-dlg { padding: 0; align-items: stretch; }
-  .export-dlg__panel { width: 100%; max-height: none; border-radius: 0; border: none; padding: 18px 16px calc(18px + env(safe-area-inset-bottom, 0px)); }
+  .export-dlg__panel { width: 100%; max-height: none; border-radius: 0; border: none; padding: 18px 16px 0; display: flex; flex-direction: column; }
+  .export-dlg__panel p { text-align: left; }
+  .export-dlg__bar {
+    position: sticky; bottom: 0;
+    background: var(--card);
+    margin: auto -16px 0;
+    padding: 10px 16px calc(10px + env(safe-area-inset-bottom, 0px));
+  }
+  .export-dlg__bar .btn--primary { flex: 1; justify-content: center; }
+  .export-dlg__iconbtn { min-width: 44px; padding: 10px 0; }
+  .export-dlg__spacer { display: none; }
+  /* The sticky export bar must match the dark panel behind it (mobile only —
+     on desktop the bar is transparent inside the floating panel). */
+  [data-theme='dark'] .export-dlg__bar { background: #16130f; }
 
   .anscard__layer { display: none; }
   .bp__sharebox { padding: 20px 18px; }
@@ -1027,3 +1074,4 @@ button { font: inherit; cursor: pointer; }
   .compare__person { flex-wrap: wrap; }
   .compare__people, .compare__add { padding: 16px; }
 }
+

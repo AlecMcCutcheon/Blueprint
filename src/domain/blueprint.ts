@@ -1015,9 +1015,14 @@ export function generateBlueprint(p: ScoredProfile): Blueprint {
     if (tierLabel && !d.unmeasured && nContrib !== undefined && nContrib <= 3) {
       tierLabel = `${tierLabel} · lightly held`;
     }
+    // Stat chips are narrow; the full label wraps to three lines on a phone.
+    // shortLabel strips any " — subclause" (Care Roles — Giving and Receiving
+    // → Care Roles) so the chip reads at a glance; UI truncates as backstop.
+    const full = DIMENSION_LABELS[d.id];
     return {
       id: d.id,
-      label: DIMENSION_LABELS[d.id],
+      label: full,
+      shortLabel: (full.split(/ [—–:] /)[0] ?? full).trim(),
       score: d.score,
       tierLabel,
       unmeasured: d.unmeasured,

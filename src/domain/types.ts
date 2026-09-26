@@ -208,7 +208,8 @@ export interface Blueprint {
   epigraph: string;
   sections: BlueprintSection[];
   /** Dimension readouts for the visual band chart. */
-  bands: { id: DimensionId; label: string; score: number; tierLabel?: string; unmeasured?: boolean }[];
+  /** Condensed label for narrow layouts (mobile band chips) — falls back to label. */
+  bands: { id: DimensionId; label: string; shortLabel?: string; score: number; tierLabel?: string; unmeasured?: boolean }[];
   tensions: { title: string; body: string }[];
 }
 

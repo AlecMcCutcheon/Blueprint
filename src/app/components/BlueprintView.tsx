@@ -44,6 +44,7 @@ const SECTION_ICONS: Record<string, IconName> = {
   __synthesis: 'loop',
 };
 
+
 export default function BlueprintView({
   blueprint,
   profile,
@@ -63,7 +64,6 @@ export default function BlueprintView({
   const { theme, toggle } = useTheme();
   const [copiedLink, setCopiedLink] = useState(false);
   const [copiedCode, setCopiedCode] = useState(false);
-  const [showShare, setShowShare] = useState(false);
   const [showCode, setShowCode] = useState(false);
   const [showExport, setShowExport] = useState(false);
   const [exportCode, setExportCode] = useState<string | null>(null);
@@ -71,9 +71,7 @@ export default function BlueprintView({
   const [exportCopied, setExportCopied] = useState(false);
   const [exportNote, setExportNote] = useState<string | null>(null);
   const [showJson, setShowJson] = useState(false);
-  // The long share note is desktop furniture — a paragraph at the bottom of the
-  // page reads as clutter on a phone, so it collapses into a toggle there.
-  const [showShareNote, setShowShareNote] = useState(false);
+
   const [nameDraft, setNameDraft] = useState(myName ?? '');
   const [intent, setIntent] = useState<ShareIntent>('show');
 
@@ -214,7 +212,7 @@ export default function BlueprintView({
         {blueprint.bands.map((b) => (
           <div key={b.id} className={`bp__band${b.unmeasured ? ' bp__band--unmeasured' : ''}`}>
             <div className="bp__band-head">
-              <span>{b.label}</span>
+              <span className="bp__band-label" title={b.label}>{b.shortLabel ?? b.label}</span>
               <span className="bp__band-score">{b.unmeasured ? '·' : b.score}</span>
             </div>
             {!b.unmeasured && b.tierLabel && (
@@ -244,10 +242,10 @@ export default function BlueprintView({
         ))}
 
         {blueprint.tensions.length > 0 && (
-          <section className="bp__section bp__section--tension">
+          <section className="bp__section">
             <h2>
               <Icon name="tension" size={19} className="bp__secicon" />
-              <span>Where your answers suggest some tension</span>
+              <span>Where the tension sits</span>
             </h2>
             {blueprint.tensions.map((t, i) => (
               <div key={i} className="bp__tension">
@@ -291,26 +289,14 @@ export default function BlueprintView({
         <section className="bp__sharebox">
           <h2>
             <Icon name="heart" size={17} className="bp__secicon" />
-            <span>The partner part</span>
+            <span>Share</span>
           </h2>
-          <p>
-            This document describes how {myName ?? 'you'} currently {myName ? 'loves' : 'love'} —
-            not a standard for anyone to be measured against. Share it as a link (optionally with
-            a name and an invitation), or as a bare code. Links and codes carry the derived
-            blueprint only — never the individual answers.
-          </p>
           {code === null ? (
             <p className="bp__code-upgrade">
               This run predates a few newer questions, so there's nothing to share yet — a share
               link needs every dimension measured. Answering the remaining questions (your answers
               are all kept) completes it and unlocks comparing.
             </p>
-          ) : !showShare ? (
-            <div className="bp__codebtns">
-              <button className="btn btn--primary btn--small" onClick={() => setShowShare(true)}>
-                <Icon name="import" size={14} /> Create a share link
-              </button>
-            </div>
           ) : (
             <div className="bp__sharepanel">
               <label className="bp__sharelabel" htmlFor="sharename">
@@ -332,30 +318,26 @@ export default function BlueprintView({
               </div>
               <fieldset className="bp__intent">
                 <legend className="bp__sharelabel">Why you're sharing</legend>
-                <label className={`bp__intentopt${intent === 'show' ? ' is-active' : ''}`}>
-                  <input
-                    type="radio"
-                    name="shareintent"
-                    checked={intent === 'show'}
-                    onChange={() => setIntent('show')}
-                  />
-                  <span>
-                    <strong>Show them my blueprint</strong>
-                    <em>They read yours — no test required.</em>
-                  </span>
-                </label>
-                <label className={`bp__intentopt${intent === 'invite' ? ' is-active' : ''}`}>
-                  <input
-                    type="radio"
-                    name="shareintent"
-                    checked={intent === 'invite'}
-                    onChange={() => setIntent('invite')}
-                  />
-                  <span>
-                    <strong>Invite them to test &amp; compare</strong>
-                    <em>They take the questionnaire, then the two blueprints are compared.</em>
-                  </span>
-                </label>
+                <div className="bp__intentopts">
+                  <label className={`bp__intentopt${intent === 'show' ? ' is-active' : ''}`}>
+                    <input
+                      type="radio"
+                      name="shareintent"
+                      checked={intent === 'show'}
+                      onChange={() => setIntent('show')}
+                    />
+                    <span>Show</span>
+                  </label>
+                  <label className={`bp__intentopt${intent === 'invite' ? ' is-active' : ''}`}>
+                    <input
+                      type="radio"
+                      name="shareintent"
+                      checked={intent === 'invite'}
+                      onChange={() => setIntent('invite')}
+                    />
+                    <span>Invite</span>
+                  </label>
+                </div>
               </fieldset>
               {link && (
                 <div className="bp__linkbox">
@@ -365,15 +347,19 @@ export default function BlueprintView({
                       <Icon name={copiedLink ? 'check' : 'copy'} size={14} />
                       {copiedLink ? 'Copied' : 'Copy link'}
                     </button>
-                    {onStartCompare && (
-                      <button className="btn btn--ghost btn--small" onClick={onStartCompare}>
-                        Compare with another code
-                      </button>
-                    )}
+                    <button
+                      className={`btn btn--ghost btn--small bp__icontoggle${showCode ? ' is-active' : ''}`}
+                      onClick={() => setShowCode((s) => !s)}
+                      title={showCode ? 'Hide the bare code' : 'Show the bare code'}
+                      aria-expanded={showCode}
+                    >
+                      <Icon name="code" size={15} />
+                      {showCode ? 'Hide code' : 'Show code'}
+                    </button>
                   </div>
                 </div>
               )}
-              {showCode && code ? (
+              {showCode && code && (
                 <div className="bp__codebox">
                   <code className="bp__code" aria-label="Your share code">{code}</code>
                   <div className="bp__codebtns">
@@ -381,55 +367,52 @@ export default function BlueprintView({
                       <Icon name={copiedCode ? 'check' : 'copy'} size={14} />
                       {copiedCode ? 'Copied' : 'Copy code'}
                     </button>
-                    <button className="btn btn--ghost btn--small" onClick={() => setShowCode(false)}>
-                      Hide code
-                    </button>
                   </div>
                 </div>
-              ) : (
-                <button className="btn btn--ghost btn--small" onClick={() => setShowCode(true)}>
-                  Prefer a bare code? Show it
-                </button>
               )}
             </div>
           )}
         </section>
       )}
 
+      {/* Bottom bar at every size: one primary text action, icon circles for
+         the rest — circles expand to full text on wide windows. */}
       <footer className="bp__footer">
-        {!isVisitor && onExport && (
-          <button className="btn btn--primary" onClick={onExport}>
-            Download as Markdown
+        <div className="bp__footer-actions">
+          {!isVisitor && onOpenReview && (
+            <button className="btn btn--primary" onClick={onOpenReview}>
+              <Icon name="feather" size={16} />
+              <span className="bp__fbtn-label">Review my answers</span>
+              <span className="bp__fbtn-mini">Review</span>
+            </button>
+          )}
+          {!isVisitor && onStartCompare && (
+            <button className="btn btn--ghost bp__fbtn-round" onClick={onStartCompare} title="Compare with another blueprint" aria-label="Compare">
+              <Icon name="tension" size={16} />
+              <span className="bp__fbtn-label">Compare</span>
+              <span className="bp__fbtn-mini">Compare</span>
+            </button>
+          )}
+          {!isVisitor && onExport && (
+            <button className="btn btn--ghost bp__fbtn-round" onClick={onExport} title="Download the document as Markdown" aria-label="Download as Markdown">
+              <Icon name="download" size={16} />
+              <span className="bp__fbtn-label">Download as Markdown</span>
+              <span className="bp__fbtn-mini">Markdown</span>
+            </button>
+          )}
+          {!isVisitor && answers && (
+            <button className="btn btn--ghost bp__fbtn-round" onClick={openExport} title="A code or file of your raw answers — restores this exact session anywhere" aria-label="Export session">
+              <Icon name="code" size={16} />
+              <span className="bp__fbtn-label">Export session</span>
+              <span className="bp__fbtn-mini">Session</span>
+            </button>
+          )}
+          <button className="btn btn--ghost bp__fbtn-round" onClick={onRetake} title={isVisitor ? 'Back to start' : 'Start over'} aria-label={isVisitor ? 'Back to start' : 'Start over'}>
+            <Icon name="loop" size={16} />
+            <span className="bp__fbtn-label">{isVisitor ? 'Back to start' : 'Start over'}</span>
+            <span className="bp__fbtn-mini">{isVisitor ? 'Back' : 'Restart'}</span>
           </button>
-        )}
-        {!isVisitor && answers && (
-          <button className="btn btn--ghost" onClick={openExport} title="A code or file of your raw answers — restores this exact session anywhere">
-            Export session
-          </button>
-        )}
-        {!isVisitor && onOpenReview && (
-          <button className="btn btn--ghost" onClick={onOpenReview}>
-            Review my answers
-          </button>
-        )}
-        <button className="btn btn--ghost" onClick={onRetake}>
-          {isVisitor ? 'Back to start' : 'Start over'}
-        </button>
-        {!isVisitor && (
-          <p className="bp__share bp__share--mobile">
-            {showShareNote ? (
-              <>
-                If you share this with a partner, share it as <em>your</em> blueprint — a description of
-                how you currently love, not a standard anyone is being measured against. Then ask for
-                theirs. The two documents are the conversation.
-              </>
-            ) : (
-              <button className="bp__share-toggle" onClick={() => setShowShareNote(true)}>
-                Why share it this way?
-              </button>
-            )}
-          </p>
-        )}
+        </div>
       </footer>
 
       {showExport && (
@@ -465,23 +448,38 @@ export default function BlueprintView({
                 aria-label="Session file contents"
               />
             )}
+            {/* A bar, not a button pile: Copy leads, file actions sit behind
+                icons, Done docks right on its own edge. */}
             <div className="export-dlg__bar">
               <button className="btn btn--primary btn--small" onClick={() => copyExport(exportCode)}>
-                {exportCopied ? 'Copied ✓' : 'Copy code'}
-              </button>
-              <button className="btn btn--ghost btn--small" onClick={downloadExport}>
-                Save file
+                <Icon name={exportCopied ? 'check' : 'copy'} size={15} />
+                {exportCopied ? 'Copied' : 'Copy'}
               </button>
               <button
-                className="btn btn--ghost btn--small"
+                className="btn btn--ghost btn--small export-dlg__iconbtn"
+                onClick={downloadExport}
+                title="Save or share the JSON file"
+                aria-label="Save or share the JSON file"
+              >
+                <Icon name="import" size={15} />
+              </button>
+              <button
+                className={`btn btn--ghost btn--small export-dlg__iconbtn${showJson ? ' is-active' : ''}`}
                 onClick={() => setShowJson((s) => !s)}
+                title={showJson ? 'Hide the raw JSON' : 'View the raw JSON'}
+                aria-label={showJson ? 'Hide the raw JSON' : 'View the raw JSON'}
                 aria-expanded={showJson}
               >
-                {showJson ? 'Hide JSON' : 'View JSON'}
+                <Icon name="code" size={15} />
               </button>
               <span className="export-dlg__spacer" />
-              <button className="btn btn--ghost btn--small" onClick={() => setShowExport(false)}>
-                Done
+              <button
+                className="btn btn--ghost btn--small export-dlg__iconbtn"
+                onClick={() => setShowExport(false)}
+                title="Done"
+                aria-label="Done"
+              >
+                <Icon name="close" size={15} />
               </button>
             </div>
             {exportNote && <p className="export-dlg__note">{exportNote}</p>}
