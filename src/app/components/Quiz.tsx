@@ -88,12 +88,6 @@ export default function Quiz({ questions, answers, onAnswer, onFinish, onStartOv
     const isForced = q.format === 'forced_pair';
     return (
       <div className={`choices${isForced ? ' choices--pair' : ''}`}>
-        {isForced && !q.note && (
-          <p className="quiz__note quiz__note--prompt quiz__note--full">
-            It always depends on the day — pick the one that's true more often than not, or the
-            one whose absence you'd feel first.
-          </p>
-        )}
         {(q.options as Array<{ id: string; label: string }>).map((o) => {
           const av = answers[q.id];
           const selected = av?.kind === 'option' && av.optionId === o.id;
@@ -182,7 +176,9 @@ export default function Quiz({ questions, answers, onAnswer, onFinish, onStartOv
               </button>
             )}
           </div>
-          {q.note && <p className="quiz__note quiz__note--prompt">{q.note}</p>}
+          {/* The question's own note is spoken by read-aloud but not rendered:
+              per-card coaching read as filler — the dock message at the bottom
+              is the one place the instrument talks about itself. */}
           {isClarifier && (
             <p className="quiz__note quiz__note--clarifier">
               One of the last few — a closer look at a territory your earlier answers left
@@ -197,11 +193,6 @@ export default function Quiz({ questions, answers, onAnswer, onFinish, onStartOv
             </p>
           )}
           {renderOptions()}
-          {answeredCurrent && (
-            <p className="quiz__note quiz__note--hint">
-              Changed your mind? Pick a different option, or go ← Back for earlier questions.
-            </p>
-          )}
         </section>
       </main>
 

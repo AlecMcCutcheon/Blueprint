@@ -206,9 +206,6 @@ button { font: inherit; cursor: pointer; }
   font-size: 0.82rem;
 }
 .quiz__note { color: var(--ink-faint); font-size: 0.88rem; font-style: italic; }
-.quiz__note--prompt { margin: 8px 0 0; }
-.quiz__note--full { grid-column: 1 / -1; margin: 0 0 2px; }
-.quiz__note--hint { margin-top: 14px; }
 
 .choices { display: grid; gap: 12px; margin-top: 24px; }
 .choices--pair { grid-template-columns: 1fr 1fr; gap: 14px; }
@@ -639,7 +636,6 @@ button { font: inherit; cursor: pointer; }
 .dock__actions { display: flex; gap: 10px; align-items: center; flex-wrap: wrap; justify-content: center; }
 .dock__confirm { font-size: 0.92rem; color: var(--ink-soft); font-style: italic; }
 .btn--danger { background: #8c3b2a; border-color: #8c3b2a; color: var(--paper); }
-.quiz__note--hint { margin-top: 14px; }
 
 /* ─── Blueprint: section headers with icons, share box ───────────────── */
 .bp__section h2 { display: flex; align-items: center; gap: 10px; }
@@ -954,13 +950,58 @@ button { font: inherit; cursor: pointer; }
 [data-theme='dark'] .compare__col,
 [data-theme='dark'] .compare__score { box-shadow: none; }
 
-/* Mobile refinements */
+/* Mobile refinements — the desktop layout translates, sizes don't. */
 @media (max-width: 640px) {
-  .screen { padding: 28px 16px 72px; }
-  .quizwrap { padding: 0 16px; }
-  .quiz__card { padding: 24px 20px; }
+  /* Type scale: the 1.15–1.35rem heads and prompts fill a phone screen.
+     Bump the root size so every rem-based size lifts together. */
+  html { font-size: 17px; }
+  body { line-height: 1.55; }
+
+  .screen { padding: 20px 14px 56px; }
+  .quizwrap { padding: 0 12px; }
+  .theme-toggle { top: 10px; right: 10px; width: 36px; height: 36px; }
+
+  /* Touch targets ≥44px; ghost paddings rebalanced. */
+  .btn { min-height: 46px; }
+  .btn--small { padding: 10px 16px; }
+
+  /* Quiz: calm, single-column, everything readable at arm's length. */
+  .quiz__top { gap: 12px; margin-bottom: 16px; padding-top: 8px; }
+  .quiz__card { padding: 22px 18px; }
+  .quiz__prompt p { font-size: 1.04rem; }
+  .quiz__promptrow { flex-direction: column-reverse; gap: 8px; }
+  .quiz__promptrow .speakbtn { align-self: flex-end; }
+  .choice { padding: 14px 15px; }
+  .choice__label { font-size: 0.98rem; }
+  .scale__label { font-size: 0.96rem; }
+  .scale__opt { padding: 12px 10px; }
+
+  /* Dock: nav bar, not a poster. Message hidden; actions row justified. */
+  .dock {
+    background: var(--paper);
+    border-top: 1px solid var(--line);
+    padding: 10px 12px calc(10px + env(safe-area-inset-bottom, 0px));
+    flex-direction: row;
+    justify-content: space-between;
+  }
+  .dock__message { display: none; }
+  .dock__actions { flex: 1; justify-content: space-between; }
+  .dock__confirm { font-size: 0.85rem; flex: 1; }
+
+  /* Blueprint document: stat bands in two columns, headings down a notch. */
+  .bp__bands { grid-template-columns: repeat(2, minmax(0, 1fr)); padding: 16px 14px; gap: 12px 16px; }
+  .bp__band-head { font-size: 0.82rem; }
+  .bp__band-tier { display: none; }
+  .bp__section h2 { font-size: 1.18rem; }
+  .bp__section p { font-size: 0.98rem; margin-bottom: 13px; }
+  .bp__share--mobile { text-align: center; }
+  .bp__share-toggle { background: none; border: none; color: var(--ink-faint); font: inherit; font-size: 0.9rem; font-style: italic; text-decoration: underline; padding: 0; }
+
+  /* Export dialog becomes a full temporary page instead of a floating box. */
+  .export-dlg { padding: 0; align-items: stretch; }
+  .export-dlg__panel { width: 100%; max-height: none; border-radius: 0; border: none; padding: 18px 16px calc(18px + env(safe-area-inset-bottom, 0px)); }
+
   .anscard__layer { display: none; }
-  .theme-toggle { top: 12px; right: 12px; }
   .bp__sharebox { padding: 20px 18px; }
   .compare__score { padding: 20px; gap: 14px; }
   .compare__xverdict { margin-left: 0; }

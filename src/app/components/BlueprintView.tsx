@@ -69,6 +69,9 @@ export default function BlueprintView({
   const [exportJson, setExportJson] = useState<string | null>(null);
   const [exportCopied, setExportCopied] = useState(false);
   const [exportNote, setExportNote] = useState<string | null>(null);
+  // The long share note is desktop furniture — a paragraph at the bottom of the
+  // page reads as clutter on a phone, so it collapses into a toggle there.
+  const [showShareNote, setShowShareNote] = useState(false);
   const [nameDraft, setNameDraft] = useState(myName ?? '');
   const [intent, setIntent] = useState<ShareIntent>('show');
 
@@ -404,10 +407,18 @@ export default function BlueprintView({
           {isVisitor ? 'Back to start' : 'Start over'}
         </button>
         {!isVisitor && (
-          <p className="bp__share">
-            If you share this with a partner, share it as <em>your</em> blueprint — a description of
-            how you currently love, not a standard anyone is being measured against. Then ask for
-            theirs. The two documents are the conversation.
+          <p className="bp__share bp__share--mobile">
+            {showShareNote ? (
+              <>
+                If you share this with a partner, share it as <em>your</em> blueprint — a description of
+                how you currently love, not a standard anyone is being measured against. Then ask for
+                theirs. The two documents are the conversation.
+              </>
+            ) : (
+              <button className="bp__share-toggle" onClick={() => setShowShareNote(true)}>
+                Why share it this way?
+              </button>
+            )}
           </p>
         )}
       </footer>
