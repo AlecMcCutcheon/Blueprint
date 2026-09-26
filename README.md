@@ -43,25 +43,28 @@ agreed with themselves.
 4. **Blueprint** — the narrative document: everyday affection → understanding →
    communication → safety → reciprocity → hard days → closeness → independence →
    privacy → crosscurrents (your top cross-dimension patterns) → tensions → closing.
-   Downloadable as Markdown; the full session exports as JSON.
+   Downloadable as Markdown; the full session exports as a portable `BPS` code.
 
 ## Sharing & privacy
 
 Two carriers, two privacy levels:
 
-- **For other people** — a share link carrying a `BP5` code: 28 derived scores plus
+- **For other people** — a share link carrying a `BP6` code: derived scores plus
   quantized variance shape (per-dimension answer counts and cancellation), tension
   directions, and channel breadth — exactly what the document reveals and nothing
   more. Raw answers never leave your machine, and the aggregates are not invertible
-  back to how any specific question was answered. The optional name and intent
+  back to how any specific question was answered. The name and intent
   (`show` vs `invite`) ride in a checksummed segment: a modified link degrades to
   the generic "somebody shared this" presentation. The shared document is byte-
   identical to the owner's (smoke-tested), so sharing no longer costs the reader
   any of the reading.
-- **For yourself** — a full-session JSON export (raw answers + question-order seed).
-  Importing one restores the *real* session: the review shows actual choices and the
-  blueprint rebuilds from evidence. Codes and files from older bank versions import
-  partially and report exactly what was dropped.
+- **For yourself** — a full-session `BPS` code (raw answers + question-order seed,
+  with your name in an opaque, checksummed block). Pasting one into the intro's
+  import box restores the *real* session: the review shows actual choices and the
+  blueprint rebuilds from evidence. Codes from older bank versions import partially
+  and report exactly what was dropped. The universal import box auto-detects what
+  you pasted — a link or `BP` code opens someone's blueprint, a `BPS` code restores
+  your own session.
 
 Everything stays in the browser. Answers live in localStorage; exports are local file
 downloads. No network calls, no accounts, no analytics.
@@ -110,10 +113,11 @@ node /tmp/smoke.cjs
 
 The smoke test answers every question three different ways and asserts the scoring
 engine and blueprint generator produce complete, distinct, non-empty output for each;
-that `BP1`–`BP5` share codes round-trip, with legacy codes marking newer dimensions
-unmeasured rather than guessed; that full-session codes and JSON exports restore
-bit-identical profiles; that clarifiers score in the main pass without inflating the
-answered count; and that share links carry name/intent without ever leaking into the code.
+that `BP1`–`BP6` share codes round-trip, with legacy codes marking newer dimensions
+unmeasured rather than guessed; that full-session codes (with and without a name)
+restore bit-identical profiles; that clarifiers score in the main pass without
+inflating the answered count; and that share links and session codes carry
+name/intent in checksummed blocks without ever leaking plaintext into the code.
 
 Additional tooling under `scripts/`: `harness.ts` (pattern fire rates across 540 seeded
 profiles), `auditmine.ts` (per-dimension evidence contributions), `catalog.ts`

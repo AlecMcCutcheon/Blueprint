@@ -356,12 +356,15 @@ export function decodeProfile(code: string): ScoredProfile | null {
  * A full-session code packs the RAW ANSWERS + presentation order seed so the
  * real session restores anywhere: review shows the actual choices, the
  * blueprint rebuilds from evidence, and even the question order survives.
- * Name/intent stay out of the code — they belong in the link (they are
- * transport, not data).
+ * The owner's display NAME rides along in an opaque, checksummed block (same
+ * scheme as a share link's ?m= segment) — never plaintext — so a restored
+ * session arrives already named and share links carry it forward.
  *
- * Layout: "BPS" + urlsafe base64 of [ 'S' tag byte, seed int32 LE ×4, then one
- * byte per core question: 0 = unanswered, 1..127 = option index +1 (scenario)
- * or 0x80|value (agreement scale). One byte per question keeps the code short
+ * Layout: "BPS" + urlsafe base64 of [ tag byte, seed int32 LE ×4, one byte
+ * per core question (0 = unanswered, 1..127 = option index +1 (scenario) or
+ * 0x80|value (agreement scale)), then optionally a name block: 0xA1 marker,
+ * name utf-8 byte length, name bytes, FNV-1a low-byte checksum over (seed
+ * bytes + marker + length + name). One byte per question keeps the code short
  * and makes it DETERMINISTIC for a given answer set — the export box doesn't
  * churn while the user reads it. Deterministic encoding requires that every
  * chosen option be findable by reverse index lookup, which encodeFullSession
@@ -373,7 +376,7 @@ export interface SessionCodeResult {
   skipped: string[];
 }
 
-export function encodeFullSession(answers: Answers, seed: number): SessionCodeResult {
+export function encodeFullSession(answers: Answers, seed: number, name?: string | null): SessionCodeResult {
   const skipped: string[] = [];
   const bytes: number[] = [0x53]; // 'S' payload tag
   const s = Math.max(1, Math.min(2147483647, Math.round(seed) || 1)) & 0x7fffffff;
@@ -396,6 +399,16 @@ export function encodeFullSession(answers: Answers, seed: number): SessionCodeRe
       bytes.push(idx + 1);
     }
   }
+
+  // Name block: opaque (the code is already base64 — the point of the wrapper
+  // is that a code reads as an opaque token end to end) and CHECKSUMMED, so a
+  // mangled name degrades to an unnamed restore instead of a garbled one.
+  const clean = (name ?? '').trim().slice(0, 40);
+  if (clean) {
+    const nameBytes = utf8Bytes(clean);
+    bytes.push(0xa1, nameBytes.length, ...nameBytes);
+    bytes.push(fnv1aLow(new Uint8Array(bytes)));
+  }
   return { code: 'BPS' + b64encode(new Uint8Array(bytes)), skipped };
 }
 
@@ -405,6 +418,8 @@ export interface DecodedSession {
   seed: number;
   /** Core questions left unanswered in the encoded session. */
   missing: string[];
+  /** The owner's display name, when the code carries a valid name block. */
+  name: string | null;
 }
 
 export function decodeFullSession(code: string): DecodedSession | null {
@@ -435,7 +450,20 @@ export function decodeFullSession(code: string): DecodedSession | null {
         answers[q.id] = { kind: 'option', optionId: opt.id };
       }
     }
-    return { answers, seed: seed > 0 ? seed : 1, missing };
+    // Optional trailing name block: [0xA1][len][name…][checksum]. Everything
+    // past the question bytes must be exactly one well-formed, checksum-clean
+    // block or it's treated as absent — corruption degrades to unnamed, never
+    // to a garbled name. Legacy codes (no block) restore unnamed, and empty
+    // names encode no block at all, so the old formats round-trip unchanged.
+    let name: string | null = null;
+    const tail = bytes.slice(5 + n);
+    if (tail.length >= 3 && tail[0] === 0xa1 && tail[1] > 0 && tail.length === tail[1] + 3) {
+      const body = bytes.slice(0, 5 + n + 2 + tail[1]); // tag + seed + marker + length + name
+      if (fnv1aLow(body) === tail[tail.length - 1]) {
+        name = textDec ? textDec.decode(tail.slice(2, 2 + tail[1])).slice(0, 40) : null;
+      }
+    }
+    return { answers, seed: seed > 0 ? seed : 1, missing, name };
   } catch {
     return null;
   }

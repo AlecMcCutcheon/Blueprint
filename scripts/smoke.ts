@@ -86,6 +86,41 @@ import { BONUS_POOL } from '../src/domain/questions';
     console.error('FAIL: garbage session codes should return null'); process.exit(1);
   }
 
+  // Named session codes: the owner's name rides in an opaque, checksummed
+  // trailing block — never plaintext, and legacy/unnamed codes restore null.
+  {
+    const encN = encodeFullSession(a.answers, 42, 'Maya');
+    const decN = decodeFullSession(encN.code);
+    if (!decN || decN.name !== 'Maya') {
+      console.error(`FAIL: named session code lost the name (got ${decN?.name})`); process.exit(1);
+    }
+    // (a.answers also carries the three injected retired state ids, which
+    // session codes deliberately never encode — compare core answers only.)
+    const coreInA = QUESTIONS.filter((q) => a.answers[q.id] !== undefined).length;
+    if (decN.seed !== 42 || Object.keys(decN.answers).length !== coreInA) {
+      console.error('FAIL: name block disturbed the answers or seed'); process.exit(1);
+    }
+    if (encN.code.includes('Maya')) {
+      console.error('FAIL: session code carries the name in plaintext'); process.exit(1);
+    }
+    if (encodeFullSession(a.answers, 42, 'Maya').code !== encN.code) {
+      console.error('FAIL: named session encoding is not deterministic'); process.exit(1);
+    }
+    if (encodeFullSession(a.answers, 42, '  Maya  ').code !== encN.code) {
+      console.error('FAIL: name should be trimmed before encoding'); process.exit(1);
+    }
+    if (decodeFullSession(enc.code)?.name !== null) {
+      console.error('FAIL: unnamed session code should decode with name null'); process.exit(1);
+    }
+    // A flipped byte in the name block degrades to UNNAMED, never a garbled name.
+    const rawN = atob(encN.code.slice(3).replace(/-/g, '+').replace(/_/g, '/'));
+    const flipped = rawN.slice(0, -1) + String.fromCharCode(rawN.charCodeAt(rawN.length - 1) ^ 0x01);
+    const corruptedN = 'BPS' + btoa(flipped).replace(/\+/g, '-').replace(/\//g, '_').replace(/=+$/, '');
+    if (decodeFullSession(corruptedN)?.name !== null) {
+      console.error('FAIL: corrupted name block must degrade to unnamed'); process.exit(1);
+    }
+  }
+
   // Session JSON round-trip + validation. The smoke runs inject retired state
   // ids (q96–q98) to exercise the legacy path — a real session file wouldn't
   // carry them, and import must DROP them (reported), never guess.
@@ -198,7 +233,7 @@ import { BONUS_POOL } from '../src/domain/questions';
   }
   if (bp.includes('Maya')) { console.error('FAIL: name leaked into the metric code'); process.exit(1); }
 
-  console.log(`session restore: code round-trip exact (${Object.keys(dec.answers).length} answers) · JSON+name round-trip · tamper dropped · ${BONUS_POOL.length} clarifiers scored-in-main-pass · link name/intent round-trip`);
+  console.log(`session restore: code round-trip exact (${Object.keys(dec.answers).length} answers) · named codes round-trip (opaque, checksummed) · JSON+name round-trip · tamper dropped · ${BONUS_POOL.length} clarifiers scored-in-main-pass · link name/intent round-trip`);
 }
 
 // Order constraints: 137 core items, no state/bonus items, echo pairs far apart.

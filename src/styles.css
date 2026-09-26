@@ -123,10 +123,18 @@ button { font: inherit; cursor: pointer; }
 
 /* ─── Quiz ───────────────────────────────────────────────────────────────── */
 .quiz__top {
-  display: flex; align-items: center; gap: 20px;
-  margin-bottom: 28px;
+  display: flex; justify-content: center;
+  margin-bottom: 22px;
 }
-.quiz__progress { flex: 1; display: flex; align-items: center; gap: 12px; }
+.quiz__progress {
+  display: flex; align-items: center; gap: 12px;
+  width: min(420px, 100%);
+  background: var(--card);
+  border: 1px solid var(--line);
+  border-radius: 999px;
+  padding: 9px 18px;
+  box-shadow: var(--shadow);
+}
 .quiz__progress-track {
   flex: 1; height: 4px; background: var(--line);
   border-radius: 2px; overflow: hidden;
@@ -152,21 +160,42 @@ button { font: inherit; cursor: pointer; }
   from { opacity: 0; transform: translateY(6px); }
   to { opacity: 1; transform: none; }
 }
+/* The instrument's one aside, as a card matching the question card. The
+   question + message pair centers together; when the two wouldn't fit, the
+   message card is unrendered for that question (fit is measured in JS). */
+.quiz__msgcard {
+  background: var(--card);
+  border: 1px solid var(--line);
+  border-radius: var(--radius);
+  padding: 12px 20px;
+  font-style: italic;
+  color: var(--ink-faint);
+  font-size: 0.92rem;
+  text-align: center;
+  width: 100%;
+  box-sizing: border-box;
+  animation: fadeUp 0.25s ease;
+}
+/* Invisible twin: always mounted, carries the message's natural height at
+   the column's real width while the visible card is unrendered — without it,
+   hide → smaller → show → bigger would oscillate. */
+.quiz__msgcard--measure {
+  position: absolute;
+  left: -9999px;
+  top: 0;
+  visibility: hidden;
+  pointer-events: none;
+  animation: none;
+}
 .quiz__prompt p {
   font-size: 1.15rem;
   margin: 0 0 10px;
 }
 .quiz__prompt p:last-child { margin-bottom: 0; }
-.quiz__promptrow {
-  display: flex;
-  align-items: flex-start;
-  gap: 12px;
-}
-.quiz__promptrow .quiz__prompt { flex: 1; }
 .speakbtn {
   flex-shrink: 0;
-  width: 38px;
-  height: 38px;
+  width: 44px;
+  height: 44px;
   border-radius: 50%;
   border: 1px solid var(--line);
   background: var(--paper-deep);
@@ -193,19 +222,60 @@ button { font: inherit; cursor: pointer; }
   50% { box-shadow: 0 0 0 7px rgba(214, 144, 95, 0.1); }
 }
 .speakbtn.is-broken { opacity: 0.55; }
-.quiz__note--tts {
-  margin-top: 12px;
-  font-style: normal;
-  border: 1px dashed var(--accent-soft);
-  border-radius: 10px;
-  padding: 10px 14px;
-  background: var(--paper-deep);
+.quiz__note { color: var(--ink-faint); font-size: 0.88rem; font-style: italic; }
+
+/* Read-aloud failure toast. Absolute inside the dock, so it never pushes
+   layout. Its resting spot is 8px above the bar's top edge; parked, a
+   transform carries it a full toast-plus-bar height DOWN — behind
+   .dock__in's opaque surface (z-index 1) and off the viewport floor. The
+   slide therefore visibly emerges from behind the bar and sinks back behind
+   it when the clock runs out. Transform, not bottom: the animation never
+   touches layout. */
+.tts-toast {
+  position: absolute; left: 0; right: 0;
+  bottom: calc(100% + 8px);
+  display: flex; justify-content: center;
+  pointer-events: none;
+  transform: translateY(calc(100% + 120px));
+  transition: transform 0.45s cubic-bezier(0.22, 1, 0.36, 1);
 }
-.quiz__note--tts code {
+.tts-toast.is-in { transform: translateY(0); }
+.tts-toast p {
+  pointer-events: auto;
+  position: relative;
+  overflow: hidden;
+  max-width: min(52ch, calc(100vw - 32px));
+  margin: 0 12px 10px;
+  background: var(--card);
+  border: 1px solid var(--line);
+  border-radius: 10px;
+  box-shadow: var(--shadow);
+  padding: 10px 14px 12px;
+  font-size: 0.88rem;
+  color: var(--ink-soft);
+}
+.tts-toast code {
   font-family: ui-monospace, 'SF Mono', Menlo, Consolas, monospace;
   font-size: 0.82rem;
 }
-.quiz__note { color: var(--ink-faint); font-size: 0.88rem; font-style: italic; }
+/* The clock: a bottom edge that drains left-to-right across the hold. It
+   only exists while the toast is IN — and since .is-in toggles on every
+   show, the animation restarts fresh each time instead of running once per
+   page load (the toast node itself is never remounted). */
+.tts-toast p::after {
+  content: '';
+  position: absolute; left: 0; bottom: 0; height: 3px; width: 100%;
+  background: var(--accent);
+  transform: scaleX(0);
+  transform-origin: left;
+}
+.tts-toast.is-in p::after {
+  animation: ttsToastClock 10s linear forwards;
+}
+@keyframes ttsToastClock {
+  from { transform: scaleX(1); }
+  to { transform: scaleX(0); }
+}
 
 .choices { display: grid; gap: 12px; margin-top: 24px; }
 .choices--pair { grid-template-columns: 1fr 1fr; gap: 14px; }
@@ -321,7 +391,7 @@ button { font: inherit; cursor: pointer; }
 .anscard__desc { margin: 4px 0 0; color: var(--ink-soft); font-size: 0.95rem; }
 .anscard__channel { color: var(--ink-faint); font-size: 0.85rem; margin: 6px 0 0; }
 
-/* ── Export dialog (session file: view / copy / save-or-share) ────────── */
+/* ── Dialogs (Downloads / Share: one panel language, mobile = full screen) ── */
 .export-dlg {
   position: fixed; inset: 0; z-index: 60;
   background: rgba(30, 25, 18, 0.45);
@@ -333,7 +403,7 @@ button { font: inherit; cursor: pointer; }
   border: 1px solid var(--line);
   border-radius: var(--radius);
   box-shadow: var(--shadow);
-  padding: 22px 24px;
+  padding: 22px 24px 0;
   width: min(560px, 100%);
   max-height: min(85vh, 720px);
   overflow: auto;
@@ -354,25 +424,56 @@ button { font: inherit; cursor: pointer; }
   max-height: 132px;
   overflow-y: auto;
 }
-.export-dlg__code--json {
-  width: 100%;
-  box-sizing: border-box;
-  resize: vertical;
-  max-height: none;
-  white-space: pre;
-}
 .export-dlg__bar {
   display: flex;
   gap: 8px;
   align-items: center;
   flex-wrap: wrap;
   border-top: 1px solid var(--line);
-  padding-top: 12px;
-  margin-top: 14px;
+  padding: 12px 24px calc(12px + env(safe-area-inset-bottom, 0px));
+  margin: 14px -24px 0;
 }
 .export-dlg__spacer { flex: 1; }
-.export-dlg__iconbtn.is-active { border-color: var(--accent); color: var(--accent); }
 .export-dlg__note { color: var(--ink-faint); font-size: 0.88rem; margin: 10px 0 0 !important; }
+/* Second section inside the combined panel (the Downloads half). Same size
+   and style as the panel's first h2 — only the divider marks the seam. (The
+   extra specificity is required: the bare .export-dlg__panel h2 rule sets
+   margin on every panel heading and would otherwise pin this one to the
+   content above it.) */
+.export-dlg__panel h2.export-dlg__sub {
+  margin-top: 30px;
+  padding-top: 18px;
+  border-top: 1px solid var(--line);
+}
+
+/* Titled rows inside the Downloads popup: name + one-liner on the left, its
+   action docked right — a menu, not a button pile. */
+.dlrow {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  padding: 12px 0;
+  border-bottom: 1px dotted var(--line);
+}
+.dlrow:last-of-type { border-bottom: none; }
+.dlrow__text { flex: 1; min-width: 0; display: flex; flex-direction: column; gap: 2px; }
+.dlrow__text strong { font-size: 0.98rem; }
+.dlrow__text span { font-size: 0.85rem; color: var(--ink-faint); }
+.dlrow .btn { flex: 0 0 auto; }
+.dlrow__none { font-size: 0.85rem; color: var(--ink-faint); font-style: italic; }
+/* Two actions sharing one row (download + copy): full-text buttons that
+   stretch to take the space the line offers — same size and style as every
+   other button in the panel. */
+.dlrow__btns { display: flex; gap: 8px; align-items: stretch; flex: 1 1 0; min-width: 0; }
+.dlrow__btns .btn { flex: 1 1 0; justify-content: center; min-width: 0; }
+.dlrow__text { flex: 2 1 0; }
+/* Text-first rows whose actions belong UNDER the text, not beside it. A
+   single action sits at its natural size; a .dlrow__btns pair spreads to
+   fill the line with normal, uncramped button padding. */
+.dlrow--stack { flex-direction: column; align-items: stretch; gap: 10px; }
+.dlrow--stack > .btn { align-self: flex-start; }
+.dlrow--stack > .dlrow__btns { display: flex; gap: 8px; }
+.dlrow--stack > .dlrow__btns .btn { flex: 1 1 0; min-width: 0; justify-content: center; }
 
 .review__measures { display: grid; gap: 28px; }
 .measures__domain h2 {
@@ -408,15 +509,14 @@ button { font: inherit; cursor: pointer; }
 
 /* Review footer: the same bottom-bar language as the blueprint footer. */
 .review__footer {
-  position: sticky; bottom: 0; z-index: 30;
+  position: fixed; left: 0; right: 0; bottom: 0; z-index: 70;
   background: var(--paper);
   border-top: 1px solid var(--line);
   display: flex; justify-content: space-between; align-items: center;
-  margin: 32px calc(50% - 50vw) 0;
   gap: 14px;
   padding: 10px max(16px, calc(50vw - 380px)) calc(10px + env(safe-area-inset-bottom, 0px));
 }
-.screen:has(> .review__footer) { padding-bottom: 0; }
+body:has(.review__footer) .screen { padding-bottom: calc(120px + env(safe-area-inset-bottom, 0px)); }
 
 /* ─── Blueprint ──────────────────────────────────────────────────────────── */
 .bp__header { text-align: center; margin-bottom: 36px; }
@@ -512,16 +612,28 @@ button { font: inherit; cursor: pointer; }
 /* Blueprint footer: one bottom bar at every size — primary action as a text
    button, secondary actions as icon circles, expanding to full text as the
    window grows. */
+/* The bar is FIXED to the viewport floor — never scrolls away, never
+   depends on page height. Content on bar-hosting pages clears it. */
 .bp__footer {
-  position: sticky; bottom: 0; z-index: 30;
+  position: fixed; left: 0; right: 0; bottom: 0; z-index: 70;
   background: var(--paper);
   border-top: 1px solid var(--line);
-  margin: 32px calc(50% - 50vw) 0;
   padding: 10px max(16px, calc(50vw - 380px)) calc(10px + env(safe-area-inset-bottom, 0px));
 }
-.screen:has(> .bp__footer) { padding-bottom: 0; }
-.bp__footer-actions { display: flex; align-items: center; justify-content: space-between; gap: 8px; }
-.bp__footer .btn { flex: 0 0 auto; min-height: 44px; white-space: nowrap; }
+body:has(.bp__footer) .screen { padding-bottom: calc(120px + env(safe-area-inset-bottom, 0px)); }
+/* ONE bar recipe for every page that hosts it (blueprint, visitor,
+   compare): same padding, same geometry, same slots. Height is FIXED — one
+   row of 44px controls, nothing wraps, nothing grows. */
+.bp__footer-actions {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+  height: 44px;
+  flex-wrap: nowrap;
+}
+.bp__footer-actions > * { flex-shrink: 0; }
+.bp__footer .btn { flex: 0 0 auto; min-height: 44px; height: 44px; white-space: nowrap; }
 .bp__footer .btn--primary { flex: 1 1 auto; min-width: 0; justify-content: center; }
 .bp__footer .btn.bp__fbtn-round { width: 44px; min-height: 44px; height: 44px; padding: 0; }
 .bp__footer .btn.bp__fbtn-round .bp__fbtn-label,
@@ -554,6 +666,50 @@ button { font: inherit; cursor: pointer; }
 .bp__fbtn-round {
   border-radius: 999px;
 }
+/* An open panel's own bar slot: X icon, accent highlight — press again to close. */
+.bp__fbtn-accent {
+  border-color: var(--accent);
+  color: var(--accent);
+  box-shadow: inset 0 0 0 1px var(--accent);
+}
+/* The Restart confirm, inside the bar — same words as the quiz dock. The
+   question text claims the row; ellipsis keeps the bar's fixed 44px row on
+   narrow screens. */
+.bp__confirm {
+  flex: 1 1 auto;
+  min-width: 0;
+  font-size: 0.92rem;
+  font-style: italic;
+  color: var(--ink-soft);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.bp__footer .btn--danger { flex: 0 0 auto; }
+
+/* Back to the previous question: a quiet circle in the dock's left seat. */
+.dock__back {
+  flex: 0 0 auto;
+  border-radius: 999px;
+}
+.dock__backlabel { margin-left: 2px; }
+
+/* Name gate: the test's own bottom nav bar — Back left, Start right. */
+.namegate__bar {
+  position: sticky; bottom: 0; z-index: 30;
+  background: var(--paper);
+  border-top: 1px solid var(--line);
+  margin-top: auto; /* flex column: pinned to the viewport floor on short pages */
+  margin-left: calc(50% - 50vw);
+  margin-right: calc(50% - 50vw);
+  padding: 10px max(16px, calc(50vw - 380px)) calc(10px + env(safe-area-inset-bottom, 0px));
+}
+.screen:has(> .namegate__bar) { padding-bottom: 0; }
+.namegate__bar-actions {
+  display: flex; align-items: center; justify-content: space-between; gap: 12px;
+}
+.namegate__bar-actions .btn--primary { flex: 1 1 auto; justify-content: center; }
+.namegate__bar-actions .btn--ghost { flex: 0 0 auto; }
 
 /* ─── Theme toggle ───────────────────────────────────────────────────── */
 .theme-toggle {
@@ -610,18 +766,34 @@ button { font: inherit; cursor: pointer; }
 .import-box__error { color: #a33d2e; font-size: 0.9rem; margin: 8px 0 0; }
 .import-box__note { color: var(--ink-faint); font-size: 0.85rem; margin: 8px 0 0; }
 
-/* Two-column import: restore your session | open someone else's blueprint */
-.import-box { display: grid; grid-template-columns: 1fr 1fr; gap: 24px; }
-@media (max-width: 700px) { .import-box { grid-template-columns: 1fr; } }
+/* One universal import box — a link, a BP code, or a BPS code; the prefix
+   decides what happens, so there is nothing to choose between up front. */
+.import-box { margin: 18px 0 30px; }
 .import-box__title { margin: 0 0 8px; font-size: 1rem; }
-.import-box__file { display: block; margin: 4px 0 12px; font-size: 0.9rem; color: var(--ink-soft); }
-.import-box__file::file-selector-button {
-  font: inherit; font-size: 0.88rem;
-  border: 1px solid var(--line); background: var(--paper-deep);
-  color: var(--ink); border-radius: 999px; padding: 7px 14px; margin-right: 10px;
-  cursor: pointer;
+
+/* ─── Name gate: the questionnaire's first step ─────────────────────── */
+.namegate {
+  min-height: 100vh;
+  min-height: 100dvh;
+  display: flex;
+  flex-direction: column;
 }
-.import-box__file::file-selector-button:hover { border-color: var(--accent-soft); }
+.namegate__inner {
+  max-width: 560px;
+  margin: 0 auto;
+  padding-top: 8vh;
+  text-align: center;
+}
+.namegate__title { font-size: clamp(1.6rem, 4.5vw, 2.4rem); margin: 10px 0 14px; }
+.namegate__lede { color: var(--ink-soft); margin: 0 0 26px; }
+.namegate__form { margin-bottom: 24px; }
+.namegate__input {
+  font: inherit; font-size: 1.1rem;
+  padding: 13px 16px; border-radius: 10px;
+  border: 1px solid var(--line); background: var(--paper-deep); color: var(--ink);
+  text-align: center;
+}
+.namegate__input:focus { outline: 2px solid var(--accent-soft); border-color: var(--accent-soft); }
 
 /* Clarifying questions close the run — a quieter note than the reassurances */
 .quiz__note--clarifier { margin-top: 10px; color: var(--accent); }
@@ -636,27 +808,41 @@ button { font: inherit; cursor: pointer; }
   padding: 0 24px;
 }
 .quiz__top { padding-top: 28px; }
-.quiz__main { flex: 1; display: flex; flex-direction: column; justify-content: center; padding: 20px 0 24px; }
+/* The question card and its message card are siblings here, centered as a
+   unit; the gap is the visible seam between them (and part of the fit
+   check — the JS reads this row-gap). */
+.quiz__main {
+  flex: 1;
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  /* If content ever overflows anyway, safe center drops the centering so
+     the top of the question stays reachable instead of clipping upward. */
+  justify-content: safe center;
+  gap: 14px;
+  padding: 20px 0 24px;
+}
 .dock {
   position: sticky;
   bottom: 0;
   left: 0;
   right: 0;
-  background: linear-gradient(to top, var(--paper) 65%, transparent);
-  padding: 14px 0 calc(16px + env(safe-area-inset-bottom, 0px));
+  border-top: 1px solid var(--line);
+  padding: 0;
+}
+/* The bar proper: its own opaque surface, one layer above the toast — so the
+   toast genuinely slides up FROM BEHIND the bar without ever moving layout. */
+.dock__in {
+  width: 100%;
+  position: relative;
+  z-index: 1;
+  background: var(--paper);
   display: flex;
   flex-direction: column;
   gap: 10px;
   align-items: center;
-}
-.dock__message {
-  margin: 0;
-  font-style: italic;
-  color: var(--ink-faint);
-  font-size: 0.92rem;
-  text-align: center;
-  max-width: 52ch;
-  animation: msgIn 0.4s ease;
+  padding: 12px 24px calc(12px + env(safe-area-inset-bottom, 0px));
 }
 .dock__catchup {
   margin: 0;
@@ -666,8 +852,13 @@ button { font: inherit; cursor: pointer; }
   max-width: 52ch;
   padding: 0 16px;
 }
-@keyframes msgIn { from { opacity: 0; transform: translateY(4px); } to { opacity: 1; transform: none; } }
-.dock__actions { display: flex; gap: 10px; align-items: center; flex-wrap: wrap; justify-content: center; }
+.dock__actions { display: flex; gap: 10px; align-items: center; flex-wrap: wrap; justify-content: center; width: 100%; }
+/* The primary owns the row: it stretches, the quiet buttons stay snug next
+   to it — same shape as the blueprint/review bars. */
+.dock__actions .dock__primary { flex: 1 1 auto; justify-content: center; }
+.dock__actions .dock__back,
+.dock__actions .dock__reset,
+.dock__actions .speakbtn { flex: 0 0 auto; }
 .dock__confirm { font-size: 0.92rem; color: var(--ink-soft); font-style: italic; }
 .btn--danger { background: #8c3b2a; border-color: #8c3b2a; color: var(--paper); }
 
@@ -699,8 +890,7 @@ button { font: inherit; cursor: pointer; }
 }
 .bp__sharebox > h2 { justify-content: flex-start; }
 .bp__sharebox h2 { display: flex; align-items: center; gap: 10px; margin: 0 0 12px; font-size: 1.2rem; }
-.bp__sharebox p { color: var(--ink-soft); margin: 0 0 16px; }
-.bp__codebox { display: flex; flex-direction: column; gap: 12px; }
+.bp__sharebox p { color: var(--ink-soft); margin: 0 0 16px; }.bp__codebox { display: flex; flex-direction: column; gap: 12px; }
 .bp__code {
   display: block;
   font-family: ui-monospace, 'SF Mono', Menlo, Consolas, monospace;
@@ -713,6 +903,7 @@ button { font: inherit; cursor: pointer; }
   color: var(--ink);
   user-select: all;
 }
+
 .bp__codebtns { display: flex; gap: 10px; flex-wrap: wrap; align-items: center; }
 /* Bare-code show/hide toggle beside Copy link (normal button padding — the
    label makes it a text button; only the active tint is special). */
@@ -733,17 +924,9 @@ button { font: inherit; cursor: pointer; }
 .bp__visitor-title { font-size: clamp(1.4rem, 3.5vw, 2rem); margin: 10px 0 12px; }
 .bp__visitor-body { color: var(--ink-soft); margin: 0 0 10px; }
 .bp__visitor-body--soft { color: var(--ink-faint); font-size: 0.95rem; font-style: italic; }
-.bp__visitor-actions { display: flex; gap: 12px; justify-content: center; flex-wrap: wrap; margin-top: 16px; }
 
-/* ── Share panel: name + intent + link ───────────────────────────────── */
 .bp__sharepanel { display: flex; flex-direction: column; gap: 14px; }
 .bp__sharelabel { font-size: 0.88rem; color: var(--ink-soft); }
-.bp__nameinput {
-  width: 100%; font: inherit; font-size: 0.98rem;
-  padding: 10px 14px; border-radius: 10px;
-  border: 1px solid var(--line); background: var(--paper-deep); color: var(--ink);
-}
-.bp__nameinput:focus { outline: 2px solid var(--accent-soft); border-color: var(--accent-soft); }
 .bp__intent { border: none; padding: 0; margin: 0; }
 .bp__intent legend { padding: 0; margin-bottom: 8px; }
 /* Two compact chips side by side — Show | Invite — not stacked explanation cards. */
@@ -900,9 +1083,6 @@ button { font: inherit; cursor: pointer; }
 .compare__xverdict.is-gap { background: transparent; border: 1px solid var(--accent-soft); color: var(--accent); }
 .compare__xverdict.is-unspecified { background: transparent; border: 1px solid var(--line); color: var(--ink-faint); }
 .compare__channels-note { color: var(--ink-faint); font-size: 0.88rem; margin: 10px 0 0; }
-.compare__back { margin-bottom: 14px; }
-.compare__footer { display: flex; justify-content: center; }
-.compare__footer--secondary { margin-top: 10px; }
 .compare__entry { max-width: 560px; }
 
 /* Directory of saved blueprints + the add-someone box — same card language
@@ -979,9 +1159,6 @@ button { font: inherit; cursor: pointer; }
 [data-theme='dark'] .bp__code { background: #16130f; }
 [data-theme='dark'] .bp__link { background: #16130f; }
 [data-theme='dark'] .bp__intentopt.is-active { background: #4a3323; }
-[data-theme='dark'] .dock {
-  background: linear-gradient(to top, var(--paper) 62%, transparent);
-}
 [data-theme='dark'] .quiz__card,
 [data-theme='dark'] .bp__sharebox,
 [data-theme='dark'] .compare__col,
@@ -991,12 +1168,11 @@ button { font: inherit; cursor: pointer; }
 @media (min-width: 640px) {
   .bp__footer .btn--primary .bp__fbtn-label { display: inline; }
   .bp__footer .btn--primary .bp__fbtn-mini { display: none; }
-}
-
-/* Stage 3 (wide window): the circles become short text pills — never
-   icon-only on a desktop, never so long they crowd the primary. */
+}  /* Stage 3 (wide window): the circles become short text pills — never
+   icon-only on a desktop, never so long they crowd the primary. Height
+   stays 44px so the bar never changes size between pages. */
 @media (min-width: 1100px) {
-  .bp__footer .btn.bp__fbtn-round { width: auto; height: auto; min-height: 44px; padding: 8px 14px; }
+  .bp__footer .btn.bp__fbtn-round { width: auto; height: 44px; min-height: 44px; padding: 8px 14px; }
   .bp__footer .btn.bp__fbtn-round .bp__fbtn-mini { display: inline; }
 }
 
@@ -1020,22 +1196,24 @@ button { font: inherit; cursor: pointer; }
   .quiz__top { gap: 12px; margin-bottom: 16px; padding-top: 8px; }
   .quiz__card { padding: 20px 16px; }
   .quiz__prompt p { font-size: 1rem; }
-  .quiz__promptrow { flex-direction: column-reverse; gap: 8px; }
-  .quiz__promptrow .speakbtn { align-self: flex-end; }
+  /* Dock: nav bar, not a poster. Message hidden; back + read-aloud join the
+     row as quiet circles; text labels yield to icons to fit a phone width. */
+  .dock__actions .speakbtn { width: 44px; height: 44px; }
+  .dock__backlabel,
+  .dock__resetlabel { display: none; }
+  .dock__back,
+  .dock__reset { width: 44px; padding: 0; justify-content: center; }
   .choice { padding: 13px 14px; }
   .choice__label { font-size: 0.96rem; }
   .scale__label { font-size: 0.94rem; }
   .scale__opt { padding: 12px 10px; }
 
   /* Dock: nav bar, not a poster. Message hidden; actions row justified. */
-  .dock {
-    background: var(--paper);
-    border-top: 1px solid var(--line);
-    padding: 10px 12px calc(10px + env(safe-area-inset-bottom, 0px));
+  .dock__in {
     flex-direction: row;
     justify-content: space-between;
+    padding: 10px 12px calc(10px + env(safe-area-inset-bottom, 0px));
   }
-  .dock__message { display: none; }
   .dock__actions { flex: 1; justify-content: space-between; }
   .dock__confirm { font-size: 0.85rem; flex: 1; }
 
@@ -1058,14 +1236,31 @@ button { font: inherit; cursor: pointer; }
     position: sticky; bottom: 0;
     background: var(--card);
     margin: auto -16px 0;
-    padding: 10px 16px calc(10px + env(safe-area-inset-bottom, 0px));
   }
   .export-dlg__bar .btn--primary { flex: 1; justify-content: center; }
-  .export-dlg__iconbtn { min-width: 44px; padding: 10px 0; }
   .export-dlg__spacer { display: none; }
   /* The sticky export bar must match the dark panel behind it (mobile only —
      on desktop the bar is transparent inside the floating panel). */
   [data-theme='dark'] .export-dlg__bar { background: #16130f; }
+
+  /* Share is its own screen on mobile (Downloads stays a popup — its rows
+     collapse to single-column text above the action). */
+  .export-dlg--share { padding: 0; align-items: stretch; }
+  .export-dlg--share .export-dlg__panel {
+    width: 100%; max-height: none; border-radius: 0; border: none;
+    padding: 18px 16px 0; display: flex; flex-direction: column;
+  }
+  .export-dlg--share .export-dlg__panel p { text-align: left; }
+  /* Narrow panels: the row's text and its full-text buttons stack, so the
+     buttons keep their labels at full width instead of squeezing. */
+  .dlrow { flex-wrap: wrap; }
+  .dlrow__btns { flex: 1 1 100%; }
+  .dlrow > .btn { flex: 1 1 auto; justify-content: center; }
+  .namegate__inner { padding-top: 6vh; }
+  /* Dock on a phone: one row, primary stretching, quiet buttons as circles. */
+  .dock__back,
+  .dock__reset { width: 44px; padding: 0; justify-content: center; }
+  .tts-toast p { margin: 0 10px 8px; }
 
   .anscard__layer { display: none; }
   .bp__sharebox { padding: 20px 18px; }

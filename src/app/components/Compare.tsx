@@ -1,13 +1,13 @@
-import { useMemo, useRef, useState } from 'react';
-import type { ScoredProfile } from '../../domain/types';
+import { useMemo, useState } from 'react';
+import type { Answers, ScoredProfile } from '../../domain/types';
 import { DIMENSION_LABELS } from '../../domain/types';
 import { CHANNEL_LABELS } from '../../domain/scoring';
 import { tierOf, TIER_LABELS } from '../../domain/dimensions';
-import { decodeProfile, compareProfiles } from '../../domain/share';
-import { importSessionJson } from '../../domain/session';
+import { decodeProfile, decodeFullSession, compareProfiles, parseShareUrl } from '../../domain/share';
 import { scoreProfile } from '../../domain/scoring';
 import Icon from './icons';
 import { useTheme } from './theme';
+import ShareOut from './ShareOut';
 
 interface Props {
   ownProfile: ScoredProfile;
@@ -15,7 +15,15 @@ interface Props {
   others?: { code: string; name: string | null; profile: ScoredProfile }[];
   /** Return to the blueprint the user came from. */
   onBack: () => void;
-  onDone: () => void;
+  /** Same share/download payload the blueprint page hosts — identical panel. */
+  answers?: Answers;
+  seed?: number;
+  onExport?: () => void;
+  onCopyMarkdown?: () => void;
+  /** Open the answers review; returning lands back on compare. */
+  onOpenReview?: () => void;
+  /** Start over (same as the blueprint bar's Restart). */
+  onRetake?: () => void;
   /** Add a code to the saved directory (upsert; existing names stick). */
   onRememberPerson?: (code: string, name: string | null) => void;
   onRenamePerson?: (code: string, name: string | null) => void;
@@ -26,7 +34,12 @@ export default function Compare({
   ownProfile,
   others = [],
   onBack,
-  onDone,
+  answers,
+  seed,
+  onExport,
+  onCopyMarkdown,
+  onOpenReview,
+  onRetake,
   onRememberPerson,
   onRenamePerson,
   onRemovePerson,
@@ -36,7 +49,6 @@ export default function Compare({
   const [error, setError] = useState<string | null>(null);
   const [partner, setPartner] = useState<ScoredProfile | null>(null);
   const [dirName, setDirName] = useState<string | null>(null);
-  const fileRef = useRef<HTMLInputElement>(null);
 
   // Whose blueprint is on the right side of the comparison. Named links and
   // directory entries (which can be renamed) win over the anonymous "them".
@@ -53,34 +65,54 @@ export default function Compare({
     [result],
   );
 
+  // One input, any carrier: share link, blueprint code (BP1–6), or a
+  // full-session code (BPS). Compared LOCALLY, never adopted — someone
+  // else's answers are only read for their scores; your own session stays
+  // exactly as it is.
   const tryCode = () => {
-    const decoded = decodeProfile(code);
+    const input = code.trim();
+    if (!input) return;
+    if (/^https?:\/\/|\?bp=/i.test(input)) {
+      const parsed = parseShareUrl(input);
+      if (!parsed) {
+        setError("That link doesn't carry a readable Blueprint code — check it and try again.");
+        return;
+      }
+      const decoded = decodeProfile(parsed.code);
+      if (!decoded) {
+        setError("That link's blueprint code doesn't parse — it may be from an older version.");
+        return;
+      }
+      setError(null);
+      onRememberPerson?.(parsed.code, parsed.name);
+      setDirName(parsed.name);
+      setPartner(decoded);
+      return;
+    }
+    if (/^BPS/i.test(input)) {
+      const decoded = decodeFullSession(input);
+      if (!decoded) {
+        setError("That session code doesn't parse — check for missing characters.");
+        return;
+      }
+      if (Object.keys(decoded.answers).length === 0) {
+        setError('That code encodes an empty session.');
+        return;
+      }
+      setError(null);
+      setDirName(decoded.name);
+      setPartner(scoreProfile(decoded.answers));
+      return;
+    }
+    const decoded = decodeProfile(input);
     if (!decoded) {
       setError("That code doesn't parse — check for missing characters.");
       return;
     }
     setError(null);
-    onRememberPerson?.(code.trim(), null);
+    onRememberPerson?.(input.trim(), null);
     setDirName(null);
     setPartner(decoded);
-  };
-
-  const readSessionFile = async (file: File) => {
-    setError(null);
-    try {
-      const text = await file.text();
-      // Compared LOCALLY, never adopted: someone else's session file is only
-      // read for its scores — your own session stays exactly as it is.
-      const r = importSessionJson(text);
-      if (Object.keys(r.answers).length === 0) {
-        setError('That file contains no answers this version can read.');
-        return;
-      }
-      setDirName(r.name);
-      setPartner(scoreProfile(r.answers));
-    } catch (e) {
-      setError(e instanceof Error ? e.message : 'That file could not be read.');
-    }
   };
 
   const answeredEnough = ownProfile.answered >= 20;
@@ -91,24 +123,13 @@ export default function Compare({
 
   return (
     <main className="screen compare">
-      <button
-        className="theme-toggle"
-        onClick={toggle}
-        aria-label={theme === 'light' ? 'Switch to dark theme' : 'Switch to light theme'}
-      >
-        <Icon name={theme === 'light' ? 'moon' : 'sun'} size={17} />
-      </button>
-
       <header className="compare__header">
-        <button className="btn btn--ghost btn--small compare__back" onClick={onBack}>
-          ← Back to my blueprint
-        </button>
         <p className="bp__kicker">Two blueprints, one conversation</p>
         <h1>Compare</h1>
         <p className="compare__lede">
           {partner
             ? `Your blueprint and ${who === 'them' ? 'theirs' : `${who}'s`}, side by side. The comparison happens entirely on this device.`
-            : "Choose whose blueprint to compare with — someone you've opened before, a share code, or a session file. Everything happens on this device."}
+            : "Choose whose blueprint to compare with — someone you've opened before, a share code, or a session code. Everything happens on this device."}
         </p>
       </header>
 
@@ -159,7 +180,7 @@ export default function Compare({
               <Icon name="import" size={16} /> Add someone new
             </h2>
             <label className="import-box__label" htmlFor="comparecode">
-              Their share code (BP1–BP6) — or just open a link they sent you
+              A share link, their blueprint code (BP1–6), or their session code (BPS)
             </label>
             <div className="import-box__row">
               <input
@@ -170,7 +191,8 @@ export default function Compare({
                   setCode(e.target.value);
                   setError(null);
                 }}
-                placeholder="BP6…"
+                onKeyDown={(e) => e.key === 'Enter' && tryCode()}
+                placeholder="Paste a link, BP…, or BPS… code"
                 spellCheck={false}
                 autoComplete="off"
               />
@@ -180,21 +202,9 @@ export default function Compare({
             </div>
             {error && <p className="import-box__error">{error}</p>}
             <p className="import-box__note">
-              Codes carry derived scores only — never their individual answers. If they sent you a
-              session file instead, you can open that:
+              Codes carry derived scores only — never their individual answers. A session code
+              (BPS) does carry answers, but it is only ever read here on your device, never saved.
             </p>
-            <input
-              ref={fileRef}
-              className="import-box__file"
-              type="file"
-              accept=".json,application/json"
-              aria-label="Their session file"
-              onChange={(e) => {
-                const f = e.target.files?.[0];
-                if (f) void readSessionFile(f);
-                e.target.value = '';
-              }}
-            />
           </section>
         </div>
       )}
@@ -389,18 +399,56 @@ export default function Compare({
             </p>
           </section>
 
-          <div className="compare__footer">
-            <button className="btn btn--primary" onClick={onDone}>
-              Done
-            </button>
-          </div>
-          <div className="compare__footer compare__footer--secondary">
-            <button className="btn btn--ghost btn--small" onClick={onBack}>
-              ← Back to my blueprint
-            </button>
-          </div>
         </div>
       )}
+
+      {/* The SAME bar as the blueprint page — same slots, same order. The
+          Compare slot is the toggle: highlighted because compare is open;
+          pressing it again returns to the blueprint. No extra buttons. */}
+      <footer className="bp__footer">
+        <div className="bp__footer-actions">
+          {onOpenReview && (
+            <button className="btn btn--primary" onClick={onOpenReview}>
+              <Icon name="feather" size={16} />
+              <span className="bp__fbtn-label">Review my answers</span>
+              <span className="bp__fbtn-mini">Review</span>
+            </button>
+          )}
+          <button
+            className="btn btn--ghost bp__fbtn-round bp__fbtn-accent"
+            onClick={onBack}
+            title="Close compare — back to my blueprint"
+            aria-label="Close compare"
+            aria-pressed="true"
+          >
+            <Icon name="tension" size={16} />
+            <span className="bp__fbtn-label">Compare</span>
+            <span className="bp__fbtn-mini">Compare</span>
+          </button>
+          <ShareOut
+            profile={ownProfile}
+            answers={answers}
+            seed={seed}
+            onExport={onExport}
+            onCopyMarkdown={onCopyMarkdown}
+          />
+          <button
+            className="btn btn--ghost bp__fbtn-round"
+            onClick={toggle}
+            title={theme === 'light' ? 'Switch to dark theme' : 'Switch to light theme'}
+            aria-label={theme === 'light' ? 'Switch to dark theme' : 'Switch to light theme'}
+          >
+            <Icon name={theme === 'light' ? 'moon' : 'sun'} size={16} />
+          </button>
+          {onRetake && (
+            <button className="btn btn--ghost bp__fbtn-round" onClick={onRetake} title="Start over" aria-label="Start over">
+              <Icon name="loop" size={16} />
+              <span className="bp__fbtn-label">Start over</span>
+              <span className="bp__fbtn-mini">Restart</span>
+            </button>
+          )}
+        </div>
+      </footer>
     </main>
   );
 }

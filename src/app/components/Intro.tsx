@@ -1,4 +1,4 @@
-import { useRef, useState } from 'react';
+import { useState } from 'react';
 import { QUESTIONS, BONUS_POOL } from '../../domain/questions';
 import Icon from './icons';
 import { useTheme } from './theme';
@@ -6,14 +6,16 @@ import { useTheme } from './theme';
 interface Props {
   hasProgress: boolean;
   answeredCount: number;
+  /** Begin the questionnaire — lands on the name step first. */
   onStart: () => void;
   onContinue: () => void;
-  /** Restore a full session from a JSON export. Returns an error string on failure. */
-  onImportJson: (text: string) => string | null;
-  /** Restore a full session from a BPS code. Returns an error string on failure. */
-  onImportSessionCode: (code: string) => string | null;
-  /** Open someone else's blueprint from their metric code (visitor mode). */
-  onOpenCode: (code: string) => string | null;
+  /**
+   * The one import path: a share link, a bare blueprint code (BP1–6), or a
+   * full-session code (BPS). The prefix decides — links/codes open that
+   * person's blueprint, session codes restore your own run. Returns an error
+   * string on failure.
+   */
+  onImportCode: (code: string) => string | null;
 }
 
 export default function Intro({
@@ -21,55 +23,21 @@ export default function Intro({
   answeredCount,
   onStart,
   onContinue,
-  onImportJson,
-  onImportSessionCode,
-  onOpenCode,
+  onImportCode,
 }: Props) {
   const { theme, toggle } = useTheme();
-  const [sessionCode, setSessionCode] = useState('');
-  const [sessionError, setSessionError] = useState<string | null>(null);
-  const [visitorCode, setVisitorCode] = useState('');
-  const [visitorError, setVisitorError] = useState<string | null>(null);
-  const [fileError, setFileError] = useState<string | null>(null);
+  const [code, setCode] = useState('');
+  const [error, setError] = useState<string | null>(null);
   const [showImport, setShowImport] = useState(false);
-  const fileRef = useRef<HTMLInputElement>(null);
 
-  // One code box per section, each strict about its own kind — with a pointer
-  // to the right box when the wrong code lands there, so the organization on
-  // screen matches what each section is for.
-  const trySessionCode = () => {
-    const c = sessionCode.trim();
+  // One box, any kind of code or a full link — what it is decides what
+  // happens, so there's nothing to choose between before pasting.
+  const tryCode = () => {
+    const c = code.trim();
     if (!c) return;
-    setSessionError(null);
-    if (/^BP[1-6]/i.test(c)) {
-      setSessionError('That\'s a blueprint code, not a session code — paste it under "Open someone else\'s blueprint" instead.');
-      return;
-    }
-    const err = onImportSessionCode(c);
-    if (err) setSessionError(err);
-  };
-
-  const tryVisitorCode = () => {
-    const c = visitorCode.trim();
-    if (!c) return;
-    setVisitorError(null);
-    if (/^BPS/i.test(c)) {
-      setVisitorError('That\'s a full-session code — restore it under "Restore your own session" instead.');
-      return;
-    }
-    const err = onOpenCode(c);
-    if (err) setVisitorError(err);
-  };
-
-  const readFile = async (file: File) => {
-    setFileError(null);
-    try {
-      const text = await file.text();
-      const err = onImportJson(text);
-      if (err) setFileError(err);
-    } catch {
-      setFileError('That file could not be read.');
-    }
+    setError(null);
+    const err = onImportCode(c);
+    if (err) setError(err);
   };
 
   return (
@@ -116,82 +84,40 @@ export default function Intro({
             onClick={() => setShowImport((s) => !s)}
             aria-expanded={showImport}
           >
-            <Icon name="import" size={15} /> Import a session or blueprint
+            <Icon name="import" size={15} /> Have a code or link?
           </button>
         </div>
 
         {showImport && (
           <div className="import-box">
-            <div className="import-box__half">
-              <h3 className="import-box__title">Restore your own session</h3>
-              <label className="import-box__label" htmlFor="sessionfile">
-                Load a session file (.json) you exported from this or another device — your
-                actual answers, restored exactly.
-              </label>
+            <label className="import-box__label" htmlFor="importcode">
+              Paste anything you were sent: a <em>share link</em> or a blueprint code (starts
+              with <code>BP</code>) opens that person's blueprint; a session code (starts with{' '}
+              <code>BPS</code>) restores your own saved run, answers and all.
+            </label>
+            <div className="import-box__row">
               <input
-                ref={fileRef}
-                id="sessionfile"
-                className="import-box__file"
-                type="file"
-                accept=".json,application/json"
+                id="importcode"
+                className="import-box__input"
+                value={code}
                 onChange={(e) => {
-                  const f = e.target.files?.[0];
-                  if (f) void readFile(f);
-                  e.target.value = '';
+                  setCode(e.target.value);
+                  setError(null);
                 }}
+                onKeyDown={(e) => e.key === 'Enter' && tryCode()}
+                placeholder="Paste a link, BP…, or BPS… code"
+                spellCheck={false}
+                autoComplete="off"
               />
-              <label className="import-box__label" htmlFor="sessioncode">
-                Or paste a full-session code (starts with <code>BPS</code>)
-              </label>
-              <div className="import-box__row">
-                <input
-                  id="sessioncode"
-                  className="import-box__input"
-                  value={sessionCode}
-                  onChange={(e) => {
-                    setSessionCode(e.target.value);
-                    setSessionError(null);
-                  }}
-                  placeholder="BPS…"
-                  spellCheck={false}
-                  autoComplete="off"
-                />
-                <button className="btn btn--ghost" onClick={trySessionCode} disabled={!sessionCode.trim()}>
-                  Restore
-                </button>
-              </div>
-              {fileError && <p className="import-box__error">{fileError}</p>}
-              {sessionError && <p className="import-box__error">{sessionError}</p>}
+              <button className="btn btn--primary" onClick={tryCode} disabled={!code.trim()}>
+                Open
+              </button>
             </div>
-            <div className="import-box__half">
-              <h3 className="import-box__title">Open someone else's blueprint</h3>
-              <label className="import-box__label" htmlFor="visitorcode">
-                If they sent you a <em>link</em>, just open it — nothing to paste here. Otherwise
-                paste their bare blueprint code (starts with <code>BP</code>)
-              </label>
-              <div className="import-box__row">
-                <input
-                  id="visitorcode"
-                  className="import-box__input"
-                  value={visitorCode}
-                  onChange={(e) => {
-                    setVisitorCode(e.target.value);
-                    setVisitorError(null);
-                  }}
-                  placeholder="BP6…"
-                  spellCheck={false}
-                  autoComplete="off"
-                />
-                <button className="btn btn--ghost" onClick={tryVisitorCode} disabled={!visitorCode.trim()}>
-                  Open blueprint
-                </button>
-              </div>
-              {visitorError && <p className="import-box__error">{visitorError}</p>}
-              <p className="import-box__note">
-                Blueprint codes carry derived scores only — never the individual answers. Their
-                answers stay theirs.
-              </p>
-            </div>
+            {error && <p className="import-box__error">{error}</p>}
+            <p className="import-box__note">
+              Blueprint codes carry derived scores only — never the individual answers. Their
+              answers stay theirs.
+            </p>
           </div>
         )}
 

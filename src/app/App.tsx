@@ -6,16 +6,16 @@ import { bonusQuestionsFor } from '../domain/bonus';
 import { decodeProfile, decodeFullSession, parseShareUrl, type ShareIntent } from '../domain/share';
 import { scoreProfile } from '../domain/scoring';
 import { generateBlueprint, blueprintToMarkdown } from '../domain/blueprint';
-import { importSessionJson } from '../domain/session';
 import { loadPeople, savePeople, upsertPerson, renamePerson, removePerson, type Person } from './people';
 import { ThemeProvider } from './components/theme';
 import Intro from './components/Intro';
+import NameGate from './components/NameGate';
 import Quiz from './components/Quiz';
 import Review from './components/Review';
 import BlueprintView from './components/BlueprintView';
 import Compare from './components/Compare';
 
-type Stage = 'intro' | 'quiz' | 'review' | 'blueprint' | 'compare';
+type Stage = 'intro' | 'name' | 'quiz' | 'review' | 'blueprint' | 'compare';
 
 const STORAGE_KEY = 'blueprint.progress.v1';
 const SEED_KEY = 'blueprint.orderSeed.v1';
@@ -215,7 +215,7 @@ function AppInner() {
   // Persist on every change — except while viewing a visitor's blueprint,
   // which is not this user's session and must never overwrite the saved run.
   useEffect(() => {
-    if (stage === 'intro') return;
+    if (stage === 'intro' || stage === 'name') return;
     if (stage === 'blueprint' && visitor) return;
     try {
       localStorage.setItem(STORAGE_KEY, JSON.stringify({ stage, answers }));
@@ -262,7 +262,15 @@ function AppInner() {
     if (complete) setCatchUpOrderIds(null);
   }, [catchUpMode, answers]);
 
-  const startFresh = useCallback(() => {
+  // The name gate is the questionnaire's FIRST step: every run is named
+  // before question 1, so every export, link, and document carries a name.
+  const startFresh = useCallback((name: string) => {
+    try {
+      localStorage.setItem(NAME_KEY, name.trim().slice(0, 40));
+    } catch {
+      // storage blocked — the name just won't survive a refresh
+    }
+    setMyName(name.trim().slice(0, 40));
     setAnswers({});
     setRestoredStaleFormat(0);
     setBlueprint(null);
@@ -308,7 +316,8 @@ function AppInner() {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [answers]);
 
-  // Where the Review screen was opened from — blueprint visits read, quiz visits complete.
+  // Where the Review screen was opened from — blueprint/compare visits read
+  // (and return where they came from), quiz visits complete the run.
   const [stageBeforeReview, setStageBeforeReview] = useState<Stage>('quiz');
 
   const handleExport = useCallback(() => {
@@ -333,6 +342,11 @@ function AppInner() {
     }
   }, []);
 
+  const handleCopyMarkdown = useCallback(() => {
+    const bp = blueprint ?? generateBlueprint(profile);
+    void navigator.clipboard.writeText(blueprintToMarkdown(bp, profile));
+  }, [blueprint, profile]);
+
   // Session-file export now lives in BlueprintView's popup (view / copy /
   // save-or-share), which builds the file itself from the answers prop.
   // handleExportSession removed — the old anchor-download was silent-noop on iOS.
@@ -353,36 +367,17 @@ function AppInner() {
         .slice(0, answeredCore)
         .every((id) => answeredIds.has(id));
     setCatchUpOrderIds(isPrefix ? null : computeCatchUpOrder(restored.orderSeed, answeredIds));
-    if (restored.name) handleSaveName(restored.name);
+    // The session's own name is the truth: a named restore adopts it, and an
+    // UNNAMED restore clears any previously cached one — otherwise a nameless
+    // session would present itself (header, exports, share links) with a
+    // stale name left over from whatever ran in this browser before.
+    handleSaveName(restored.name);
     setVisitor(null);
     setClarifierQueue([]);
     setBlueprint(generateBlueprint(scoreProfile(restored.answers)));
     setStage('blueprint');
     clearShareUrl();
   }, [adoptSeed, handleSaveName]);
-
-  const restoreFromJson = useCallback((text: string): string | null => {
-    try {
-      const result = importSessionJson(text);
-      if (Object.keys(result.answers).length === 0) {
-        return 'That file contains no answers this version can read.';
-      }
-      adoptRestored(result);
-      return null;
-    } catch (e) {
-      return e instanceof Error ? e.message : 'That file could not be read as a Blueprint session.';
-    }
-  }, [adoptRestored]);
-
-  const restoreFromSessionCode = useCallback((code: string): string | null => {
-    const decoded = decodeFullSession(code);
-    if (!decoded) return "That code doesn't parse as a full-session code — check for missing characters.";
-    if (Object.keys(decoded.answers).length === 0) {
-      return 'That code encodes an empty session.';
-    }
-    adoptRestored({ answers: decoded.answers, orderSeed: decoded.seed, name: null });
-    return null;
-  }, [adoptRestored]);
 
   // ── Visitor actions ──
   // Directory of other people's blueprints opened here (for choosing whom to
@@ -411,18 +406,52 @@ function AppInner() {
     });
   }, []);
 
-  // A bare metric code (BP1/2/3) pasted on the intro opens that person's
-  // blueprint — visitor mode without a name, framed accordingly.
-  const openVisitorCode = useCallback((code: string): string | null => {
+  // A metric code (BP1/2/3) pasted on the intro — or carried by a pasted
+  // share link — opens that person's blueprint in visitor mode. Links bring
+  // their name and intent along in the checksummed ?m= segment; bare codes
+  // arrive anonymous.
+  const openVisitorCode = useCallback((code: string, name?: string | null, intent: ShareIntent = 'show'): string | null => {
     const trimmed = code.trim();
     const decoded = decodeProfile(trimmed);
     if (!decoded) return "That code doesn't parse — check for missing characters.";
     clearShareUrl();
-    rememberPerson(trimmed, null);
-    setVisitor({ code: trimmed, name: null, intent: 'show', profile: decoded });
+    rememberPerson(trimmed, name ?? null);
+    setVisitor({ code: trimmed, name: name ?? null, intent, profile: decoded });
     setStage('blueprint');
     return null;
   }, [rememberPerson]);
+
+  // ── The universal import: one box, one router. ──
+  // A share link or bare BP code opens that person's blueprint (visitor
+  // mode); a BPS session code restores YOUR OWN run. The prefix decides —
+  // no separate boxes, no file pickers.
+  const handleImportCode = useCallback((raw: string): string | null => {
+    const input = raw.trim();
+    if (!input) return null;
+    if (/^https?:\/\/|\?bp=/i.test(input)) {
+      const parsed = parseShareUrl(input);
+      if (!parsed) {
+        return "That link doesn't carry a readable Blueprint code — check it and try again.";
+      }
+      openVisitorCode(parsed.code, parsed.name, parsed.intent);
+      return null;
+    }
+    if (/^BPS/i.test(input)) {
+      const decoded = decodeFullSession(input);
+      if (!decoded) {
+        return "That session code doesn't parse — check for missing characters.";
+      }
+      if (Object.keys(decoded.answers).length === 0) {
+        return 'That code encodes an empty session.';
+      }
+      adoptRestored({ answers: decoded.answers, orderSeed: decoded.seed, name: decoded.name });
+      return null;
+    }
+    if (/^BP[1-6]/i.test(input)) {
+      return openVisitorCode(input);
+    }
+    return 'Not a recognizable code or link — session codes start with BPS, blueprint codes with BP, or paste a full share link.';
+  }, [adoptRestored, openVisitorCode]);
 
   const saved = loadPersisted();
   const savedCount = Object.keys(saved?.answers ?? {}).length;
@@ -437,15 +466,23 @@ function AppInner() {
       <Intro
         hasProgress={savedCount > 0}
         answeredCount={savedCount}
-        onStart={startFresh}
+        onStart={() => setStage('name')}
         onContinue={() => {
           clearShareUrl();
           setVisitor(null);
           setStage('quiz');
         }}
-        onImportJson={restoreFromJson}
-        onImportSessionCode={restoreFromSessionCode}
-        onOpenCode={openVisitorCode}
+        onImportCode={handleImportCode}
+      />
+    );
+  }
+
+  if (stage === 'name') {
+    return (
+      <NameGate
+        initialName={myName ?? ''}
+        onDone={startFresh}
+        onBack={() => setStage('intro')}
       />
     );
   }
@@ -467,12 +504,12 @@ function AppInner() {
   if (stage === 'review') {
     // Opened from the blueprint: `back` returns there and `finish` is hidden —
     // the blueprint already exists, this visit is for reading, not completing.
-    const fromBlueprint = blueprint !== null && stageBeforeReview === 'blueprint';
+    const fromBlueprint = blueprint !== null && (stageBeforeReview === 'blueprint' || stageBeforeReview === 'compare');
     return (
       <Review
         answers={answers}
         order={order}
-        onBack={fromBlueprint ? () => setStage('blueprint') : () => setStage('quiz')}
+        onBack={fromBlueprint ? () => setStage(stageBeforeReview) : () => setStage('quiz')}
         onFinish={fromBlueprint ? () => setStage('blueprint') : finish}
         hideFinish={fromBlueprint}
       />
@@ -488,7 +525,15 @@ function AppInner() {
           return decoded ? { code: p.code, name: p.name, profile: decoded } : null;
         }).filter((p): p is NonNullable<typeof p> => p !== null)}
         onBack={() => setStage('blueprint')}
-        onDone={() => setStage('intro')}
+        onOpenReview={() => {
+          setStageBeforeReview('compare');
+          setStage('review');
+        }}
+        onRetake={startOver}
+        answers={answers}
+        seed={seed}
+        onExport={handleExport}
+        onCopyMarkdown={handleCopyMarkdown}
         onRememberPerson={rememberPerson}
         onRenamePerson={handleRenamePerson}
         onRemovePerson={handleRemovePerson}
@@ -522,16 +567,15 @@ function AppInner() {
     );
   }
 
-  return (
-    <BlueprintView
-      blueprint={blueprint ?? generateBlueprint(profile)}
-      profile={profile}
-      myName={myName}
-      onExport={handleExport}
-      answers={answers}
-      seed={seed}
-      onSaveName={handleSaveName}
-      onStartCompare={() => setStage('compare')}
+  return (      <BlueprintView
+        blueprint={blueprint ?? generateBlueprint(profile)}
+        profile={profile}
+        myName={myName}
+        onExport={handleExport}
+        onCopyMarkdown={handleCopyMarkdown}
+        answers={answers}
+        seed={seed}
+        onStartCompare={() => setStage('compare')}
       onRetake={startOver}
       unansweredCount={QUESTIONS.filter((q) => answers[q.id] === undefined).length}
       onStartUpgrade={

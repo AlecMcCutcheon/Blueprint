@@ -1,4 +1,4 @@
-import { useMemo, useState } from 'react';
+import { useEffect, useLayoutEffect, useMemo, useRef, useState } from 'react';
 import type { Answers, Question } from '../../domain/types';
 import { BONUS_POOL } from '../../domain/questions';
 import { messageFor } from './messages';
@@ -40,6 +40,42 @@ export default function Quiz({ questions, answers, onAnswer, onFinish, onStartOv
   // (The through-history pass reviews already-answered questions; App retires
   // catch-up mode automatically once every core question is answered.)
   const showCatchUpNotice = catchUpActive === true && answers[q.id] === undefined;
+  // The dock message lives in its own card under the question card (same
+  // styling), the pair centered as a unit. When a question + its options are
+  // too tall to share the space, the message card disappears for that
+  // question. A hidden, always-mounted measurer carries the message's
+  // natural height even while the real one is unrendered — otherwise
+  // hide → smaller → show → bigger would oscillate forever.
+  const mainRef = useRef<HTMLElement | null>(null);
+  const cardRef = useRef<HTMLElement | null>(null);
+  const msgMeasureRef = useRef<HTMLElement | null>(null);
+  const [msgVisible, setMsgVisible] = useState(true);
+  useLayoutEffect(() => {
+    const main = mainRef.current, card = cardRef.current, meas = msgMeasureRef.current;
+    if (!main || !card || !meas) return;
+    const check = () => {
+      const cs = getComputedStyle(main);
+      const avail = main.clientHeight - parseFloat(cs.paddingTop) - parseFloat(cs.paddingBottom);
+      const gap = parseFloat(cs.rowGap) || 0;
+      setMsgVisible(card.offsetHeight + gap + meas.offsetHeight <= avail);
+    };
+    check();
+    const ro = new ResizeObserver(check);
+    ro.observe(main);
+    ro.observe(card);
+    return () => ro.disconnect();
+  }, [q.id]);
+  // Read-aloud can fail (no voices installed, engine dead). Instead of a
+  // per-card note that shoves the layout around, the failure surfaces as a
+  // toast anchored to the dock's top edge: it slides up from behind the bar,
+  // holds ten seconds while its clock bar drains, then sinks back out.
+  const [ttsToast, setTtsToast] = useState(false);
+  useEffect(() => {
+    if (!failedReason) return;
+    setTtsToast(true);
+    const t = window.setTimeout(() => setTtsToast(false), 10000);
+    return () => window.clearTimeout(t);
+  }, [failedReason]);
   const countFresh = useMemo(
     () => questions.filter((x) => answers[x.id] === undefined).length,
     [questions, answers],
@@ -110,32 +146,22 @@ export default function Quiz({ questions, answers, onAnswer, onFinish, onStartOv
     onAnswer(q.id, value);
   };
 
-  /** Read the scenario aloud, then each option as "Option A … Option B …" */
+  /** Read the question itself. The options are already on screen — the voice
+      is for listening to the scenario, not for reciting the choice list. */
   const speakQuestion = () => {
     if (speaking) {
       stopSpeech();
       return;
     }
-    const parts: string[] = [q.prompt.join(' ')];
-    if (q.note) parts.push(q.note);
-    q.options.forEach((o, i) => {
-      const letter = String.fromCharCode(65 + i); // A, B, C…
-      parts.push(`Option ${letter}. ${o.label}`);
-    });
-    speak(parts.join(' .. '));
+    speak(q.prompt.join(' '));
   };
 
   return (
     <div className="quizwrap">
+      {/* Progress is the header's only furniture, in its own rounded pill —
+          back and read-aloud live in the bottom nav bar with the rest of the
+          test's navigation. */}
       <header className="quiz__top">
-        <button
-          className="btn btn--ghost btn--small"
-          onClick={back}
-          disabled={index === 0}
-          title="Change an earlier answer"
-        >
-          ← Back
-        </button>
         <div className="quiz__progress">
           <div className="quiz__progress-track" aria-hidden>
             <div className="quiz__progress-fill" style={{ width: `${pct}%` }} />
@@ -149,32 +175,12 @@ export default function Quiz({ questions, answers, onAnswer, onFinish, onStartOv
         </div>
       </header>
 
-      <main className="quiz__main">
-        <section className="quiz__card" key={q.id}>
-          <div className="quiz__promptrow">
-            <div className="quiz__prompt">
-              {q.prompt.map((p, i) => (
-                <p key={i}>{p}</p>
-              ))}
-            </div>
-            {ttsSupported && (
-              <button
-                className={`speakbtn${speaking ? ' is-speaking' : ''}${failedReason ? ' is-broken' : ''}`}
-                onClick={speakQuestion}
-                aria-label={speaking ? 'Stop reading' : 'Read this question aloud'}
-                title={
-                  failedReason === 'no-voices'
-                    ? 'No speech voices are installed in this browser'
-                    : failedReason === 'engine'
-                      ? 'Speech could not start in this browser'
-                      : speaking
-                        ? 'Stop reading'
-                        : 'Read aloud'
-                }
-              >
-                <Icon name={speaking ? 'stop' : 'volume'} size={16} />
-              </button>
-            )}
+      <main className="quiz__main" ref={mainRef}>
+        <section className="quiz__card" key={q.id} ref={cardRef}>
+          <div className="quiz__prompt">
+            {q.prompt.map((p, i) => (
+              <p key={i}>{p}</p>
+            ))}
           </div>
           {/* The question's own note is spoken by read-aloud but not rendered:
               per-card coaching read as filler — the dock message at the bottom
@@ -185,25 +191,31 @@ export default function Quiz({ questions, answers, onAnswer, onFinish, onStartOv
               genuinely open.
             </p>
           )}
-          {failedReason === 'no-voices' && (
-            <p className="quiz__note quiz__note--tts">
-              This browser has no speech voices installed, so read-aloud can't play. On Linux:
-              install <code>speech-dispatcher</code> and <code>espeak-ng</code>, then restart the
-              browser. Voice quality is best on Chrome or Edge.
-            </p>
-          )}
           {renderOptions()}
         </section>
+
+        {/* The dock message, as a matching card: the question + message pair
+            centers together, and the message yields its seat when the two
+            wouldn't fit. */}
+        {msgVisible && (
+          <aside className="quiz__msgcard" key={`msg-${q.id}`}>
+            {messageFor(index)}
+          </aside>
+ )}
+        {/* Invisible twin that measures the message's natural height. */}
+        <aside className="quiz__msgcard quiz__msgcard--measure" ref={msgMeasureRef} aria-hidden>
+          {messageFor(index)}
+        </aside>
       </main>
 
       <footer className="dock">
+        <div className="dock__in">
         {showCatchUpNotice && (
           <p className="dock__catchup">
             The questionnaire grew since you started — {countFresh} new questions first;
             your previous answers carry over, and ← Back can revisit any of them.
           </p>
         )}
-        <p className="dock__message">{messageFor(index)}</p>
         <div className="dock__actions">
           {confirmingReset ? (
             <>
@@ -218,14 +230,43 @@ export default function Quiz({ questions, answers, onAnswer, onFinish, onStartOv
           ) : (
             <>
               <button
+                className="btn btn--ghost btn--small dock__back"
+                onClick={back}
+                disabled={index === 0}
+                title="Back to the previous question"
+                aria-label="Previous question"
+              >
+                <span aria-hidden>←</span>
+                <span className="dock__backlabel">Back</span>
+              </button>
+              {ttsSupported && (
+                <button
+                  className={`speakbtn${speaking ? ' is-speaking' : ''}${failedReason ? ' is-broken' : ''}`}
+                  onClick={speakQuestion}
+                  aria-label={speaking ? 'Stop reading' : 'Read the question aloud'}
+                  title={
+                    failedReason === 'no-voices'
+                      ? 'No speech voices are installed in this browser'
+                      : failedReason === 'engine'
+                        ? 'Speech could not start in this browser'
+                        : speaking
+                          ? 'Stop reading'
+                          : 'Read the question aloud'
+                  }
+                >
+                  <Icon name={speaking ? 'stop' : 'volume'} size={16} />
+                </button>
+              )}
+              <button
                 className="btn btn--ghost btn--small dock__reset"
                 onClick={() => setConfirmingReset(true)}
                 title="Clear this run"
               >
-                <Icon name="loop" size={14} /> Start over
+                <Icon name="loop" size={14} />
+                <span className="dock__resetlabel">Start over</span>
               </button>
               <button
-                className="btn btn--primary"
+                className="btn btn--primary dock__primary"
                 onClick={advance}
                 disabled={!answeredCurrent}
                 autoFocus={answeredCurrent}
@@ -234,6 +275,26 @@ export default function Quiz({ questions, answers, onAnswer, onFinish, onStartOv
               </button>
             </>
           )}
+        </div>
+        </div>
+
+        {/* Read-aloud failure toast. A CHILD of the dock (this was the bug:
+            as a sibling, its percentages resolved against the viewport and
+            it flew off the top of the page). Inside, it rests just above the
+            bar's edge and parks translated down BEHIND .dock__in's opaque
+            surface — an overlay that never pushes layout. */}
+        <div className={`tts-toast${ttsToast ? ' is-in' : ''}`} role="status" aria-live="polite">
+          <p>
+            {failedReason === 'no-voices' ? (
+              <>
+                No speech voices in this browser, so read-aloud can't play. On Linux: install{' '}
+                <code>speech-dispatcher</code> and <code>espeak-ng</code>, then restart it. Chrome
+                or Edge sound best.
+              </>
+            ) : (
+              <>Speech couldn't start in this browser.</>
+            )}
+          </p>
         </div>
       </footer>
     </div>

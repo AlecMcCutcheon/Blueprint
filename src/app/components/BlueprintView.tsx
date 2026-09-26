@@ -1,10 +1,10 @@
-import { useEffect, useMemo, useState } from 'react';
+import { useMemo, useState } from 'react';
 import type { Answers, Blueprint, ScoredProfile } from '../../domain/types';
-import { profileToCode6, buildShareLink, encodeFullSession, type ShareIntent } from '../../domain/share';
-import { buildSessionFile, saveBlob, sessionFileName } from '../../domain/session';
+import { profileToCode6, type ShareIntent } from '../../domain/share';
 import Icon from './icons';
 import type { IconName } from './icons';
 import { useTheme } from './theme';
+import ShareOut from './ShareOut';
 
 interface Props {
   blueprint: Blueprint;
@@ -14,11 +14,12 @@ interface Props {
   /** The owner's display name (link building + document phrasing). */
   myName?: string | null;
   onExport?: () => void;
-  /** Raw answers for the session export popup (absent for visitors). */
+  /** Copy the document as markdown to the clipboard (Downloads menu). */
+  onCopyMarkdown?: () => void;
+  /** Raw answers for the session-code export (absent for visitors). */
   answers?: Answers;
   /** The run's presentation-order seed (session code + export need it to restore). */
   seed?: number;
-  onSaveName?: (name: string | null) => void;
   onStartCompare?: () => void;
   /** Visitor: begin the questionnaire themselves. */
   onStartTest?: () => void;
@@ -51,9 +52,9 @@ export default function BlueprintView({
   visitor,
   myName,
   onExport,
+  onCopyMarkdown,
   answers,
   seed = 0,
-  onSaveName,
   onStartCompare,
   onStartTest,
   onRetake,
@@ -62,24 +63,13 @@ export default function BlueprintView({
   onOpenReview,
 }: Props) {
   const { theme, toggle } = useTheme();
-  const [copiedLink, setCopiedLink] = useState(false);
-  const [copiedCode, setCopiedCode] = useState(false);
-  const [showCode, setShowCode] = useState(false);
-  const [showExport, setShowExport] = useState(false);
-  const [exportCode, setExportCode] = useState<string | null>(null);
-  const [exportJson, setExportJson] = useState<string | null>(null);
-  const [exportCopied, setExportCopied] = useState(false);
-  const [exportNote, setExportNote] = useState<string | null>(null);
-  const [showJson, setShowJson] = useState(false);
-
-  const [nameDraft, setNameDraft] = useState(myName ?? '');
-  const [intent, setIntent] = useState<ShareIntent>('show');
-
-  useEffect(() => setNameDraft(myName ?? ''), [myName]);
+  // Restarting from the blueprint wipes the saved run — the same
+  // "are you sure?" gate the quiz dock uses before it does that.
+  const [confirmingReset, setConfirmingReset] = useState(false);
 
   // Encoding throws while any dimension is unmeasured (e.g. a run made before
-  // the newer questions existed) — catch it so the page renders and the share
-  // box explains the upgrade path instead of crashing.
+  // the newer questions existed) — catch it so the page renders and the
+  // upgrade section explains the path instead of crashing.
   const code = useMemo(() => {
     try {
       return profileToCode6(profile);
@@ -88,76 +78,11 @@ export default function BlueprintView({
     }
   }, [profile]);
 
-  // The link rebuilds live as the name/intent change — the name lives in the
-  // URL, never in the code, so a bare code shared some other way stays name-free.
-  const link = useMemo(
-    () => (code ? buildShareLink(code, { name: nameDraft.trim() || null, intent }) : null),
-    [code, nameDraft, intent],
-  );
-
-  const copyTo = async (text: string | null, mark: (v: boolean) => void) => {
-    if (!text) return;
-    try {
-      await navigator.clipboard.writeText(text);
-    } catch {
-      // clipboard blocked — user can still select the text manually
-    }
-    mark(true);
-    window.setTimeout(() => mark(false), 2000);
-  };
-
-  const commitName = () => onSaveName?.(nameDraft.trim() || null);
-
-  // The export popup is code-first: the full-session code (BPS…) is one
-  // copy-pasteable string that restores the exact run anywhere via “Import a
-  // session” — usually easier than moving a file. The JSON file stays
-  // available under a toggle for people who want an attachment instead.
-  const openExport = () => {
-    if (!answers) return;
-    try {
-      setExportCode(encodeFullSession(answers, seed).code);
-    } catch {
-      setExportCode(null); // stale option ids — the file still works
-    }
-    setExportJson(JSON.stringify(buildSessionFile(answers, seed, nameDraft.trim() || null), null, 2));
-    setExportCopied(false);
-    setExportNote(null);
-    setShowJson(false);
-    setShowExport(true);
-  };
-  const copyExport = async (text: string | null) => {
-    if (!text) return;
-    try {
-      await navigator.clipboard.writeText(text);
-    } catch {
-      // clipboard blocked — the code/textarea is user-selectable
-    }
-    setExportCopied(true);
-    window.setTimeout(() => setExportCopied(false), 2000);
-  };
-  const downloadExport = async () => {
-    if (!exportJson) return;
-    const r = await saveBlob(new Blob([exportJson], { type: 'application/json' }), sessionFileName(nameDraft.trim() || null));
-    setExportNote(
-      r === 'shared' ? 'Shared — pick “Save to Files” or send it to yourself from the sheet.'
-      : r === 'cancelled' ? null
-      : 'Downloaded — check your files or downloads.',
-    );
-  };
-
   const isVisitor = !!visitor;
   const vName = visitor?.name ?? null;
 
   return (
     <main className="screen blueprint">
-      <button
-        className="theme-toggle"
-        onClick={toggle}
-        aria-label={theme === 'light' ? 'Switch to dark theme' : 'Switch to light theme'}
-      >
-        <Icon name={theme === 'light' ? 'moon' : 'sun'} size={17} />
-      </button>
-
       {isVisitor ? (
         <header className="bp__visitor" role="note">
           <p className="bp__kicker">
@@ -169,29 +94,14 @@ export default function BlueprintView({
           <p className="bp__epigraph" style={{ fontSize: '1.1rem', fontStyle: 'italic', margin: '0 0 0.75rem' }}>{blueprint.epigraph}</p>
           <p className="bp__visitor-body">
             {vName ? `${vName} answered` : 'Someone answered'} {profile.answered} questions about
-            how they love, and this document is the result — built entirely from their pattern of
-            choices.
-            {visitor?.intent === 'invite' ? (
-              <> They've invited you to take the test yourself, so the two of you can compare
-              blueprints side by side — on your device, in this browser, with nothing uploaded.</>
-            ) : (
-              <> They shared it so you could see how they currently love — not as a standard
-              anyone is measured against.</>
-            )}
+            how they love — this document is built entirely from their choices.{' '}
+            {visitor?.intent === 'invite'
+              ? "You're invited to take it yourself: your answers stay on your device, and the two blueprints compare side by side."
+              : 'Shared to be seen, not to measure yourself against.'}
           </p>
           <p className="bp__visitor-body bp__visitor-body--soft">
-            The document below speaks to them — its “you” means {vName ?? 'them'}. If you'd like a
-            comparison of your own, you can take the same test here; it's 25–40 minutes and
-            entirely yours.
+            In the document below, “you” means {vName ?? 'them'}.
           </p>
-          <div className="bp__visitor-actions">
-            <button className="btn btn--primary" onClick={onStartTest}>
-              {visitor?.intent === 'invite' ? 'Take the test →' : 'Take it yourself (optional) →'}
-            </button>
-            <button className="btn btn--ghost" onClick={onRetake}>
-              Back to start
-            </button>
-          </div>
         </header>
       ) : (
         <header className="bp__header">
@@ -285,207 +195,97 @@ export default function BlueprintView({
         </section>
       )}
 
-      {!isVisitor && (
-        <section className="bp__sharebox">
-          <h2>
-            <Icon name="heart" size={17} className="bp__secicon" />
-            <span>Share</span>
-          </h2>
-          {code === null ? (
-            <p className="bp__code-upgrade">
-              This run predates a few newer questions, so there's nothing to share yet — a share
-              link needs every dimension measured. Answering the remaining questions (your answers
-              are all kept) completes it and unlocks comparing.
-            </p>
-          ) : (
-            <div className="bp__sharepanel">
-              <label className="bp__sharelabel" htmlFor="sharename">
-                The name it should arrive with (optional, lives in the link — never in the code)
-              </label>
-              <div className="bp__sharerow">
-                <input
-                  id="sharename"
-                  className="bp__nameinput"
-                  value={nameDraft}
-                  maxLength={40}
-                  placeholder={myName ?? 'e.g. Maya'}
-                  spellCheck={false}
-                  autoComplete="off"
-                  onChange={(e) => setNameDraft(e.target.value)}
-                  onBlur={commitName}
-                  onKeyDown={(e) => e.key === 'Enter' && commitName()}
-                />
-              </div>
-              <fieldset className="bp__intent">
-                <legend className="bp__sharelabel">Why you're sharing</legend>
-                <div className="bp__intentopts">
-                  <label className={`bp__intentopt${intent === 'show' ? ' is-active' : ''}`}>
-                    <input
-                      type="radio"
-                      name="shareintent"
-                      checked={intent === 'show'}
-                      onChange={() => setIntent('show')}
-                    />
-                    <span>Show</span>
-                  </label>
-                  <label className={`bp__intentopt${intent === 'invite' ? ' is-active' : ''}`}>
-                    <input
-                      type="radio"
-                      name="shareintent"
-                      checked={intent === 'invite'}
-                      onChange={() => setIntent('invite')}
-                    />
-                    <span>Invite</span>
-                  </label>
-                </div>
-              </fieldset>
-              {link && (
-                <div className="bp__linkbox">
-                  <code className="bp__link" aria-label="Your share link">{link}</code>
-                  <div className="bp__codebtns">
-                    <button className="btn btn--primary btn--small" onClick={() => copyTo(link, setCopiedLink)}>
-                      <Icon name={copiedLink ? 'check' : 'copy'} size={14} />
-                      {copiedLink ? 'Copied' : 'Copy link'}
-                    </button>
-                    <button
-                      className={`btn btn--ghost btn--small bp__icontoggle${showCode ? ' is-active' : ''}`}
-                      onClick={() => setShowCode((s) => !s)}
-                      title={showCode ? 'Hide the bare code' : 'Show the bare code'}
-                      aria-expanded={showCode}
-                    >
-                      <Icon name="code" size={15} />
-                      {showCode ? 'Hide code' : 'Show code'}
-                    </button>
-                  </div>
-                </div>
-              )}
-              {showCode && code && (
-                <div className="bp__codebox">
-                  <code className="bp__code" aria-label="Your share code">{code}</code>
-                  <div className="bp__codebtns">
-                    <button className="btn btn--ghost btn--small" onClick={() => copyTo(code, setCopiedCode)}>
-                      <Icon name={copiedCode ? 'check' : 'copy'} size={14} />
-                      {copiedCode ? 'Copied' : 'Copy code'}
-                    </button>
-                  </div>
-                </div>
-              )}
-            </div>
-          )}
-        </section>
-      )}
-
       {/* Bottom bar at every size: one primary text action, icon circles for
-         the rest — circles expand to full text on wide windows. */}
+         the rest — circles expand to full text on wide windows. Visitors get
+         the two actions that matter to them: take the test (primary) and back
+         to start. */}
       <footer className="bp__footer">
         <div className="bp__footer-actions">
-          {!isVisitor && onOpenReview && (
-            <button className="btn btn--primary" onClick={onOpenReview}>
-              <Icon name="feather" size={16} />
-              <span className="bp__fbtn-label">Review my answers</span>
-              <span className="bp__fbtn-mini">Review</span>
-            </button>
+          {isVisitor ? (
+            <>
+              <button className="btn btn--primary" onClick={onStartTest}>
+                <Icon name="feather" size={16} />
+                <span className="bp__fbtn-label">
+                  {visitor?.intent === 'invite' ? 'Take the test' : 'Take it yourself'}
+                </span>
+                <span className="bp__fbtn-mini">Take the test</span>
+              </button>
+              <button
+                className="btn btn--ghost bp__fbtn-round"
+                onClick={onRetake}
+                title="Back to start"
+                aria-label="Back to start"
+              >
+                <Icon name="loop" size={16} />
+                <span className="bp__fbtn-label">Back to start</span>
+                <span className="bp__fbtn-mini">Back</span>
+              </button>
+              <button
+                className="btn btn--ghost bp__fbtn-round"
+                onClick={toggle}
+                title={theme === 'light' ? 'Switch to dark theme' : 'Switch to light theme'}
+                aria-label={theme === 'light' ? 'Switch to dark theme' : 'Switch to light theme'}
+              >
+                <Icon name={theme === 'light' ? 'moon' : 'sun'} size={16} />
+              </button>
+            </>
+          ) : confirmingReset ? (
+            <>
+              <span className="bp__confirm">Clear this run and return to the start?</span>
+              <button className="btn btn--danger btn--small" onClick={onRetake}>
+                Yes, start over
+              </button>
+              <button className="btn btn--ghost btn--small" onClick={() => setConfirmingReset(false)}>
+                Keep going
+              </button>
+            </>
+          ) : (
+            <>
+              {onOpenReview && (
+                <button className="btn btn--primary" onClick={onOpenReview}>
+                  <Icon name="feather" size={16} />
+                  <span className="bp__fbtn-label">Review my answers</span>
+                  <span className="bp__fbtn-mini">Review</span>
+                </button>
+              )}
+              {onStartCompare && (
+                <button className="btn btn--ghost bp__fbtn-round" onClick={onStartCompare} title="Compare with another blueprint" aria-label="Compare">
+                  <Icon name="tension" size={16} />
+                  <span className="bp__fbtn-label">Compare</span>
+                  <span className="bp__fbtn-mini">Compare</span>
+                </button>
+              )}
+              <ShareOut
+                profile={profile}
+                myName={myName}
+                answers={answers}
+                seed={seed}
+                onExport={onExport}
+                onCopyMarkdown={onCopyMarkdown}
+              />
+              <button
+                className="btn btn--ghost bp__fbtn-round"
+                onClick={toggle}
+                title={theme === 'light' ? 'Switch to dark theme' : 'Switch to light theme'}
+                aria-label={theme === 'light' ? 'Switch to dark theme' : 'Switch to light theme'}
+              >
+                <Icon name={theme === 'light' ? 'moon' : 'sun'} size={16} />
+              </button>
+              <button
+                className="btn btn--ghost bp__fbtn-round"
+                onClick={() => setConfirmingReset(true)}
+                title="Start over"
+                aria-label="Start over"
+              >
+                <Icon name="loop" size={16} />
+                <span className="bp__fbtn-label">Start over</span>
+                <span className="bp__fbtn-mini">Restart</span>
+              </button>
+            </>
           )}
-          {!isVisitor && onStartCompare && (
-            <button className="btn btn--ghost bp__fbtn-round" onClick={onStartCompare} title="Compare with another blueprint" aria-label="Compare">
-              <Icon name="tension" size={16} />
-              <span className="bp__fbtn-label">Compare</span>
-              <span className="bp__fbtn-mini">Compare</span>
-            </button>
-          )}
-          {!isVisitor && onExport && (
-            <button className="btn btn--ghost bp__fbtn-round" onClick={onExport} title="Download the document as Markdown" aria-label="Download as Markdown">
-              <Icon name="download" size={16} />
-              <span className="bp__fbtn-label">Download as Markdown</span>
-              <span className="bp__fbtn-mini">Markdown</span>
-            </button>
-          )}
-          {!isVisitor && answers && (
-            <button className="btn btn--ghost bp__fbtn-round" onClick={openExport} title="A code or file of your raw answers — restores this exact session anywhere" aria-label="Export session">
-              <Icon name="code" size={16} />
-              <span className="bp__fbtn-label">Export session</span>
-              <span className="bp__fbtn-mini">Session</span>
-            </button>
-          )}
-          <button className="btn btn--ghost bp__fbtn-round" onClick={onRetake} title={isVisitor ? 'Back to start' : 'Start over'} aria-label={isVisitor ? 'Back to start' : 'Start over'}>
-            <Icon name="loop" size={16} />
-            <span className="bp__fbtn-label">{isVisitor ? 'Back to start' : 'Start over'}</span>
-            <span className="bp__fbtn-mini">{isVisitor ? 'Back' : 'Restart'}</span>
-          </button>
         </div>
       </footer>
 
-      {showExport && (
-        <div className="export-dlg" role="dialog" aria-modal="true" aria-label="Export session" onClick={() => setShowExport(false)}>
-          <div className="export-dlg__panel" onClick={(e) => e.stopPropagation()}>
-            <h2>
-              <Icon name="import" size={16} /> Export session
-            </h2>
-            {exportCode ? (
-              <>
-                <p>
-                  Copy this code and send it however you like. Pasting it into “Import a session”
-                  on this or any other device restores your exact run — answers and question order.
-                </p>
-                <div className="export-dlg__code" role="textbox" tabIndex={0} aria-label="Full-session code">
-                  {exportCode}
-                </div>
-              </>
-            ) : (
-              <p>
-                This run predates a question-bank change, so it has no portable code — the JSON
-                file below still restores it exactly.
-              </p>
-            )}
-            {showJson && exportJson && (
-              <textarea
-                className="export-dlg__code export-dlg__code--json"
-                readOnly
-                value={exportJson}
-                rows={8}
-                onFocus={(e) => e.currentTarget.select()}
-                spellCheck={false}
-                aria-label="Session file contents"
-              />
-            )}
-            {/* A bar, not a button pile: Copy leads, file actions sit behind
-                icons, Done docks right on its own edge. */}
-            <div className="export-dlg__bar">
-              <button className="btn btn--primary btn--small" onClick={() => copyExport(exportCode)}>
-                <Icon name={exportCopied ? 'check' : 'copy'} size={15} />
-                {exportCopied ? 'Copied' : 'Copy'}
-              </button>
-              <button
-                className="btn btn--ghost btn--small export-dlg__iconbtn"
-                onClick={downloadExport}
-                title="Save or share the JSON file"
-                aria-label="Save or share the JSON file"
-              >
-                <Icon name="import" size={15} />
-              </button>
-              <button
-                className={`btn btn--ghost btn--small export-dlg__iconbtn${showJson ? ' is-active' : ''}`}
-                onClick={() => setShowJson((s) => !s)}
-                title={showJson ? 'Hide the raw JSON' : 'View the raw JSON'}
-                aria-label={showJson ? 'Hide the raw JSON' : 'View the raw JSON'}
-                aria-expanded={showJson}
-              >
-                <Icon name="code" size={15} />
-              </button>
-              <span className="export-dlg__spacer" />
-              <button
-                className="btn btn--ghost btn--small export-dlg__iconbtn"
-                onClick={() => setShowExport(false)}
-                title="Done"
-                aria-label="Done"
-              >
-                <Icon name="close" size={15} />
-              </button>
-            </div>
-            {exportNote && <p className="export-dlg__note">{exportNote}</p>}
-          </div>
-        </div>
-      )}
     </main>
   );
 }
