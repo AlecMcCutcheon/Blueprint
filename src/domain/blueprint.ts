@@ -749,6 +749,8 @@ export function generateBlueprint(p: ScoredProfile): Blueprint {
       body: `Your answers show you most naturally express care through ${CHANNEL_LABELS[p.channels.express] ?? p.channels.express}, while the care that actually reaches you comes most strongly through ${CHANNEL_LABELS[p.channels.receive] ?? p.channels.receive}. This is one of the most common — and most fixable — patterns between two people. The fix is almost boring: show each other the dictionary. Tell a partner what lands for you; ask what lands for them; then believe both answers.`,
     });
   }
+  // Per-document lead/stamp rotation state for pair tension cards.
+  let tensionRotation: { leads: Set<number>; stamps: Set<string> } | null = null;
   for (const c of p.consistency) {
     if (c.agreement < 45 && c.dimension === 'ambiguity_update') {
       tensions.push({
@@ -756,7 +758,12 @@ export function generateBlueprint(p: ScoredProfile): Blueprint {
         body: 'When your partner said "I\'m fine" once, and when they said it all week, your answers told different stories. That isn\'t hypocrisy — it\'s information about your thresholds. It\'s worth knowing at what point a quiet partner stops being "having an off day" and starts being, in your private accounting, something that needs a response.',
       });
     } else if (c.agreement < 40 && c.dimension !== 'ambiguity_update') {
-      const card = pairTensionCard(c, p, runSeed);
+      // One rotation state per document: cards must not repeat each other's
+      // lead-in or closing stamp (see pairTensionCard).
+      if (!tensionRotation) {
+        tensionRotation = { leads: new Set<number>(), stamps: new Set<string>() };
+      }
+      const card = pairTensionCard(c, p, runSeed, tensionRotation.leads, tensionRotation.stamps);
       if (card) tensions.push(card);
     }
   }
@@ -1224,15 +1231,32 @@ const PAIR_TENSION_LIBRARY: Record<string, PairCardCopy> = {
  * Build the tension card for one disagreeing echo pair — territory-named,
  * direction-aware when raw answers are available, honest about what is
  * unknown when they are not.
+ *
+ * usedLeads / usedStamps: per-document rotation state. Two cards opening with
+ * the identical lead (or carrying the identical "Where this sits overall")
+ * read as a printing error, and the per-pair hash can collide on the same one
+ * of three leads within a single document — Alec's real run did exactly that.
+ * The caller threads one Set through every card so each document rotates.
  */
-function pairTensionCard(c: ConsistencyPair, p: ScoredProfile, runSeed = 0): Blueprint['tensions'][number] | null {
+function pairTensionCard(
+  c: ConsistencyPair,
+  p: ScoredProfile,
+  runSeed = 0,
+  usedLeads: Set<number> = new Set(),
+  usedStamps: Set<string> = new Set(),
+): Blueprint['tensions'][number] | null {
   const copy = PAIR_TENSION_LIBRARY[c.a + '|' + c.b] ?? PAIR_TENSION_LIBRARY[c.b + '|' + c.a];
   if (!copy) return null;
   const dimScore = p.dimensions[c.dimension as DimensionId]?.score;
-  const scale =
+  const rawStamp =
     dimScore !== undefined && !p.dimensions[c.dimension as DimensionId]?.unmeasured
-      ? ` Where this sits overall: the ${proseLabel(c.dimension as DimensionId)} reads ${tierLabelFor(dimScore)} on this dimension — the disagreement is about which pull leads, not whether the trait is present.`
+      ? `Where this sits overall: the ${proseLabel(c.dimension as DimensionId)} reads ${tierLabelFor(dimScore)} on this dimension — the disagreement is about which pull leads, not whether the trait is present.`
       : '';
+  // De-dup the closing stamp per document: if this dimension's stamp already
+  // ran on an earlier card, drop it here (the earlier card carries it).
+  const stamp = rawStamp && usedStamps.has(rawStamp) ? '' : rawStamp;
+  if (rawStamp) usedStamps.add(rawStamp);
+  const scale = stamp ? ` ${stamp}` : '';
 
   const posA = c.positionA;
   const posB = c.positionB;
@@ -1281,7 +1305,12 @@ function pairTensionCard(c: ConsistencyPair, p: ScoredProfile, runSeed = 0): Blu
     `The same territory looked different twice: ${copy.a} in one scenario, then ${copy.b} — and your answers split. Read side by side, the reading: ${dir}.`,
     `${copy.a[0].toUpperCase() + copy.a.slice(1)} — and then, from the other side, ${copy.b}. On ${copy.territory}, your instincts pulled apart, and the split says — ${dir}.`,
   ];
-  const lead = leads[Math.floor(Math.abs(Math.sin(hash(c.a + c.b) + runSeed) * 10000)) % leads.length];
+  // Rotation with per-document de-dup: start from the pair's hash slot, then
+  // walk forward past any lead this document has already shown.
+  const base = Math.floor(Math.abs(Math.sin(hash(c.a + c.b) + runSeed) * 10000)) % leads.length;
+  const leadIdx = [...leads.keys()].map((k) => (base + k) % leads.length).find((i) => !usedLeads.has(i)) ?? base;
+  usedLeads.add(leadIdx);
+  const lead = leads[leadIdx];
   return {
     title: `Two readings of ${copy.territory}`,
     body: `${lead} ${qualifier} ${copy.tradeoff}${scale}`,
