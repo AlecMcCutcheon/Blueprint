@@ -572,7 +572,7 @@ export interface ProfileCompare {
   matches: { dimension: DimensionId; a: number; b: number }[];
   gaps: { dimension: DimensionId; a: number; b: number; delta: number }[];
   /** Does what one person naturally GIVE match what the other hears best? */
-  crossChannels: { youGive: string | null; theyHear: string | null; match: boolean }[];
+  crossChannels: { youGive: string | null; theyHear: string | null; match: boolean; state: 'match' | 'gap' | 'unspecified' }[];
 }
 
 export function compareProfiles(a: ScoredProfile, b: ScoredProfile): ProfileCompare {
@@ -597,16 +597,24 @@ export function compareProfiles(a: ScoredProfile, b: ScoredProfile): ProfileComp
     .slice(0, 3)
     .map(({ dimension, a: sa, b: sb }) => ({ dimension, a: sa, b: sb }));
   const gaps = [...items].sort((x, y) => y.delta - x.delta).slice(0, 3);
+  // A null channel is NOT a mismatch: a missing express channel means no
+  // flagship way of giving; a missing receive channel is the WIDE dictionary
+  // — care lands in whatever register it arrives in. Rendering "— / transla-
+  // tion needed" for a wide receiver tells exactly the wrong story.
+  const stateFor = (give: string | null, hear: string | null): 'match' | 'gap' | 'unspecified' =>
+    !give || !hear ? 'unspecified' : give === hear ? 'match' : 'gap';
   const crossChannels = [
     {
       youGive: a.channels.express,
       theyHear: b.channels.receive,
       match: !!a.channels.express && a.channels.express === b.channels.receive,
+      state: stateFor(a.channels.express, b.channels.receive),
     },
     {
       youGive: b.channels.express,
       theyHear: a.channels.receive,
       match: !!b.channels.express && b.channels.express === a.channels.receive,
+      state: stateFor(b.channels.express, a.channels.receive),
     },
   ];
   return { alignmentIndex, matches, gaps, crossChannels };

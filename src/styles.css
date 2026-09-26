@@ -778,6 +778,7 @@ button { font: inherit; cursor: pointer; }
 }
 .compare__xrow.is-match { border-color: var(--high); }
 .compare__xrow.is-gap { border-style: dashed; }
+.compare__xrow.is-unspecified { border-style: dotted; }
 .compare__xwho { font-size: 0.95rem; color: var(--ink-soft); }
 .compare__xarrow { color: var(--ink-faint); }
 .compare__xverdict {
@@ -790,6 +791,7 @@ button { font: inherit; cursor: pointer; }
 }
 .compare__xverdict.is-match { background: var(--high); color: #fff; }
 .compare__xverdict.is-gap { background: transparent; border: 1px solid var(--accent-soft); color: var(--accent); }
+.compare__xverdict.is-unspecified { background: transparent; border: 1px solid var(--line); color: var(--ink-faint); }
 .compare__channels-note { color: var(--ink-faint); font-size: 0.88rem; margin: 10px 0 0; }
 .compare__back { margin-bottom: 14px; }
 .compare__footer { display: flex; justify-content: center; }

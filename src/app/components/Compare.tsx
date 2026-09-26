@@ -244,26 +244,28 @@ export default function Compare({
               actually hears best. This is where mismatches hide in otherwise happy relationships.
             </p>
             {result.crossChannels.map((c, i) => (
-              <div key={i} className={`compare__xrow${c.match ? ' is-match' : ' is-gap'}`}>
+              <div key={i} className={`compare__xrow${c.state === 'match' ? ' is-match' : c.state === 'gap' ? ' is-gap' : ' is-unspecified'}`}>
                 <span className="compare__xwho">
                   {i === 0 ? 'You give' : `${who === 'them' ? 'They' : who} give${who === 'them' ? '' : 's'}`}{' '}
-                  <strong>{c.youGive ? CHANNEL_LABELS[c.youGive] : '—'}</strong>
+                  <strong>{c.youGive ? CHANNEL_LABELS[c.youGive] : 'no single channel'}</strong>
                 </span>
                 <span className="compare__xarrow" aria-hidden>→</span>
                 <span className="compare__xwho">
                   {i === 0
                     ? `${who === 'them' ? 'they' : who} hear${who === 'them' ? '' : 's'}`
                     : 'you hear'}{' '}
-                  <strong>{c.theyHear ? CHANNEL_LABELS[c.theyHear] : '—'}</strong>
+                  <strong>{c.theyHear ? CHANNEL_LABELS[c.theyHear] : 'in any channel'}</strong>
                 </span>
-                <span className={`compare__xverdict ${c.match ? 'is-match' : 'is-gap'}`}>
-                  {c.match ? 'lands' : 'translation needed'}
+                <span className={`compare__xverdict ${c.state === 'match' ? 'is-match' : c.state === 'gap' ? 'is-gap' : 'is-unspecified'}`}>
+                  {c.state === 'match' ? 'lands' : c.state === 'gap' ? 'translation needed' : 'dictionary varies'}
                 </span>
               </div>
             ))}
             <p className="compare__channels-note">
               "Translation needed" isn't a verdict — it's a to-do. Tell each other what lands.
-              Then believe the answer.
+              Then believe the answer. A missing channel isn't a gap either: "no single channel" means
+              no flagship way of giving, and "in any channel" means a wide receiving dictionary —
+              care lands wherever it's aimed.
             </p>
           </section>
 
