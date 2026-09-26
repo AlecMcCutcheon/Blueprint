@@ -529,7 +529,7 @@ function AppInner() {
       myName={myName}
       onExport={handleExport}
       answers={answers}
-      orderSeed={seed}
+      seed={seed}
       onSaveName={handleSaveName}
       onStartCompare={() => setStage('compare')}
       onRetake={startOver}

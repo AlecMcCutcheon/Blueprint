@@ -38,7 +38,7 @@ h1, h2, h3 { line-height: 1.25; font-weight: 600; }
 button { font: inherit; cursor: pointer; }
 
 .screen {
-  max-width: 880px;
+  max-width: 760px;
   margin: 0 auto;
   padding: 48px 24px 96px;
 }
@@ -341,20 +341,36 @@ button { font: inherit; cursor: pointer; }
 .export-dlg__panel h2 { display: flex; align-items: center; gap: 8px; margin: 0 0 8px; font-size: 1.15rem; }
 .export-dlg__panel p { color: var(--ink-soft); margin: 0 0 12px; }
 .export-dlg__code {
-  width: 100%;
-  box-sizing: border-box;
   font-family: ui-monospace, 'SF Mono', Menlo, Consolas, monospace;
-  font-size: 0.78rem;
-  line-height: 1.45;
+  font-size: 0.8rem;
+  line-height: 1.5;
+  word-break: break-all;
   background: var(--paper-deep);
   color: var(--ink);
   border: 1px solid var(--line);
   border-radius: 10px;
-  padding: 12px;
-  resize: vertical;
+  padding: 12px 14px;
   user-select: all;
+  max-height: 132px;
+  overflow-y: auto;
 }
-.export-dlg__btns { display: flex; gap: 10px; flex-wrap: wrap; margin-top: 12px; }
+.export-dlg__code--json {
+  width: 100%;
+  box-sizing: border-box;
+  resize: vertical;
+  max-height: none;
+  white-space: pre;
+}
+.export-dlg__bar {
+  display: flex;
+  gap: 8px;
+  align-items: center;
+  flex-wrap: wrap;
+  border-top: 1px solid var(--line);
+  padding-top: 12px;
+  margin-top: 14px;
+}
+.export-dlg__spacer { flex: 1; }
 .export-dlg__note { color: var(--ink-faint); font-size: 0.88rem; margin: 10px 0 0 !important; }
 
 .review__measures { display: grid; gap: 28px; }
@@ -401,7 +417,7 @@ button { font: inherit; cursor: pointer; }
   font-size: 0.75rem; color: var(--accent);
 }
 .bp__epigraph {
-  font-size: clamp(1.7rem, 4.5vw, 2.6rem);
+  font-size: clamp(1.5rem, 4.5vw, 2.6rem);
   font-style: italic;
   font-weight: 500;
   margin: 10px auto 14px;
@@ -480,14 +496,14 @@ button { font: inherit; cursor: pointer; }
   padding-bottom: 10px;
   margin-bottom: 18px;
 }
-.bp__section p { font-size: 1.06rem; color: var(--ink); margin: 0 0 16px; }
+.bp__section p { font-size: 1.02rem; color: var(--ink); margin: 0 0 16px; max-width: 68ch; }
 
 .bp__tension > h3 { text-align: center; }
 
 .bp__section--tension {
   background: var(--paper-deep);
   border-radius: var(--radius);
-  padding: 24px 28px;
+  padding: 18px 22px;
   border: 1px dashed var(--accent-soft);
 }
 .bp__tension h3 { font-size: 1.05rem; margin: 18px 0 6px; }
@@ -688,17 +704,17 @@ button { font: inherit; cursor: pointer; }
   border-left: 3px solid var(--accent);
   border-radius: var(--radius);
   box-shadow: var(--shadow);
-  padding: 26px 30px;
+  padding: 20px 22px;
   margin-bottom: 36px;
-  text-align: center;
+  text-align: left;
 }
 .bp__visitor .bp__kicker { display: inline-flex; align-items: center; gap: 6px; }
-/* Text here follows the page's width pattern: it fills the panel like every
-   other text block on the page, centered by the panel's text-align. */
-.bp__visitor-title { font-size: clamp(1.4rem, 3.5vw, 2rem); margin: 10px 0 12px; }
+/* Body text fills the panel flush left; the title and action row share the
+   same left edge so the panel reads as one aligned block. */
+.bp__visitor-title { font-size: clamp(1.4rem, 3.5vw, 2rem); margin: 10px 0 12px; text-align: left; }
 .bp__visitor-body { color: var(--ink-soft); margin: 0 0 10px; }
 .bp__visitor-body--soft { color: var(--ink-faint); font-size: 0.95rem; font-style: italic; }
-.bp__visitor-actions { display: flex; gap: 12px; justify-content: center; flex-wrap: wrap; margin-top: 16px; }
+.bp__visitor-actions { display: flex; gap: 12px; justify-content: flex-start; flex-wrap: wrap; margin-top: 16px; }
 
 /* ── Share panel: name + intent + link ───────────────────────────────── */
 .bp__sharepanel { display: flex; flex-direction: column; gap: 14px; }
@@ -954,26 +970,27 @@ button { font: inherit; cursor: pointer; }
 @media (max-width: 640px) {
   /* Type scale: the 1.15–1.35rem heads and prompts fill a phone screen.
      Bump the root size so every rem-based size lifts together. */
-  html { font-size: 17px; }
+  /* Body 16px, measure capped near ~66ch — small paragraphs beat shrunken text. */
+  html { font-size: 16px; }
   body { line-height: 1.55; }
 
-  .screen { padding: 20px 14px 56px; }
-  .quizwrap { padding: 0 12px; }
+  .screen { padding: 16px 12px 56px; }
+  .quizwrap { padding: 0 8px; }
   .theme-toggle { top: 10px; right: 10px; width: 36px; height: 36px; }
 
   /* Touch targets ≥44px; ghost paddings rebalanced. */
-  .btn { min-height: 46px; }
+  .btn { min-height: 44px; }
   .btn--small { padding: 10px 16px; }
 
   /* Quiz: calm, single-column, everything readable at arm's length. */
   .quiz__top { gap: 12px; margin-bottom: 16px; padding-top: 8px; }
-  .quiz__card { padding: 22px 18px; }
-  .quiz__prompt p { font-size: 1.04rem; }
+  .quiz__card { padding: 20px 16px; }
+  .quiz__prompt p { font-size: 1rem; }
   .quiz__promptrow { flex-direction: column-reverse; gap: 8px; }
   .quiz__promptrow .speakbtn { align-self: flex-end; }
-  .choice { padding: 14px 15px; }
-  .choice__label { font-size: 0.98rem; }
-  .scale__label { font-size: 0.96rem; }
+  .choice { padding: 13px 14px; }
+  .choice__label { font-size: 0.96rem; }
+  .scale__label { font-size: 0.94rem; }
   .scale__opt { padding: 12px 10px; }
 
   /* Dock: nav bar, not a poster. Message hidden; actions row justified. */
@@ -990,10 +1007,12 @@ button { font: inherit; cursor: pointer; }
 
   /* Blueprint document: stat bands in two columns, headings down a notch. */
   .bp__bands { grid-template-columns: repeat(2, minmax(0, 1fr)); padding: 16px 14px; gap: 12px 16px; }
-  .bp__band-head { font-size: 0.82rem; }
+  .bp__band-head { font-size: 0.8rem; }
   .bp__band-tier { display: none; }
-  .bp__section h2 { font-size: 1.18rem; }
-  .bp__section p { font-size: 0.98rem; margin-bottom: 13px; }
+  .bp__section h2 { font-size: 1.12rem; }
+  .bp__section p { font-size: 0.96rem; margin-bottom: 13px; }
+  .bp__epigraph { font-size: clamp(1.35rem, 6.5vw, 1.7rem); max-width: none; padding: 0 6px; }
+  .bp__section--tension { padding: 14px 12px; }
   .bp__share--mobile { text-align: center; }
   .bp__share-toggle { background: none; border: none; color: var(--ink-faint); font: inherit; font-size: 0.9rem; font-style: italic; text-decoration: underline; padding: 0; }
 

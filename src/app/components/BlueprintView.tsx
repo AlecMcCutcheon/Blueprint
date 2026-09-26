@@ -1,6 +1,6 @@
 import { useEffect, useMemo, useState } from 'react';
 import type { Answers, Blueprint, ScoredProfile } from '../../domain/types';
-import { profileToCode6, buildShareLink, type ShareIntent } from '../../domain/share';
+import { profileToCode6, buildShareLink, encodeFullSession, type ShareIntent } from '../../domain/share';
 import { buildSessionFile, saveBlob, sessionFileName } from '../../domain/session';
 import Icon from './icons';
 import type { IconName } from './icons';
@@ -16,8 +16,8 @@ interface Props {
   onExport?: () => void;
   /** Raw answers for the session export popup (absent for visitors). */
   answers?: Answers;
-  /** The run's presentation-order seed (session export needs it to restore). */
-  orderSeed?: number;
+  /** The run's presentation-order seed (session code + export need it to restore). */
+  seed?: number;
   onSaveName?: (name: string | null) => void;
   onStartCompare?: () => void;
   /** Visitor: begin the questionnaire themselves. */
@@ -51,7 +51,7 @@ export default function BlueprintView({
   myName,
   onExport,
   answers,
-  orderSeed = 0,
+  seed = 0,
   onSaveName,
   onStartCompare,
   onStartTest,
@@ -66,9 +66,11 @@ export default function BlueprintView({
   const [showShare, setShowShare] = useState(false);
   const [showCode, setShowCode] = useState(false);
   const [showExport, setShowExport] = useState(false);
+  const [exportCode, setExportCode] = useState<string | null>(null);
   const [exportJson, setExportJson] = useState<string | null>(null);
   const [exportCopied, setExportCopied] = useState(false);
   const [exportNote, setExportNote] = useState<string | null>(null);
+  const [showJson, setShowJson] = useState(false);
   // The long share note is desktop furniture — a paragraph at the bottom of the
   // page reads as clutter on a phone, so it collapses into a toggle there.
   const [showShareNote, setShowShareNote] = useState(false);
@@ -108,22 +110,29 @@ export default function BlueprintView({
 
   const commitName = () => onSaveName?.(nameDraft.trim() || null);
 
-  // The export popup owns the whole session-file flow: view the JSON, copy it,
-  // or save it — via the share sheet on iOS (anchor downloads are unreliable
-  // there), via a normal download everywhere else.
+  // The export popup is code-first: the full-session code (BPS…) is one
+  // copy-pasteable string that restores the exact run anywhere via “Import a
+  // session” — usually easier than moving a file. The JSON file stays
+  // available under a toggle for people who want an attachment instead.
   const openExport = () => {
     if (!answers) return;
-    setExportJson(JSON.stringify(buildSessionFile(answers, orderSeed, nameDraft.trim() || null), null, 2));
+    try {
+      setExportCode(encodeFullSession(answers, seed).code);
+    } catch {
+      setExportCode(null); // stale option ids — the file still works
+    }
+    setExportJson(JSON.stringify(buildSessionFile(answers, seed, nameDraft.trim() || null), null, 2));
     setExportCopied(false);
     setExportNote(null);
+    setShowJson(false);
     setShowExport(true);
   };
-  const copyExport = async () => {
-    if (!exportJson) return;
+  const copyExport = async (text: string | null) => {
+    if (!text) return;
     try {
-      await navigator.clipboard.writeText(exportJson);
+      await navigator.clipboard.writeText(text);
     } catch {
-      // clipboard blocked — the textarea below is select-all
+      // clipboard blocked — the code/textarea is user-selectable
     }
     setExportCopied(true);
     window.setTimeout(() => setExportCopied(false), 2000);
@@ -394,8 +403,8 @@ export default function BlueprintView({
           </button>
         )}
         {!isVisitor && answers && (
-          <button className="btn btn--ghost" onClick={openExport} title="A JSON file of your raw answers — restores this exact session anywhere">
-            Export session file
+          <button className="btn btn--ghost" onClick={openExport} title="A code or file of your raw answers — restores this exact session anywhere">
+            Export session
           </button>
         )}
         {!isVisitor && onOpenReview && (
@@ -423,34 +432,56 @@ export default function BlueprintView({
         )}
       </footer>
 
-      {showExport && exportJson && (
-        <div className="export-dlg" role="dialog" aria-modal="true" aria-label="Export session file" onClick={() => setShowExport(false)}>
+      {showExport && (
+        <div className="export-dlg" role="dialog" aria-modal="true" aria-label="Export session" onClick={() => setShowExport(false)}>
           <div className="export-dlg__panel" onClick={(e) => e.stopPropagation()}>
             <h2>
-              <Icon name="import" size={16} /> Export session file
+              <Icon name="import" size={16} /> Export session
             </h2>
-            <p>
-              This JSON holds your raw answers and the question order — opening it on any device
-              restores this exact session. Copy it and send it however you like, or save the file.
-            </p>
-            <textarea
-              className="export-dlg__code"
-              readOnly
-              value={exportJson}
-              rows={8}
-              onFocus={(e) => e.currentTarget.select()}
-              spellCheck={false}
-              aria-label="Session file contents"
-            />
-            <div className="export-dlg__btns">
-              <button className="btn btn--primary" onClick={copyExport}>
-                {exportCopied ? 'Copied ✓' : 'Copy JSON'}
+            {exportCode ? (
+              <>
+                <p>
+                  Copy this code and send it however you like. Pasting it into “Import a session”
+                  on this or any other device restores your exact run — answers and question order.
+                </p>
+                <div className="export-dlg__code" role="textbox" tabIndex={0} aria-label="Full-session code">
+                  {exportCode}
+                </div>
+              </>
+            ) : (
+              <p>
+                This run predates a question-bank change, so it has no portable code — the JSON
+                file below still restores it exactly.
+              </p>
+            )}
+            {showJson && exportJson && (
+              <textarea
+                className="export-dlg__code export-dlg__code--json"
+                readOnly
+                value={exportJson}
+                rows={8}
+                onFocus={(e) => e.currentTarget.select()}
+                spellCheck={false}
+                aria-label="Session file contents"
+              />
+            )}
+            <div className="export-dlg__bar">
+              <button className="btn btn--primary btn--small" onClick={() => copyExport(exportCode)}>
+                {exportCopied ? 'Copied ✓' : 'Copy code'}
               </button>
-              <button className="btn btn--ghost" onClick={downloadExport}>
-                Save / share file
+              <button className="btn btn--ghost btn--small" onClick={downloadExport}>
+                Save file
               </button>
-              <button className="btn btn--ghost" onClick={() => setShowExport(false)}>
-                Close
+              <button
+                className="btn btn--ghost btn--small"
+                onClick={() => setShowJson((s) => !s)}
+                aria-expanded={showJson}
+              >
+                {showJson ? 'Hide JSON' : 'View JSON'}
+              </button>
+              <span className="export-dlg__spacer" />
+              <button className="btn btn--ghost btn--small" onClick={() => setShowExport(false)}>
+                Done
               </button>
             </div>
             {exportNote && <p className="export-dlg__note">{exportNote}</p>}
