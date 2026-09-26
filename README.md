@@ -119,7 +119,7 @@ Additional tooling under `scripts/`: `harness.ts` (pattern fire rates across 540
 profiles), `auditmine.ts` (per-dimension evidence contributions), `catalog.ts`
 (regenerates the pattern catalog), and `opposite-session.ts` (builds a session that
 answers every question maximally against a source session — the divergence stress test:
-25/30 dimensions move >15 points and the generated documents share under 10% of
+29/30 dimensions move >15 points and the generated documents share under 10% of
 paragraphs). `reachability.ts` proves from the bank's weights which score bands each
 dimension can actually reach (all 29 bank dimensions hit all 7 tiers exactly; the
 derived channel-alignment dimension enumerates 6 of 7), enumerates the channel-derived
