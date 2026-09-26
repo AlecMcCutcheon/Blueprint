@@ -152,7 +152,7 @@ export default function Compare({
               <Icon name="import" size={16} /> Add someone new
             </h2>
             <label className="import-box__label" htmlFor="comparecode">
-              Their share code (BP1–BP4) — or just open a link they sent you
+              Their share code (BP1–BP6) — or just open a link they sent you
             </label>
             <div className="import-box__row">
               <input
@@ -163,7 +163,7 @@ export default function Compare({
                   setCode(e.target.value);
                   setError(null);
                 }}
-                placeholder="BP4…"
+                placeholder="BP6…"
                 spellCheck={false}
                 autoComplete="off"
               />

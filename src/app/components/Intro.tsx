@@ -178,7 +178,7 @@ export default function Intro({
                     setVisitorCode(e.target.value);
                     setVisitorError(null);
                   }}
-                  placeholder="BP4…"
+                  placeholder="BP6…"
                   spellCheck={false}
                   autoComplete="off"
                 />

@@ -315,7 +315,7 @@ Export: blueprint as downloadable Markdown.
 
 ### Sharing: two carriers, two privacy levels
 
-**Metric codes / links (for other people).** A BP1/BP2/BP3 code carries only derived metrics —
+**Metric codes / links (for other people).** A BP1–BP6 code carries only derived metrics —
 never raw answers — and decodes entirely client-side. It travels either as a bare code or
 wrapped in a **share link**: `?bp=<code>&name=<optional name>&mode=show|invite`. The name and
 the intent live in the LINK, never in the code (transport, not payload): a code pasted some
