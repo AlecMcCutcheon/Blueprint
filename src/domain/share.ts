@@ -1,5 +1,8 @@
-import type { ScoredProfile, DimensionId, Answers } from './types';
+import type { ScoredProfile, DimensionId, Answers, DomainId } from './types';
+import { DOMAIN_LABELS, DOMAIN_DIMENSIONS } from './types';
 import { ALL_DIMENSIONS, CONSISTENCY_PAIRS } from './scoring';
+import { tierOf } from './dimensions';
+import type { TierId } from './dimensions';
 import { QUESTIONS } from './questions';
 
 // Two carriers, two privacy levels:
@@ -566,6 +569,30 @@ export function parseShareUrl(input: string | URLSearchParams): ParsedShareUrl |
 
 // ─── Comparison ──────────────────────────────────────────────────────────────
 
+/** One dimension's side-by-side reading, with tier words from the document. */
+export interface CompareDimension {
+  dimension: DimensionId;
+  a: number;
+  b: number;
+  /** |a − b|. */
+  delta: number;
+  tierA: TierId;
+  tierB: TierId;
+  /** True when the two scores sit in different tier bands — prose would read them differently. */
+  tierGap: boolean;
+  /** Direction: +1 you higher, −1 they higher, 0 tie. */
+  direction: -1 | 0 | 1;
+}
+
+/** All measured dimensions of one domain, plus how hot that domain runs. */
+export interface CompareDomain {
+  domain: DomainId;
+  label: string;
+  rows: CompareDimension[];
+  /** Mean |delta| across the domain's measured rows. */
+  meanDelta: number;
+}
+
 export interface ProfileCompare {
   /** 0–100: 100 = identical profiles across the measured primary dimensions. */
   alignmentIndex: number;
@@ -573,6 +600,16 @@ export interface ProfileCompare {
   gaps: { dimension: DimensionId; a: number; b: number; delta: number }[];
   /** Does what one person naturally GIVE match what the other hears best? */
   crossChannels: { youGive: string | null; theyHear: string | null; match: boolean; state: 'match' | 'gap' | 'unspecified' }[];
+  /** Every measured dimension, grouped by domain in DOMAIN_DIMENSIONS order. */
+  domains: CompareDomain[];
+  /** Measured dimension count behind the index — context for legacy codes. */
+  measuredCount: number;
+  /** Dimensions at least one side couldn't measure (legacy share codes). */
+  unmeasuredCount: number;
+  /** Measured dims in the same tier band — the deep-agreement core. */
+  sameTierCount: number;
+  /** Deltas that crossed a tier boundary — where two documents disagree about the reading, not just the number. */
+  tierGaps: { dimension: DimensionId; a: number; b: number; delta: number }[];
 }
 
 export function compareProfiles(a: ScoredProfile, b: ScoredProfile): ProfileCompare {
@@ -617,5 +654,49 @@ export function compareProfiles(a: ScoredProfile, b: ScoredProfile): ProfileComp
       state: stateFor(b.channels.express, a.channels.receive),
     },
   ];
-  return { alignmentIndex, matches, gaps, crossChannels };
+
+  // ── The full 30-dimension table, grouped by domain ──
+  // Every measured dimension appears — matches/gaps are the headlines, this
+  // is the whole story. Tier bands come from the document itself, so the
+  // compare screen speaks the same language the blueprints do.
+  const deltaByDim = new Map(items.map((x) => [x.dimension, x]));
+  const domains: CompareDomain[] = (Object.keys(DOMAIN_DIMENSIONS) as DomainId[]).map((domain) => {
+    const rows: CompareDimension[] = [];
+    for (const d of DOMAIN_DIMENSIONS[domain]) {
+      const it = deltaByDim.get(d);
+      if (!it) continue; // unmeasured on at least one side
+      const tierA = tierOf(it.a);
+      const tierB = tierOf(it.b);
+      rows.push({
+        dimension: d,
+        a: it.a,
+        b: it.b,
+        delta: it.delta,
+        tierA,
+        tierB,
+        tierGap: tierA !== tierB,
+        direction: it.a > it.b ? 1 : it.a < it.b ? -1 : 0,
+      });
+    }
+    const mean = rows.length > 0 ? rows.reduce((s, r) => s + r.delta, 0) / rows.length : 0;
+    return { domain, label: DOMAIN_LABELS[domain], rows, meanDelta: Math.round(mean * 10) / 10 };
+  });
+  const allRows = domains.flatMap((d) => d.rows);
+  const sameTierCount = allRows.filter((r) => !r.tierGap).length;
+  const tierGaps = [...allRows]
+    .filter((r) => r.tierGap)
+    .sort((x, y) => y.delta - x.delta)
+    .map(({ dimension, a: sa, b: sb, delta }) => ({ dimension, a: sa, b: sb, delta }));
+
+  return {
+    alignmentIndex,
+    matches,
+    gaps,
+    crossChannels,
+    domains,
+    measuredCount: allRows.length,
+    unmeasuredCount: ALL_DIMENSIONS.length - 1 - allRows.length, // −1: alignment composite never counted
+    sameTierCount,
+    tierGaps,
+  };
 }

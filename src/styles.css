@@ -761,6 +761,48 @@ button { font: inherit; cursor: pointer; }
 .compare__barfill.is-you { background: var(--accent); }
 .compare__barfill.is-them { background: var(--ink-faint); }
 .compare__delta { grid-column: 1 / -1; font-size: 0.8rem; color: var(--ink-faint); }
+.compare__col-note { margin: 14px 0 0; color: var(--ink-soft); font-size: 0.9rem; }
+
+/* Tier-gap section: where the two documents would read the same dimension differently */
+.compare__tiergaps {
+  background: var(--paper-deep);
+  border-radius: var(--radius);
+  padding: 22px 26px;
+}
+.compare__tiergaps h2 { display: flex; align-items: center; gap: 8px; font-size: 1.1rem; margin: 0 0 8px; }
+.compare__bands { grid-column: 1 / -1; font-size: 0.8rem; color: var(--accent); }
+
+/* The full 30-dimension picture, grouped by domain */
+.compare__domains { display: grid; gap: 18px; }
+.compare__domains h2 { display: flex; align-items: center; gap: 8px; font-size: 1.1rem; margin: 0; }
+.compare__domains .compare__channels-lede { margin-bottom: 4px; }
+.compare__domain {
+  background: var(--card);
+  border: 1px solid var(--line);
+  border-radius: var(--radius);
+  padding: 16px 20px 8px;
+}
+.compare__domain h3 {
+  display: flex; align-items: baseline; justify-content: space-between; gap: 12px;
+  font-size: 0.95rem; letter-spacing: 0.06em; text-transform: uppercase;
+  color: var(--ink-soft); margin: 0 0 6px;
+}
+.compare__domain-delta { font-size: 0.78rem; font-variant-numeric: tabular-nums; color: var(--ink-faint); }
+.compare__row.is-tight .compare__rowlabel { color: var(--ink-faint); }
+.compare__row.is-tiergap { border-bottom-color: var(--accent-soft); }
+.compare__flag {
+  grid-column: 1 / -1;
+  justify-self: start;
+  font-size: 0.72rem;
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+  color: var(--accent);
+  border: 1px solid var(--accent-soft);
+  border-radius: 999px;
+  padding: 1px 8px;
+  margin-bottom: 6px;
+}
+.compare__domain-none { color: var(--ink-faint); font-size: 0.9rem; margin: 4px 0 8px; }
 .compare__channels {
   background: var(--paper-deep);
   border-radius: var(--radius);

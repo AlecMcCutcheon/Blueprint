@@ -2,6 +2,7 @@ import { useMemo, useRef, useState } from 'react';
 import type { ScoredProfile } from '../../domain/types';
 import { DIMENSION_LABELS } from '../../domain/types';
 import { CHANNEL_LABELS } from '../../domain/scoring';
+import { tierOf, TIER_LABELS } from '../../domain/dimensions';
 import { decodeProfile, compareProfiles } from '../../domain/share';
 import { importSessionJson } from '../../domain/session';
 import { scoreProfile } from '../../domain/scoring';
@@ -44,6 +45,12 @@ export default function Compare({
   const result = useMemo(
     () => (partner ? compareProfiles(ownProfile, partner) : null),
     [partner, ownProfile],
+  );
+
+  // Domains sorted tightest-first — powers the prose in the whole-picture lede.
+  const domainsByFit = useMemo(
+    () => (result ? [...result.domains].sort((x, y) => x.meanDelta - y.meanDelta) : []),
+    [result],
   );
 
   const tryCode = () => {
@@ -203,6 +210,12 @@ export default function Compare({
                 High isn't "better" — two identical people would make a boring team. What matters
                 is whether the differences below are ones you can build around.
               </p>
+              <p className="compare__score-context">
+                {result.measuredCount} of 29 dimensions measured
+                {result.unmeasuredCount > 0
+                  ? ` · ${result.unmeasuredCount} not carried by this share code`
+                  : ''}{' '}· {result.sameTierCount} sit in the same tier band
+              </p>
             </div>
             <button className="btn btn--ghost btn--small" onClick={backToEntry}>
               Choose someone else
@@ -217,6 +230,12 @@ export default function Compare({
               {result.matches.map((m) => (
                 <MatchRow key={m.dimension} label={DIMENSION_LABELS[m.dimension]} a={m.a} b={m.b} theirName={who} />
               ))}
+              {result.tierGaps.length === 0 && (
+                <p className="compare__col-note">
+                  Not one of your {result.measuredCount} shared dimensions crosses a tier boundary —
+                  two documents would tell the same story about you both.
+                </p>
+              )}
             </section>
             <section className="compare__col">
               <h2>
@@ -232,8 +251,109 @@ export default function Compare({
                   theirName={who}
                 />
               ))}
+              {result.tierGaps.length > 0 && (
+                <p className="compare__col-note">
+                  The largest deltas first. Gaps that cross a tier boundary are marked below —
+                  that's where two documents would disagree about the reading, not just the number.
+                </p>
+              )}
             </section>
           </div>
+
+          {result.tierGaps.length > 0 && (
+            <section className="compare__tiergaps">
+              <h2>
+                <Icon name="tension" size={16} /> Where the band changes
+              </h2>
+              <p className="compare__channels-lede">
+                These cross a tier boundary — the same language your own document uses, from
+                "middle ground" to "a defining channel." One of you would be described in a
+                different register than the other here, which is worth a conversation before it's
+                worth a fix.
+              </p>
+              {result.tierGaps.slice(0, 6).map((g) => {
+                const tierA = tierOf(g.a);
+                const tierB = tierOf(g.b);
+                return (
+                  <div key={g.dimension} className="compare__row">
+                    <span className="compare__rowlabel">{DIMENSION_LABELS[g.dimension]}</span>
+                    <span className="compare__rownums">{g.a} · {g.b}</span>
+                    <div className="compare__bars">
+                      <div className="compare__bar">
+                        <div className="compare__barfill is-you" style={{ width: `${g.a}%` }} />
+                      </div>
+                      <div className="compare__bar">
+                        <div className="compare__barfill is-them" style={{ width: `${g.b}%` }} />
+                      </div>
+                    </div>
+                    <span className="compare__bands">
+                      you: {TIER_LABELS[tierA].toLowerCase()} · {who === 'them' ? 'them' : who}:{' '}
+                      {TIER_LABELS[tierB].toLowerCase()}
+                    </span>
+                  </div>
+                );
+              })}
+            </section>
+          )}
+
+          <section className="compare__domains">
+            <h2>
+              <Icon name="check" size={16} /> The whole picture, domain by domain
+            </h2>
+            <p className="compare__channels-lede">
+              Every measured dimension, in the same grouping your own blueprint uses. You and{' '}
+              {who === 'them' ? 'they' : who} travel closest together in{' '}
+              <strong>{domainsByFit[0]?.label.toLowerCase()}</strong>
+              {domainsByFit.length > 1 && (
+                <>
+                  ; the widest stretch is{' '}<strong>{domainsByFit[domainsByFit.length - 1].label.toLowerCase()}</strong>
+                </>
+              )}
+              .
+            </p>
+            {result.domains.map((dom) => (
+              <div key={dom.domain} className="compare__domain">
+                <h3>
+                  {dom.label}
+                  <span className="compare__domain-delta">Δ{dom.meanDelta} average</span>
+                </h3>
+                {dom.rows.map((r) => {
+                  const tierA = tierOf(r.a);
+                  const tierB = tierOf(r.b);
+                  return (
+                    <div
+                      key={r.dimension}
+                      className={`compare__row${r.tierGap ? ' is-tiergap' : r.delta <= 5 ? ' is-tight' : ''}`}
+                      title={`You ${r.a} (${TIER_LABELS[tierA].toLowerCase()}) · ${who} ${r.b} (${TIER_LABELS[tierB].toLowerCase()})`}
+                    >
+                      <span className="compare__rowlabel">{DIMENSION_LABELS[r.dimension]}</span>
+                      <span className="compare__rownums">{r.a} · {r.b}</span>
+                      <div className="compare__bars">
+                        <div className="compare__bar">
+                          <div className="compare__barfill is-you" style={{ width: `${r.a}%` }} />
+                        </div>
+                        <div className="compare__bar">
+                          <div className="compare__barfill is-them" style={{ width: `${r.b}%` }} />
+                        </div>
+                      </div>
+                      {r.tierGap && <span className="compare__flag">band shifts</span>}
+                    </div>
+                  );
+                })}
+                {dom.rows.length === 0 && (
+                  <p className="compare__domain-none">No measured dimensions in this domain.</p>
+                )}
+              </div>
+            ))}
+            {result.unmeasuredCount > 0 && (
+              <p className="compare__channels-note">
+                {result.unmeasuredCount} dimension{result.unmeasuredCount === 1 ? '' : 's'}{' '}
+                {result.unmeasuredCount === 1 ? 'is' : 'are'} missing from the comparison because
+                this share code predates the dimensions — a code never guesses what it can't
+                measure.
+              </p>
+            )}
+          </section>
 
           <section className="compare__channels">
             <h2>

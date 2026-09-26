@@ -254,9 +254,15 @@ export const DOMAIN_LABELS: Record<DomainId, string> = {
   boundaries: 'Boundaries & Privacy',
 };
 
+/**
+ * Domain grouping used by the review screen and the compare screen. All 30
+ * scored dimensions appear exactly once; express_receive_alignment is listed
+ * where it lives in the bank (reciprocity) and surfaces in Compare's
+ * domain table even though the alignment math excludes it.
+ */
 export const DOMAIN_DIMENSIONS: Record<DomainId, DimensionId[]> = {
-  closeness: ['affection_daily', 'desire', 'desire_initiation', 'intimacy_attunement', 'vulnerability_safety', 'reassurance_security', 'sexual_communication', 'positivity_play'],
-  reciprocity: ['care_initiation', 'receiving_comfort', 'scorekeeping', 'express_receive_alignment'],
+  closeness: ['affection_daily', 'desire', 'desire_initiation', 'intimacy_attunement', 'desire_grace', 'vulnerability_safety', 'reassurance_security', 'sexual_communication', 'positivity_play'],
+  reciprocity: ['care_initiation', 'receiving_comfort', 'care_role_flexibility', 'scorekeeping', 'express_receive_alignment'],
   processing: ['listening_first', 'logic_emotion_integration', 'curiosity_worlds', 'perspective_taking', 'capitalization', 'feedback_receiving'],
   teamwork: ['direct_communication', 'repair_orientation', 'same_side_problems', 'conflict_engagement'],
   interdependence: ['autonomy_connection', 'shared_home_effort', 'commitment_sacrifice', 'money_coordination'],

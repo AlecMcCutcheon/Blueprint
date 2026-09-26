@@ -117,7 +117,10 @@ answered count; and that share links carry name/intent without ever leaking into
 
 Additional tooling under `scripts/`: `harness.ts` (pattern fire rates across 540 seeded
 profiles), `auditmine.ts` (per-dimension evidence contributions), `catalog.ts`
-(regenerates the pattern catalog), and `opposite-session.ts` (builds a session that
+(regenerates the pattern catalog), `compare-check.ts` (prints the compare screen's full
+data shape — alignment context line, matches/gaps, tier-band crossings, the domain
+by-domain table, and the channel cross-check — for two session files, with row-count and
+determinism assertions), and `opposite-session.ts` (builds a session that
 answers every question maximally against a source session — the divergence stress test:
 29/30 dimensions move >15 points and the generated documents share under 10% of
 paragraphs). `reachability.ts` proves from the bank's weights which score bands each
