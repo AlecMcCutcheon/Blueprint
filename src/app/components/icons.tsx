@@ -13,7 +13,8 @@ export type IconName =
   | 'tension' | 'sparkle' | 'feather'
   | 'copy' | 'check' | 'import' | 'close'
   | 'volume' | 'stop' | 'door' | 'code' | 'download'
-  | 'share';
+  | 'share'
+  | 'arrow-left' | 'arrow-right';
 
 const PATHS: Record<IconName, React.ReactNode> = {
   sun: (
@@ -125,6 +126,18 @@ const PATHS: Record<IconName, React.ReactNode> = {
       <rect x="5" y="3" width="14" height="18" rx="1.5" />
       <path d="M7 21V7.5L14 3" />
       <circle cx="15.4" cy="12.6" r="0.4" />
+    </>
+  ),
+  'arrow-left': (
+    <>
+      <path d="M20 12H4" />
+      <path d="M11 5l-7 7 7 7" />
+    </>
+  ),
+  'arrow-right': (
+    <>
+      <path d="M4 12h16" />
+      <path d="M13 5l7 7-7 7" />
     </>
   ),
 };

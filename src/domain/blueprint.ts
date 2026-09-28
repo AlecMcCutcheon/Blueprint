@@ -16,7 +16,7 @@ const CALIBRATION_REWRITES: [RegExp, string][] = [
   [/is among the rarest of everyday gifts/g, 'is a real everyday gift'],
   [/conflict researchers would design on purpose/g, 'the combination conflict research keeps pointing toward'],
   [/safer with you than with almost anyone else/g, 'unlikely to have that vulnerability turned against them'],
-  [/usually need both, in exactly that sequence, and rarely get them from the same person/g, 'usually work best in that order — understanding first, then the load'],
+  [/usually need both, in exactly that sequence, and rarely get them from the same person/g, 'usually work best in that order: understanding first, then the load'],
   [/keep bringing you their good news first/g, 'could make you someone people naturally bring good news to'],
   [/likely feel safe being complicated around you/g, 'can likely be complicated around you without bracing'],
 ];
@@ -134,11 +134,11 @@ function alignmentParagraphFor(p: ScoredProfile, runSeed: number): string {
   const { express, receive } = p.channels;
   if (express && !receive && (p.receiveBreadth ?? 0) >= 3) {
     const name = (c: string) => CHANNEL_LABELS[c] ?? c;
-    return `Your giving runs through one flagship channel — ${name(express)} — while your receiving side reads as a wide dictionary: care lands in whatever register it is offered. That combination is generous in both directions, and it carries one specific risk: a partner may assume your way of giving is also your way of needing, and never discover the breadth on the other side. The bridge is the same as ever — tell them when something lands, in whichever register it arrived.`;
+    return `Your giving runs through one flagship channel, ${name(express)}, while your receiving side reads as a wide dictionary: care lands in whatever register it is offered. That combination is generous in both directions, and it carries one specific risk: a partner may assume your way of giving is also your way of needing, and never discover the breadth on the other side. The bridge is the same as ever: tell them when something lands, in whichever register it arrived.`;
   }
   if (express && receive && express !== receive) {
     const name = (c: string) => CHANNEL_LABELS[c] ?? c;
-    return `Your giving and receiving profiles overlap in breadth — you speak and hear several registers of care — but your flagship channels differ: you give most naturally through ${name(express)}, while what lands hardest arrives through ${name(receive)}. Breadth and emphasis are different measurements, and both are real; the single-channel asymmetry is named in the tensions below, because it is the one worth a dictionary exchange.`;
+    return `Your giving and receiving profiles overlap in breadth, you speak and hear several registers of care, but your flagship channels differ: you give most naturally through ${name(express)}, while what lands hardest arrives through ${name(receive)}. Breadth and emphasis are different measurements, and both are real; the single-channel asymmetry is named in the tensions below, because it is the one worth a dictionary exchange.`;
   }
   if (express && !receive) {
     const name = (c: string) => CHANNEL_LABELS[c] ?? c;
@@ -146,11 +146,11 @@ function alignmentParagraphFor(p: ScoredProfile, runSeed: number): string {
     // unnamed). The generic tier paragraph would INVENT an offset channel —
     // say the honest thing instead: giving has a flagship, receiving is
     // unmapped in this run.
-    return `Your giving runs through one flagship channel — ${name(express)} — but your answers never converged on a single channel for receiving: the receive-side questions point in different directions, so this document will not guess. That is a finding in itself. A partner may assume your way of giving is your way of needing, and the honest answer right now is "unmapped" — watch what actually lands when care arrives, and tell them when it does.`;
+    return `Your giving runs through one flagship channel, ${name(express)}, but your answers never converged on a single channel for receiving: the receive-side questions point in different directions, so this document will not guess. That is a finding in itself. A partner may assume your way of giving is your way of needing, and the honest answer right now is "unmapped": watch what actually lands when care arrives, and tell them when it does.`;
   }
   if (!express && receive) {
     const name = (c: string) => CHANNEL_LABELS[c] ?? c;
-    return `The care that reaches you comes most clearly through ${name(receive)} — but your giving side never converged on one flagship channel in this run, so this document will not guess at how you most naturally give. The useful move is the same in both directions: notice which register you reach for when someone you love has a rough day, and say it out loud.`;
+    return `The care that reaches you comes most clearly through ${name(receive)}, but your giving side never converged on one flagship channel in this run, so this document will not guess at how you most naturally give. The useful move is the same in both directions: notice which register you reach for when someone you love has a rough day, and say it out loud.`;
   }
   const s = p.dimensions.express_receive_alignment?.score;
   return s === undefined ? '' : paragraphFor('express_receive_alignment', s, runSeed);
@@ -387,7 +387,7 @@ const SECTION_SPECS: SectionSpec[] = [
       { anyOf: ['separate_worlds_curious'], texts: ['Two Worlds, Both Visited', 'Curiosity as Compatibility', 'Touring Each Other'] },
     ],
     intro: () =>
-      'One of the biggest things for you appears to be how interpretation happens — what you do in the space between someone\'s behavior and your conclusion about it.',
+      'One of the biggest things for you appears to be how interpretation happens: what you do in the space between someone\'s behavior and your conclusion about it.',
   },
   {
     id: 'communication',
@@ -439,7 +439,7 @@ const SECTION_SPECS: SectionSpec[] = [
       { anyOf: ['care_loop_open', 'one_way_care'], texts: ['The Care Loop', 'Who Gets Taken Care of Here', 'The Give and the Gate'] },
     ],
     intro: () =>
-      'This is where your answers were most consistent: what you do with care — giving it, receiving it, and whether it turns into an accounting problem.',
+      'This is where your answers were most consistent: what you do with care: giving it, receiving it, and whether it turns into an accounting problem.',
   },
   {
     id: 'hard_days',
@@ -475,7 +475,7 @@ const SECTION_SPECS: SectionSpec[] = [
       { anyOf: ['grace_architecture', 'mismatch_audit'], texts: ['Want Without the Audit', 'What a No Costs Here', 'The Grace Ledger'] },
     ],
     intro: () =>
-      'Your answers sketch how closeness actually travels in and out of you — through what channel, at what volume, how you keep attraction alive, and how much of the relationship\'s lightness is tended.',
+      'Your answers sketch how closeness actually travels in and out of you: through what channel, at what volume, how you keep attraction alive, and how much of the relationship\'s lightness is tended.',
   },
   {
     id: 'independence',
@@ -507,7 +507,7 @@ const SECTION_SPECS: SectionSpec[] = [
     ],
     dims: ['relational_privacy', 'external_processing'],
     intro: () =>
-      'One more boundary, drawn around the relationship itself: what stays between two people, and where outside voices are welcome — and on purpose.',
+      'One more boundary, drawn around the relationship itself: what stays between two people, and where outside voices are welcome, and on purpose.',
   },
 ];
 
@@ -517,23 +517,23 @@ function channelProfileText(p: ScoredProfile): string | null {
   const rec = p.channels.receive;
   if (!exp && !rec && !p.receiveBreadth) return null;
   if (exp && rec && exp === rec) {
-    return `You appear to speak nearly the same love dialect in both directions: you give most naturally through ${name(exp)}, and that is also the channel that reaches you most deeply. That symmetry makes you unusually legible to a partner — what they see you do is a reliable map of what you need.`;
+    return `You appear to speak nearly the same love dialect in both directions: you give most naturally through ${name(exp)}, and that is also the channel that reaches you most deeply. That symmetry makes you unusually legible to a partner: what they see you do is a reliable map of what you need.`;
   }
   if (exp && rec) {
-    return `You appear to give most naturally through ${name(exp)}, but the care that actually reaches you comes most strongly through ${name(rec)}. That is not a flaw — it is a translation note. A partner who watches what you do might misread the manual; the one who asks what you need will find the real one.`;
+    return `You appear to give most naturally through ${name(exp)}, but the care that actually reaches you comes most strongly through ${name(rec)}. That is not a flaw: it is a translation note. A partner who watches what you do might misread the manual; the one who asks what you need will find the real one.`;
   }
   // Receive is null for two very different reasons: no usable answers, or the
   // answers naming several channels evenly (breadth, not absence). Say the
   // true one.
   if (exp && !rec) {
     if ((p.receiveBreadth ?? 0) >= 3) {
-      return `Your answers show you give most naturally through ${name(exp)} — and on the receiving side, something rarer: each care question named a different channel, which reads less like an unreadable dictionary and more like a wide one. Care appears to reach you in whatever register it is offered. The risk flips accordingly: not starvation, but a partner never learning which gesture mattered most.`;
+      return `Your answers show you give most naturally through ${name(exp)}, and on the receiving side, something rarer: each care question named a different channel, which reads less like an unreadable dictionary and more like a wide one. Care appears to reach you in whatever register it is offered. The risk flips accordingly: not starvation, but a partner never learning which gesture mattered most.`;
     }
-    return `Your answers show you give most naturally through ${name(exp)}. What the answers say less clearly is which channel reaches you when you're the one who needs care — worth watching for, and worth telling the people close to you.`;
+    return `Your answers show you give most naturally through ${name(exp)}. What the answers say less clearly is which channel reaches you when you're the one who needs care: worth watching for, and worth telling the people close to you.`;
   }
   return rec
-    ? `The care that reaches you most strongly comes through ${name(rec)}. What your answers say less clearly is how you naturally give it — worth noticing which gestures you reach for first, because that is usually your native dialect.`
-    : `Neither direction of your love dialect came through clearly in the channel questions — worth noticing, over the next while, which gestures you reach for first and which ones land hardest when they arrive.`;
+    ? `The care that reaches you most strongly comes through ${name(rec)}. What your answers say less clearly is how you naturally give it: worth noticing which gestures you reach for first, because that is usually your native dialect.`
+    : `Neither direction of your love dialect came through clearly in the channel questions: worth noticing, over the next while, which gestures you reach for first and which ones land hardest when they arrive.`;
 }
 
 export function generateBlueprint(p: ScoredProfile): Blueprint {
@@ -566,10 +566,10 @@ export function generateBlueprint(p: ScoredProfile): Blueprint {
     desire_grace: ['Every mismatch files a report.', 'Want, in your answers, arrives with an invoice attached.', 'A no is never just a no.'],
     receiving_comfort: ['Loves loudly, receives carefully.', 'Gives freely; receives like it costs.', 'Open hand out, closed hand in.', 'The door swings out more easily than in.'],
     scorekeeping: ['Someone who loves in actions and counts in silences.', 'A quiet ledger behind open generosity.', 'Gives big; remembers quietly.', 'Generosity with a memory.'],
-    direct_communication: ['Careful where it counts, direct where it matters.', 'Says the true thing — except when it exposes.', 'Plain speech with a private wing.', 'Truth, selectively scheduled.'],
+    direct_communication: ['Careful where it counts, direct where it matters.', 'Says the true thing: except when it exposes.', 'Plain speech with a private wing.', 'Truth, selectively scheduled.'],
     desire: ['A quiet interior that wants, without announcing it.', 'Wanting kept mostly private.', 'The wanting runs hot inside; outside, stillness.', 'Want, kept off the wire.'],
     affection_daily: ['Closeness held at a chosen temperature.', 'Reach withheld; warmth rationed by design.', 'Contact as occasion, not current.', 'Warmth on a thermostat, not a tide.'],
-    perspective_taking: ['Reads fast, trusts slowly.', 'Interpretation with a gatekeeper.', 'Charity for some; verdicts for others.', 'Curious first, convinced after — usually.'],
+    perspective_taking: ['Reads fast, trusts slowly.', 'Interpretation with a gatekeeper.', 'Charity for some; verdicts for others.', 'Curious first, convinced after: usually.'],
     relational_privacy: ['A life the two of you keep between you.', 'Walls high, doors selective.', 'A story told only when settled.', 'Few entries in the public record.'],
     sexual_communication: ['Feels deeply, says less where it counts most.', 'The deepest wants stay offstage.', 'Desire legible only in clues.', 'Want, spoken in a lower register.'],
     capitalization: ['Loves steadily; celebrates quietly.', 'Good news gets a receipt, not a room.', 'Marks the big ones; the small joys slip past.', 'Joy acknowledged; rarely amplified.'],
@@ -579,7 +579,7 @@ export function generateBlueprint(p: ScoredProfile): Blueprint {
   const EPIGRAPH_BY_HIGH: Partial<Record<DimensionId, string[]>> = {
     care_role_flexibility: ['Treasured, and lets itself be treasured.', 'The gestures flow both ways.', 'Makes people feel precious; knows how to be made to feel precious.'],
     desire_grace: ['A no stays a no.', 'Want in the room, without an invoice.', 'Where desire is never taxed.'],
-    care_initiation: ['Notices first, moves first — love as anticipation.', 'Love, in your answers, shows up early.', 'Anticipates the need; arrives before the ask.', 'The first responder of the people they love.'],
+    care_initiation: ['Notices first, moves first: love as anticipation.', 'Love, in your answers, shows up early.', 'Anticipates the need; arrives before the ask.', 'The first responder of the people they love.'],
     repair_orientation: ['Always circling back.', 'Returns, repairs, remains.', 'The one who comes back.', 'Nothing stays broken between you for long.'],
     listening_first: ['A safe place to fall apart.', 'Heard all the way to the end.', 'Where the story gets to finish.', 'People bring you their unfinished sentences.'],
     same_side_problems: ['Same side of everything.', 'Us versus it, every time.', 'Problems get externalized; people get embraced.', 'Takes the problem’s side, and yours.'],
@@ -592,7 +592,7 @@ export function generateBlueprint(p: ScoredProfile): Blueprint {
     positivity_play: ['Gardens fun; plants the plan nobody knew they wanted.', 'Carries the spark; hands you the match.', 'Lightness, on purpose.', 'Builds the joke ahead of time.'],
     capitalization: ['Where joy goes to land.', 'Stops the world for good news.', 'Wins grow when told to you.', 'Good news compounds at your place.'],
     conflict_engagement: ['Curious even mid-argument.', 'Stays in the ring; hears while defending.', 'Heat does not cost you your hearing.', 'Argues to learn, not to win.'],
-    commitment_sacrifice: ['Backs people — visibly, without an invoice.', 'All the way in, books closed.', 'Gives like it settles the question.', 'Bets on people, and stays at the table.'],
+    commitment_sacrifice: ['Backs people: visibly, without an invoice.', 'All the way in, books closed.', 'Gives like it settles the question.', 'Bets on people, and stays at the table.'],
     money_coordination: ['Talks about money like a teammate.', 'One ledger, two signatures.', 'A team economy, no double standards.', 'Money as a shared project, never a weapon.'],
   };
 
@@ -637,7 +637,7 @@ export function generateBlueprint(p: ScoredProfile): Blueprint {
       // gap explicitly rather than a plausible-looking mid-band paragraph.
       if (p.dimensions[dim]?.unmeasured) {
         paragraphs.push(
-          '*This dimension was not measured by the earlier version of the questionnaire this blueprint came from — there is no honest way to render it yet. Answering the newer questions completes this section.*',
+          '*This dimension was not measured by the earlier version of the questionnaire this blueprint came from: there is no honest way to render it yet. Answering the newer questions completes this section.*',
         );
         continue;
       }
@@ -648,7 +648,7 @@ export function generateBlueprint(p: ScoredProfile): Blueprint {
       const nContrib = p.variance?.[dim]?.contributions.length ?? p.dimensions[dim]?.varianceShape?.count;
       if (nContrib !== undefined && nContrib <= 3) {
         const last = paragraphs[paragraphs.length - 1];
-        paragraphs[paragraphs.length - 1] = `Worth reading gently — this dimension rests on some of the fewest answers in your run (${nContrib} ${nContrib === 1 ? 'answer carries' : 'answers carry'} it, where most others have many more): ${last}`;
+        paragraphs[paragraphs.length - 1] = `Worth reading gently: this dimension rests on some of the fewest answers in your run (${nContrib} ${nContrib === 1 ? 'answer carries' : 'answers carry'} it, where most others have many more): ${last}`;
       }
       // Derived patterns render at their placement point (a co-occurring score
       // changes this paragraph's meaning), then legacy interplay covers
@@ -676,7 +676,7 @@ export function generateBlueprint(p: ScoredProfile): Blueprint {
     }
     if (spec.id === 'communication' && p.dimensions.direct_communication.score >= 60) {
       paragraphs.push(
-        'Taken together, your directness and your curiosity suggest something specific: you don\'t just want honesty about problems — you want the relationship to be a place where enthusiasm is also spoken out loud. Not only "this bothered me," but "look at this thing I love."',
+        'Taken together, your directness and your curiosity suggest something specific: you don\'t just want honesty about problems: you want the relationship to be a place where enthusiasm is also spoken out loud. Not only "this bothered me," but "look at this thing I love."',
       );
     }
     // Stitch the section's accumulated readings into full paragraphs before
@@ -753,7 +753,7 @@ export function generateBlueprint(p: ScoredProfile): Blueprint {
   ) {
     tensions.push({
       title: 'You give in one language and listen in another',
-      body: `Your answers show you most naturally express care through ${CHANNEL_LABELS[p.channels.express] ?? p.channels.express}, while the care that actually reaches you comes most strongly through ${CHANNEL_LABELS[p.channels.receive] ?? p.channels.receive}. This is one of the most common — and most fixable — patterns between two people. The fix is almost boring: show each other the dictionary. Tell a partner what lands for you; ask what lands for them; then believe both answers.`,
+      body: `Your answers show you most naturally express care through ${CHANNEL_LABELS[p.channels.express] ?? p.channels.express}, while the care that actually reaches you comes most strongly through ${CHANNEL_LABELS[p.channels.receive] ?? p.channels.receive}. This is one of the most common, and most fixable, patterns between two people. The fix is almost boring: show each other the dictionary. Tell a partner what lands for you; ask what lands for them; then believe both answers.`,
     });
   }
   // Per-document lead/stamp rotation state for pair tension cards.
@@ -762,7 +762,7 @@ export function generateBlueprint(p: ScoredProfile): Blueprint {
     if (c.agreement < 45 && c.dimension === 'ambiguity_update') {
       tensions.push({
         title: 'You respond differently to a bad day and a bad week',
-        body: 'When your partner said "I\'m fine" once, and when they said it all week, your answers told different stories. That isn\'t hypocrisy — it\'s information about your thresholds. It\'s worth knowing at what point a quiet partner stops being "having an off day" and starts being, in your private accounting, something that needs a response.',
+        body: 'When your partner said "I\'m fine" once, and when they said it all week, your answers told different stories. That isn\'t hypocrisy: it\'s information about your thresholds. It\'s worth knowing at what point a quiet partner stops being "having an off day" and starts being, in your private accounting, something that needs a response.',
       });
     } else if (c.agreement < 40 && c.dimension !== 'ambiguity_update') {
       // One rotation state per document: cards must not repeat each other's
@@ -777,7 +777,7 @@ export function generateBlueprint(p: ScoredProfile): Blueprint {
   if (p.consistencyIndex >= 78) {
     tensions.push({
       title: 'Your answers agreed with themselves to an unusual degree',
-      body: 'Across scenarios asked hours-of-attention apart, in different clothes, your instincts kept pointing the same direction. Whatever this document says about you, you built it consistently — these are not mood answers.',
+      body: 'Across scenarios asked hours-of-attention apart, in different clothes, your instincts kept pointing the same direction. Whatever this document says about you, you built it consistently: these are not mood answers.',
     });
   }
   if (p.answered < p.total) {
@@ -789,12 +789,12 @@ export function generateBlueprint(p: ScoredProfile): Blueprint {
     const invalidated = p.invalidated ?? 0;
     const invNote =
       invalidated > 0
-        ? ` ${invalidated === 1 ? 'One answer' : String(invalidated) + ' answers'} from this run can no longer be read — the ${invalidated === 1 ? 'question was' : 'questions were'} re-designed since, and the old format no longer exists. They still count as answered-with-honesty; they just cannot speak in the current scoring.`
+        ? ` ${invalidated === 1 ? 'One answer' : String(invalidated) + ' answers'} from this run can no longer be read: the ${invalidated === 1 ? 'question was' : 'questions were'} re-designed since, and the old format no longer exists. They still count as answered-with-honesty; they just cannot speak in the current scoring.`
         : '';
     if (grewBy > 0 && skipped === 0) {
       tensions.push({
         title: 'The questionnaire has grown since this run',
-        body: `You answered every question this run contained — all ${String(p.answered)} of them. The bank has since gained ${String(grewBy)} newer ${grewBy === 1 ? 'question' : 'questions'} this document does not use. Nothing here is missing because of you; the newer questions would sharpen the quieter dimensions whenever you feel like answering them — everything already answered is kept, and the document completes itself.${invNote}`, 
+        body: `You answered every question this run contained: all ${String(p.answered)} of them. The bank has since gained ${String(grewBy)} newer ${grewBy === 1 ? 'question' : 'questions'} this document does not use. Nothing here is missing because of you; the newer questions would sharpen the quieter dimensions whenever you feel like answering them: everything already answered is kept, and the document completes itself.${invNote}`, 
       });
     } else if (grewBy > 0) {
       const missed = p.total - p.answered - grewBy - invalidated;
@@ -803,16 +803,16 @@ export function generateBlueprint(p: ScoredProfile): Blueprint {
         body:
           `You answered ${String(p.answered)} of the ${String(p.total - grewBy)} questions this run contained, and the bank has since added ${String(grewBy)} more. ` +
           (invalidated > 0
-            ? `${invalidated === 1 ? 'One of those answers' : String(invalidated) + ' of those answers'} can no longer be read — the ${invalidated === 1 ? 'question was' : 'questions were'} re-designed since, so they no longer feed the scoring at all. ` +
+            ? `${invalidated === 1 ? 'One of those answers' : String(invalidated) + ' of those answers'} can no longer be read: the ${invalidated === 1 ? 'question was' : 'questions were'} re-designed since, so they no longer feed the scoring at all. ` +
               (missed > 0
                 ? `The other ${String(missed)} were skipped at the time. Answering the remaining (and newer) questions completes the picture; nothing already answered is lost.`
                 : 'Everything else this run contained was answered. Answering the newer questions completes the picture; nothing already answered is lost.')
-            : `Everything here is valid — it's built from what you did answer — but the quieter dimensions had less evidence to work from. Answering the remaining (and newer) questions completes the picture; nothing already answered is lost.`),
+            : `Everything here is valid: it's built from what you did answer, but the quieter dimensions had less evidence to work from. Answering the remaining (and newer) questions completes the picture; nothing already answered is lost.`),
       });
     } else {
       tensions.push({
         title: 'This blueprint is built from a partial run',
-        body: `You answered ${String(p.answered)} of ${String(p.total)} questions. Everything here is still valid — it's built from what you did answer — but the quieter dimensions had less evidence to work from.`,
+        body: `You answered ${String(p.answered)} of ${String(p.total)} questions. Everything here is still valid: it's built from what you did answer, but the quieter dimensions had less evidence to work from.`,
       });
     }
   }
@@ -820,7 +820,7 @@ export function generateBlueprint(p: ScoredProfile): Blueprint {
   if (unmeasuredCount > 0) {
     tensions.push({
       title: unmeasuredCount === 1 ? 'One thing this document cannot see' : `Things this document cannot see (${unmeasuredCount})`,
-      body: `This blueprint was built from an earlier, shorter version of the questionnaire — ${unmeasuredCount === 1 ? 'one section is' : `${unmeasuredCount} sections are`} marked as unmeasured below rather than guessed. The honest upgrade: answer the newer questions whenever you like — everything already answered is kept, and the document completes itself.`,
+      body: `This blueprint was built from an earlier, shorter version of the questionnaire: ${unmeasuredCount === 1 ? 'one section is' : `${unmeasuredCount} sections are`} marked as unmeasured below rather than guessed. The honest upgrade: answer the newer questions whenever you like: everything already answered is kept, and the document completes itself.`,
     });
   }
 
@@ -841,16 +841,16 @@ export function generateBlueprint(p: ScoredProfile): Blueprint {
   let leadIn: string;
   if (p.consistencyIndex >= 78 && disagreeingPairs.length === 0) {
     leadIn =
-      'Your answers kept pointing the same direction — across ' + String(p.consistency.length) + ' deliberately repeated scenarios, in different clothes, your instincts agreed with themselves ' + String(p.consistencyIndex) + '% of the time. That consistency is why the picture below can be drawn in confident strokes.';
+      'Your answers kept pointing the same direction: across ' + String(p.consistency.length) + ' deliberately repeated scenarios, in different clothes, your instincts agreed with themselves ' + String(p.consistencyIndex) + '% of the time. That consistency is why the picture below can be drawn in confident strokes.';
   } else if (disagreeingPairs.length > 0 && p.consistencyIndex >= 60) {
     leadIn =
-      'Mostly, your answers pointed one direction — but not everywhere. ' + String(disagreeingPairs.length) + ' of the ' + String(p.consistency.length) + ' repeated-scenario pairs pulled different instincts from you, and this document treats those disagreements as findings, not noise: they are named, given their two readings, and — where a clarifying question was answered — resolved.';
+      'Mostly, your answers pointed one direction, but not everywhere. ' + String(disagreeingPairs.length) + ' of the ' + String(p.consistency.length) + ' repeated-scenario pairs pulled different instincts from you, and this document treats those disagreements as findings, not noise: they are named, given their two readings, and, where a clarifying question was answered, resolved.';
   } else if (disagreeingPairs.length > 0) {
     leadIn =
-      'This picture was assembled from answers that disagreed with themselves in places — ' + String(disagreeingPairs.length) + ' repeated scenarios pulled different instincts from you. Read the sections below with that in mind: where the document sounds least sure of you is usually where two of your values are still negotiating.';
+      'This picture was assembled from answers that disagreed with themselves in places: ' + String(disagreeingPairs.length) + ' repeated scenarios pulled different instincts from you. Read the sections below with that in mind: where the document sounds least sure of you is usually where two of your values are still negotiating.';
   } else {
     leadIn =
-      'Your answers were steady enough (' + String(p.consistencyIndex) + '% self-agreement across repeated scenarios) to sketch this picture in fair confidence — with the usual caveat that any mirror shows the face that was brought to it.';
+      'Your answers were steady enough (' + String(p.consistencyIndex) + '% self-agreement across repeated scenarios) to sketch this picture in fair confidence: with the usual caveat that any mirror shows the face that was brought to it.';
   }
 
   // The shape paragraph composes SIX signal families instead of the old
@@ -879,7 +879,7 @@ export function generateBlueprint(p: ScoredProfile): Blueprint {
     );
   } else {
     shapeSentences.push(
-      'Based on your answers, a relationship that may feel natural to you is still more assembly than inheritance — your scores sit close enough to the middle that the fit is something you will design with someone, not discover pre-made.',
+      'Based on your answers, a relationship that may feel natural to you is still more assembly than inheritance: your scores sit close enough to the middle that the fit is something you will design with someone, not discover pre-made.',
     );
   }
   if (lowSyn) {
@@ -898,9 +898,9 @@ export function generateBlueprint(p: ScoredProfile): Blueprint {
     const label1 = proseLabel(domPattern.dims[0]);
     const label2 = proseLabel(domPattern.dims[1]);
     const spineLeads = [
-      `The most specific work in your answers happens at the meeting of ${label1} and ${label2} — that interaction is the spine of this document.`,
-      `If this document has a spine, it is the meeting of ${label1} and ${label2} — each one changes what the other means for you.`,
-      `${label1} and ${label2} are the pair doing the most work in your answers — neither reading is complete without the other.`,
+      `The most specific work in your answers happens at the meeting of ${label1} and ${label2}, that interaction is the spine of this document.`,
+      `If this document has a spine, it is the meeting of ${label1} and ${label2}: each one changes what the other means for you.`,
+      `${label1} and ${label2} are the pair doing the most work in your answers: neither reading is complete without the other.`,
     ];
     shapeSentences.push(seededPick(spineLeads, hash('spine') + runSeed));
   }
@@ -912,22 +912,22 @@ export function generateBlueprint(p: ScoredProfile): Blueprint {
       const d0 = dividedDims[0];
       const dl = proseLabel(d0);
       shapeSentences.push(
-        `And one part of this picture is genuinely two-valued rather than settled: your ${dl} reads as a back-and-forth still in negotiation — the sections above name what the average was hiding.`,
+        `And one part of this picture is genuinely two-valued rather than settled: your ${dl} reads as a back-and-forth still in negotiation: the sections above name what the average was hiding.`,
       );
     } else if (dividedDims.length <= 3) {
       const names = dividedDims.slice(0, 2).map((d) => proseLabel(d)).join(' and ');
       shapeSentences.push(
-        `And parts of this picture are still negotiating rather than settled — ${names}${dividedDims.length === 3 ? ', and one more' : ''} read as live back-and-forths above, where the averages hid the tug-of-war.`,
+        `And parts of this picture are still negotiating rather than settled: ${names}${dividedDims.length === 3 ? ', and one more' : ''} read as live back-and-forths above, where the averages hid the tug-of-war.`,
       );
     } else {
       shapeSentences.push(
-        `And more of this picture is still negotiating than settled: ${String(dividedDims.length)} of your dimensions read as live back-and-forths above — the averages hide more than they show, which makes the sections worth reading as negotiations, not verdicts.`,
+        `And more of this picture is still negotiating than settled: ${String(dividedDims.length)} of your dimensions read as live back-and-forths above: the averages hide more than they show, which makes the sections worth reading as negotiations, not verdicts.`,
       );
     }
   }
   if (p.channels.express && p.channels.receive && p.channels.express !== p.channels.receive) {
     shapeSentences.push(
-      'Care also moves through you in two different languages — the one you give in and the one that reaches you — which makes the dictionary exchange the single highest-leverage habit in this whole document.',
+      'Care also moves through you in two different languages, the one you give in and the one that reaches you, which makes the dictionary exchange the single highest-leverage habit in this whole document.',
     );
   }
 
@@ -939,24 +939,24 @@ export function generateBlueprint(p: ScoredProfile): Blueprint {
   // every entry must be earnable from that pattern's own conditions. The
   // fallback exists for runs that produced no headline to key on.
   const fallbackWord =
-    'What this run cannot yet do is name the partnership dynamic your full pattern points to — that reading needs at least two strong signals crossing, and this one did not produce them. What it can say honestly: almost every dimension above reads better with information than with guessing, which is a principle, not a compliment. Take this document to someone and trade dictionaries — what lands for you, what lands for them — and let the specific dynamic name itself.';
+    'What this run cannot yet do is name the partnership dynamic your full pattern points to, that reading needs at least two strong signals crossing, and this one did not produce them. What it can say honestly: almost every dimension above reads better with information than with guessing, which is a principle, not a compliment. Take this document to someone and trade dictionaries, what lands for you, what lands for them, and let the specific dynamic name itself.';
   const PATTERN_DYNAMICS: Record<string, string> = {
     space_and_certainty:
-      'The relationship that works with this is one where distance is never silent. The person who fits you is not the one who needs the least space or the most togetherness — it is the one who narrates: gone for the evening, and here is what that evening is; quiet today, and it is the work, not you. What fails against you is not distance but ambiguity — a partner who goes dark and calls it normal will convert your security into surveillance, slowly, without anyone deciding to. Your answers fund that reading in two places: the space you can genuinely afford, and the checking you do when the story goes missing.',
+      'The relationship that works with this is one where distance is never silent. The person who fits you is not the one who needs the least space or the most togetherness, it is the one who narrates: gone for the evening, and here is what that evening is; quiet today, and it is the work, not you. What fails against you is not distance but ambiguity, a partner who goes dark and calls it normal will convert your security into surveillance, slowly, without anyone deciding to. Your answers fund that reading in two places: the space you can genuinely afford, and the checking you do when the story goes missing.',
     noticed_not_managing:
-      'The dynamic that works with you is a partner who treats your needs as information rather than tasks — someone who asks well, and then occasionally beats the ask. What they cannot do is manage you: solving before hearing, reassuring before understanding — care that arrives pre-decided reads to you as not being seen, even when it is generous. The failure mode to watch is yours: a partner who asks every time is doing nothing wrong, and part of you will still register the missing anticipation as a shortage of love. That is the appetite your care, reassurance, and directness scores build toward together — which is why this document could name it at all.',
+      'The dynamic that works with you is a partner who treats your needs as information rather than tasks, someone who asks well, and then occasionally beats the ask. What they cannot do is manage you: solving before hearing, reassuring before understanding, care that arrives pre-decided reads to you as not being seen, even when it is generous. The failure mode to watch is yours: a partner who asks every time is doing nothing wrong, and part of you will still register the missing anticipation as a shortage of love. That is the appetite your care, reassurance, and directness scores build toward together, which is why this document could name it at all.',
     team_of_two:
-      'You are built for the partnership model where two sovereign people form one front: separate weekends that cost nothing, and a crisis that gets both of you instantly. The person who fits that is not someone who merges with you — it is someone who reports to you, and lets you report back: what happened in their world, what changed in yours. What fails is drift — two independent lives that stop filing to each other, not from conflict but from nobody being asked. Your space-without-fear and your us-versus-it instinct are the same finding viewed from two ends; a partner who carries both will feel rare, because they are.',
+      'You are built for the partnership model where two sovereign people form one front: separate weekends that cost nothing, and a crisis that gets both of you instantly. The person who fits that is not someone who merges with you, it is someone who reports to you, and lets you report back: what happened in their world, what changed in yours. What fails is drift, two independent lives that stop filing to each other, not from conflict but from nobody being asked. Your space-without-fear and your us-versus-it instinct are the same finding viewed from two ends; a partner who carries both will feel rare, because they are.',
     independent_but_connected:
-      'The dynamic that works with you is density over constancy: a partner who wants the days apart and the evenings together — full contact when you share time, no deficit accounting when you don\'t. What fails against you is a partner who reads your need for room as cooling, or your warmth as a promise of merged schedules; both misreadings end with someone trying to convert the other. The tell your answers give is structural: your affection and your space are both high without contradiction — so the right partner experiences your distance and your touch as the same signal, not competing ones.',
+      'The dynamic that works with you is density over constancy: a partner who wants the days apart and the evenings together, full contact when you share time, no deficit accounting when you don\'t. What fails against you is a partner who reads your need for room as cooling, or your warmth as a promise of merged schedules; both misreadings end with someone trying to convert the other. The tell your answers give is structural: your affection and your space are both high without contradiction, so the right partner experiences your distance and your touch as the same signal, not competing ones.',
     shared_reality:
-      'The relationship that works with you runs on shared information: a partner who says the true thing while it is small, and asks before concluding. With you, the fight is survivable and the curation is not. What fails is the slow editorial version — a partner deciding what you can handle, even kindly, is manufacturing the exact concealment your answers punish hardest. Watch your own half too: your charity is genuine, but it gets spent faster when the facts arrive late. Your directness and your benefit-of-the-doubt built this reading together; neither alone would predict that concealment outranks conflict as your dealbreaker.',
+      'The relationship that works with you runs on shared information: a partner who says the true thing while it is small, and asks before concluding. With you, the fight is survivable and the curation is not. What fails is the slow editorial version: a partner deciding what you can handle, even kindly, is manufacturing the exact concealment your answers punish hardest. Watch your own half too: your charity is genuine, but it gets spent faster when the facts arrive late. Your directness and your benefit-of-the-doubt built this reading together; neither alone would predict that concealment outranks conflict as your dealbreaker.',
     separate_worlds_curious:
-      'You are suited to the visiting arrangement: two people with their own worlds who keep touring each other\'s. The partner who fits you has a life you find interesting and room for you inside it — not as a guest wing, but as a reader. What fails is the drift into polite strangers: invitations that stop, tours that end, not from conflict but from nobody booking the next visit. Your answers pay for this reading on both sides — the space you keep and the second question you ask — and that combination is rarer than either trait alone.',
+      'You are suited to the visiting arrangement: two people with their own worlds who keep touring each other\'s. The partner who fits you has a life you find interesting and room for you inside it, not as a guest wing, but as a reader. What fails is the drift into polite strangers: invitations that stop, tours that end, not from conflict but from nobody booking the next visit. Your answers pay for this reading on both sides, the space you keep and the second question you ask, and that combination is rarer than either trait alone.',
     care_loop_open:
-      'The dynamic that works with you is a circulating loop, not an assigned post: care flows whichever way the week demands, and being the one looked after never reads to you as demotion. The partner who fits that is not the designated caretaker or the designated charge — it is someone who can be held on Tuesday and hold on Thursday without anyone keeping the ledger. What fails against you is role rigidity in either direction: a partner who cannot receive without guilt starves the loop from one side, and one who cannot give without an audience starves it from the other. Your flexibility and your comfort being comforted built this reading together — the loop is open because both halves of it answered.',
+      'The dynamic that works with you is a circulating loop, not an assigned post: care flows whichever way the week demands, and being the one looked after never reads to you as demotion. The partner who fits that is not the designated caretaker or the designated charge, it is someone who can be held on Tuesday and hold on Thursday without anyone keeping the ledger. What fails against you is role rigidity in either direction: a partner who cannot receive without guilt starves the loop from one side, and one who cannot give without an audience starves it from the other. Your flexibility and your comfort being comforted built this reading together, the loop is open because both halves of it answered.',
     grace_architecture:
-      'The dynamic that works with you runs on want without invoice: desire that gets said out loud and then left free, and a no that lands as information rather than rejection. The partner who fits that is someone who can be wanted hard and not collected on — who trusts that your wanting them is not a debt they now owe in scheduled payments. What fails against you is the audit: a partner who tracks who wanted whom more, and converts every mismatch of timing into evidence about the relationship. Your answers fund this in two places — the grace you extend when want does not land, and the attunement that tells you which silences are weather and which are messages.'}
+      'The dynamic that works with you runs on want without invoice: desire that gets said out loud and then left free, and a no that lands as information rather than rejection. The partner who fits that is someone who can be wanted hard and not collected on, who trusts that your wanting them is not a debt they now owe in scheduled payments. What fails against you is the audit: a partner who tracks who wanted whom more, and converts every mismatch of timing into evidence about the relationship. Your answers fund this in two places, the grace you extend when want does not land, and the attunement that tells you which silences are weather and which are messages.'}
   // The final word is COMPOSED, not selected: the authored core dynamic is
   // the spine, and up to three conditional modules deepen it with other
   // signals — so two profiles sharing a dominant pattern still get different
@@ -964,7 +964,7 @@ export function generateBlueprint(p: ScoredProfile): Blueprint {
   // negotiation differ. Every module must earn its place from a signal the
   // document actually rendered.
   const CHANNEL_INTEGRATION =
-    'One complication this dynamic has to survive: the care you give and the care that reaches you travel in different registers. The partner described here has to learn your receiving language rather than assume it mirrors your giving — and telling them what it is falls to you, because the answers above say watching you will not reveal it.';
+    'One complication this dynamic has to survive: the care you give and the care that reaches you travel in different registers. The partner described here has to learn your receiving language rather than assume it mirrors your giving, and telling them what it is falls to you, because the answers above say watching you will not reveal it.';
   let finalWord: string;
   if (!domPattern || !PATTERN_DYNAMICS[domPattern.id]) {
     finalWord = fallbackWord;
@@ -976,17 +976,17 @@ export function generateBlueprint(p: ScoredProfile): Blueprint {
       // Wide-dictionary receiving: care lands in every register — the
       // integration risk is not translation but attention (a partner never
       // learns which gesture mattered most).
-      parts.push('One complication this dynamic has to survive: care reaches you in almost any register it is offered — a wide dictionary, not a narrow one. That is generous, and it hides a cost: a partner may never learn which gesture mattered most, because you never single it out. The dynamic above works better once you do.');
+      parts.push('One complication this dynamic has to survive: care reaches you in almost any register it is offered: a wide dictionary, not a narrow one. That is generous, and it hides a cost: a partner may never learn which gesture mattered most, because you never single it out. The dynamic above works better once you do.');
     }
     const secondPattern = plan.headline[1]?.pattern;
     const secondFrame = secondPattern ? frameById.get(secondPattern.id) : undefined;
     if (secondFrame) {
-      parts.push(`A second current held in your answers too — "${secondFrame}" — and the partner described above has to make sense under both readings, not just the dominant one.`);
+      parts.push(`A second current held in your answers too: "${secondFrame}", and the partner described above has to make sense under both readings, not just the dominant one.`);
     }
     const dividedCore = domPattern.dims.find((d) => dividedDims.includes(d));
     if (dividedCore) {
       const dl = proseLabel(dividedCore);
-      parts.push(`Worth one more layer: ${dl} — one of the dimensions doing the work in this dynamic — is itself the divided reading named above. The partner who fits you will meet whichever side of that negotiation is on duty that week, which makes naming the back-and-forth to them part of making the dynamic work.`);
+      parts.push(`Worth one more layer: ${dl}, one of the dimensions doing the work in this dynamic, is itself the divided reading named above. The partner who fits you will meet whichever side of that negotiation is on duty that week, which makes naming the back-and-forth to them part of making the dynamic work.`);
     }
     finalWord = parts.join(' ');
   }
@@ -1132,10 +1132,10 @@ const PAIR_TENSION_LIBRARY: Record<string, PairCardCopy> = {
   'q10|q55': {
     territory: 'being loved out loud',
     a: 'a compliment from nowhere',
-    b: 'care that arrives without a word — the snack set beside you',
+    b: 'care that arrives without a word: the snack set beside you',
     lowIs: 'worded praise lands more easily than wordless care',
     highIs: 'wordless care lands more easily than worded praise',
-    tradeoff: 'Whether you measure love by what gets said or by what gets done — a partner will assume one of the two, and the wrong guess reads as indifference.',
+    tradeoff: 'Whether you measure love by what gets said or by what gets done: a partner will assume one of the two, and the wrong guess reads as indifference.',
   },
   // q04 = terrible week, first hour; q61 = bad presentation, first 30 seconds
   // [listening_first] — lean>0: more listening in the sharp, specific moment.
@@ -1145,7 +1145,7 @@ const PAIR_TENSION_LIBRARY: Record<string, PairCardCopy> = {
     b: 'a partner walking in from a presentation that just went badly',
     lowIs: 'you show up as a listener more when the wound is diffuse than when it is specific',
     highIs: 'you show up as a listener more when the wound is specific than when it is diffuse',
-    tradeoff: 'Whether comfort means “help me carry this” or “sit with me in it” — both are love, and they are not interchangeable on the receiving end.',
+    tradeoff: 'Whether comfort means “help me carry this” or “sit with me in it”: both are love, and they are not interchangeable on the receiving end.',
   },
   // q14 = offered back-rub at 9pm; q62 = thanks after two weeks of cooking
   // [scorekeeping] — the pair's declared dimension is the LEDGER, not comfort:
@@ -1155,8 +1155,8 @@ const PAIR_TENSION_LIBRARY: Record<string, PairCardCopy> = {
     territory: 'your private ledger of giving and receiving',
     a: 'receiving care at 9pm with your defenses down',
     b: 'two weeks of dinners answered by a warm thank-you for one of them',
-    lowIs: 'the ledger opens on the receiving side — care offered to you stirs a debt feeling — while your own giving runs invoice-free',
-    highIs: 'the ledger opens on the giving side — you keep an account of your own outlay — while care arriving for you lands debt-free',
+    lowIs: 'the ledger opens on the receiving side, care offered to you stirs a debt feeling, while your own giving runs invoice-free',
+    highIs: 'the ledger opens on the giving side, you keep an account of your own outlay, while care arriving for you lands debt-free',
     tradeoff: 'This asymmetric ledger is one of the most common quiet patterns there is: many people give freely and still feel debt the moment care arrives, or the exact reverse. Naming which way yours points is the whole exercise.',
   },
   // q06 = their enthusiasm, ten minutes in; q69 = explaining your own thing
@@ -1165,9 +1165,9 @@ const PAIR_TENSION_LIBRARY: Record<string, PairCardCopy> = {
     territory: 'meeting another person’s world',
     a: 'their excitement about something you know nothing about',
     b: 'the moment your own world is the one on the table',
-    lowIs: 'the attention you extend to their world is easy and forgiving — while engagement with yours faces a stricter audition: performed interest stings more than absence would',
+    lowIs: 'the attention you extend to their world is easy and forgiving: while engagement with yours faces a stricter audition: performed interest stings more than absence would',
     highIs: 'you extend more curiosity to their world than you ask back for yours',
-    tradeoff: 'Whether interest is something you extend or something you exchange — the difference between being interesting and being interested.',
+    tradeoff: 'Whether interest is something you extend or something you exchange: the difference between being interesting and being interested.',
   },
   // q63 = morning after an argument (support frame); q67 = group-chat screenshots (content frame)
   // [relational_privacy] — lean>0: firmer in the content frame than the support frame.
@@ -1177,7 +1177,7 @@ const PAIR_TENSION_LIBRARY: Record<string, PairCardCopy> = {
     b: 'a friend asking to see the screenshots of last night\'s disagreement',
     lowIs: 'your line is firmer when telling the story reads as seeking support than when it reads as entertainment',
     highIs: 'your line is firmer when sharing reads as content than when it reads as seeking counsel',
-    tradeoff: 'Privacy as protection versus privacy as a wall — worth knowing which frame actually trips it, because the two feel nothing alike from inside.',
+    tradeoff: 'Privacy as protection versus privacy as a wall: worth knowing which frame actually trips it, because the two feel nothing alike from inside.',
   },
   // q65 = two-person principle (live details sealed); q72 = finished-story principle
   // [relational_privacy] — lean>0: the finished-story stance outweighed the two-person one,
@@ -1186,8 +1186,8 @@ const PAIR_TENSION_LIBRARY: Record<string, PairCardCopy> = {
     territory: 'the boundary around your private life',
     a: '“worked out between the two people in it, before anyone else hears details”',
     b: '“outsiders get the finished story, never the drafts”',
-    lowIs: 'you seal the live details while letting the settled story travel — narration over counsel',
-    highIs: 'you seal the settled story while leaving room for a trusted voice in the live details — counsel over narration',
+    lowIs: 'you seal the live details while letting the settled story travel: narration over counsel',
+    highIs: 'you seal the settled story while leaving room for a trusted voice in the live details: counsel over narration',
     tradeoff: 'Both are real privacy stances; they just permit different things. A partner assuming the wrong one will feel shut out without knowing why.',
   },
   // q74 = heat rising in your chest (scenario); q84 = curiosity-under-fire (scale)
@@ -1197,8 +1197,8 @@ const PAIR_TENSION_LIBRARY: Record<string, PairCardCopy> = {
     a: 'the moment the heat actually rises in your chest',
     b: 'the calmer claim about what you can hold while defending your side',
     lowIs: 'in the moment you stayed more curious than your calmer self gives you credit for',
-    highIs: 'your stated curiosity outruns your in-the-moment behavior — on paper you stay open longer than your chest does',
-    tradeoff: 'Whether your conflict style survives contact with an actual raised voice — most people’s is calmer on paper than in the body.',
+    highIs: 'your stated curiosity outruns your in-the-moment behavior: on paper you stay open longer than your chest does',
+    tradeoff: 'Whether your conflict style survives contact with an actual raised voice: most people’s is calmer on paper than in the body.',
   },
   // q78 = your news deflected (“that’s great” + subject change); q88 = your news carried to a distracted room
   // [capitalization] — lean>0: the delivery-strategy answer outweighed the deflection sting.
@@ -1206,9 +1206,9 @@ const PAIR_TENSION_LIBRARY: Record<string, PairCardCopy> = {
     territory: 'good news finding its landing place',
     a: 'watching your shared news get deflected',
     b: 'deciding how to deliver your news to a distracted room',
-    lowIs: 'you hold the receiver responsible — their deflection is what costs',
+    lowIs: 'you hold the receiver responsible: their deflection is what costs',
     highIs: 'you adapt your own telling to protect the news rather than count on the reception',
-    tradeoff: 'Whether you manage the telling or hold the receiving to a standard — both protect joy, and each hides its own cost.',
+    tradeoff: 'Whether you manage the telling or hold the receiving to a standard: both protect joy, and each hides its own cost.',
   },
   // q75 = “I’d say so out loud” (scale); q85 = the bedroom scenario
   // [sexual_communication] — lean>0: the scenario showed more willingness than the scale claimed.
@@ -1216,9 +1216,9 @@ const PAIR_TENSION_LIBRARY: Record<string, PairCardCopy> = {
     territory: 'saying the unsayable in intimacy',
     a: 'the abstract claim about voicing a bedroom preference',
     b: 'the same territory asked as a lived scenario',
-    lowIs: 'in the concrete situation, voicing it costs more than the abstract scale admitted — the policy is braver than the practice',
+    lowIs: 'in the concrete situation, voicing it costs more than the abstract scale admitted: the policy is braver than the practice',
     highIs: 'in the concrete moment you voice preferences more readily than the abstract scale predicted',
-    tradeoff: 'Whether your spoken philosophy of desire survives the actual bedroom — the gap between policy and practice is the whole finding.',
+    tradeoff: 'Whether your spoken philosophy of desire survives the actual bedroom: the gap between policy and practice is the whole finding.',
   },
   // q87 = partner’s cross-country gamble; q90 = the audit scale
   // [commitment_sacrifice] — lean>0: everyday giving settled its books more easily than the big gamble.
@@ -1226,9 +1226,9 @@ const PAIR_TENSION_LIBRARY: Record<string, PairCardCopy> = {
     territory: 'backing someone all the way in',
     a: 'a partner’s cross-country gamble that would cost you both for years',
     b: 'the everyday question of whether your giving settles its own books',
-    lowIs: 'you back big gambles more freely than your everyday giving admits — the audit runs on Tuesdays, not at crossroads',
+    lowIs: 'you back big gambles more freely than your everyday giving admits: the audit runs on Tuesdays, not at crossroads',
     highIs: 'everyday giving settles its own books, but the audit wakes up when the cost is concrete',
-    tradeoff: 'Whether generosity survives arithmetic — the moment a real price tag tests whether the giving was unconditional or just untested.',
+    tradeoff: 'Whether generosity survives arithmetic: the moment a real price tag tests whether the giving was unconditional or just untested.',
   },
   // q53 = care you most like to receive; q54 = care you most naturally give
   // [express_receive_alignment] — note: these are channel-tag questions and carry
@@ -1236,7 +1236,7 @@ const PAIR_TENSION_LIBRARY: Record<string, PairCardCopy> = {
   // (the zero-guard in pairTensionCard handles it). The channel card above it
   // already names the asymmetry; this one notes the answers didn't cohere.
   'q53|q54': {
-    territory: 'how care travels — out and in',
+    territory: 'how care travels: out and in',
     a: 'the care you most like to receive',
     b: 'the care you most naturally give',
     lowIs: 'the receiving side of that pair outweighed the giving side',
@@ -1268,7 +1268,7 @@ function pairTensionCard(
   const dimScore = p.dimensions[c.dimension as DimensionId]?.score;
   const rawStamp =
     dimScore !== undefined && !p.dimensions[c.dimension as DimensionId]?.unmeasured
-      ? `Where this sits overall: the ${proseLabel(c.dimension as DimensionId)} reads ${tierLabelFor(dimScore)} on this dimension — the disagreement is about which pull leads, not whether the trait is present.`
+      ? `Where this sits overall: the ${proseLabel(c.dimension as DimensionId)} reads ${tierLabelFor(dimScore)} on this dimension: the disagreement is about which pull leads, not whether the trait is present.`
       : '';
   // De-dup the closing stamp per document: if this dimension's stamp already
   // ran on an earlier card, drop it here (the earlier card carries it).
@@ -1290,7 +1290,7 @@ function pairTensionCard(
     // honest about the disagreement without inventing which way it leaned.
     return {
       title: `Two readings of ${copy.territory}`,
-      body: `Two scenarios probed ${copy.territory} from different angles — ${copy.a}, then ${copy.b} — and your instincts pulled apart. This link carries the reading, not the answer-by-answer reasoning, so it can't tell you which way the disagreement leaned. ${copy.tradeoff}${scale}`,
+      body: `Two scenarios probed ${copy.territory} from different angles, ${copy.a}, then ${copy.b}, and your instincts pulled apart. This link carries the reading, not the answer-by-answer reasoning, so it can't tell you which way the disagreement leaned. ${copy.tradeoff}${scale}`,
     };
   }
   // A vanishing lean means the pair's shared dimension carries no usable
@@ -1299,7 +1299,7 @@ function pairTensionCard(
   if (Math.abs(lean) < 0.05) {
     return {
       title: `Two readings of ${copy.territory}`,
-      body: `Two scenarios probed ${copy.territory} from different angles — ${copy.a}, then ${copy.b} — and your instincts pulled apart. ${copy.tradeoff}${scale}`,
+      body: `Two scenarios probed ${copy.territory} from different angles, ${copy.a}, then ${copy.b}, and your instincts pulled apart. ${copy.tradeoff}${scale}`,
     };
   }
   const dir = lean > 0 ? copy.highIs : copy.lowIs;
@@ -1310,18 +1310,18 @@ function pairTensionCard(
   const gap = Math.abs(leanQ);
   // Magnitude ladder: the size of the disagreement changes the reading.
   const qualifier = gap >= 1.0
-    ? 'That is a wide split — two of your operating values are in open conflict here, and one of them is currently winning by default.'
+    ? 'That is a wide split: two of your operating values are in open conflict here, and one of them is currently winning by default.'
     : gap >= 0.6
-      ? 'That is not a wobble — a real fork in how you operate.'
-      : 'That is a narrow disagreement — close to the threshold, worth knowing, not worth over-reading.';
+      ? 'That is not a wobble: a real fork in how you operate.'
+      : 'That is a narrow disagreement: close to the threshold, worth knowing, not worth over-reading.';
   // Lead-ins avoid any frame that assumes dir's grammatical shape — some pair
   // directions are "you …" clauses, others are noun phrases ("the attention
   // you extend…"). A colon frame reads cleanly with either; "they point to
   // you seal…" and "the split reads as you seal…" do not.
   const leads = [
-    `Two scenarios probed ${copy.territory} from different angles — ${copy.a}, then ${copy.b} — and your instincts disagreed. Read together, the finding: ${dir}.`,
-    `The same territory looked different twice: ${copy.a} in one scenario, then ${copy.b} — and your answers split. Read side by side, the reading: ${dir}.`,
-    `${copy.a[0].toUpperCase() + copy.a.slice(1)} — and then, from the other side, ${copy.b}. On ${copy.territory}, your instincts pulled apart, and the split says — ${dir}.`,
+    `Two scenarios probed ${copy.territory} from different angles, ${copy.a}, then ${copy.b}, and your instincts disagreed. Read together, the finding: ${dir}.`,
+    `The same territory looked different twice: ${copy.a} in one scenario, then ${copy.b}, and your answers split. Read side by side, the reading: ${dir}.`,
+    `${copy.a[0].toUpperCase() + copy.a.slice(1)}, and then, from the other side, ${copy.b}. On ${copy.territory}, your instincts pulled apart, and the split says, ${dir}.`,
   ];
   // Rotation with per-document de-dup: start from the pair's hash slot, then
   // walk forward past any lead this document has already shown.

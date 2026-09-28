@@ -5,6 +5,7 @@ import { scoreProfile, CHANNEL_LABELS } from '../../domain/scoring';
 import { DIMENSIONS, TIER_LABELS, tierOf } from '../../domain/dimensions';
 import { DIMENSION_LABELS, DOMAIN_LABELS, DOMAIN_DIMENSIONS } from '../../domain/types';
 import type { DimensionId, DomainId } from '../../domain/types';
+import Icon from './icons';
 
 interface Props {
   answers: Answers;
@@ -12,8 +13,6 @@ interface Props {
   order: string[];
   onBack: () => void;
   onFinish: () => void;
-  /** True when revisiting from the blueprint — the blueprint already exists. */
-  hideFinish?: boolean;
 }
 
 const LAYER_NAMES: Record<number, string> = {
@@ -25,7 +24,7 @@ const LAYER_NAMES: Record<number, string> = {
   6: 'Deep pattern',
 };
 
-export default function Review({ answers, order, onBack, onFinish, hideFinish = false }: Props) {
+export default function Review({ answers, order, onBack, onFinish }: Props) {
   const [tab, setTab] = useState<'answers' | 'measures'>('answers');
   const profile = useMemo(() => scoreProfile(answers), [answers]);
 
@@ -35,7 +34,7 @@ export default function Review({ answers, order, onBack, onFinish, hideFinish = 
   return (
     <main className="screen review">
       <header className="review__header">
-        <h1>{hideFinish ? 'Your answers, as given' : 'Before you read your blueprint'}</h1>
+        <h1>Before you read your blueprint</h1>
         <p className="review__lede">
           The honesty part of the deal: here's what each choice revealed, and what the other
           choices would have revealed instead. The meaning of your answers lives in this contrast.
@@ -47,7 +46,8 @@ export default function Review({ answers, order, onBack, onFinish, hideFinish = 
             className={`review__tab${tab === 'answers' ? ' is-active' : ''}`}
             onClick={() => setTab('answers')}
           >
-            What each answer revealed
+            <span className="bp__fbtn-label">What each answer revealed</span>
+            <span className="bp__fbtn-mini">Revealed</span>
           </button>
           <button
             role="tab"
@@ -55,7 +55,8 @@ export default function Review({ answers, order, onBack, onFinish, hideFinish = 
             className={`review__tab${tab === 'measures' ? ' is-active' : ''}`}
             onClick={() => setTab('measures')}
           >
-            What was actually measured
+            <span className="bp__fbtn-label">What was actually measured</span>
+            <span className="bp__fbtn-mini">Measured</span>
           </button>
         </div>
       </header>
@@ -123,13 +124,15 @@ export default function Review({ answers, order, onBack, onFinish, hideFinish = 
 
       <footer className="review__footer">
         <button className="btn btn--ghost" onClick={onBack}>
-          ← {hideFinish ? 'Back to blueprint' : 'Back to questions'}
+          <Icon name="arrow-left" size={14} />
+          <span className="bp__fbtn-label">Back to questions</span>
+          <span className="bp__fbtn-mini">Questions</span>
         </button>
-        {!hideFinish && (
-          <button className="btn btn--primary" onClick={onFinish}>
-            Read my blueprint →
-          </button>
-        )}
+        <button className="btn btn--primary" onClick={onFinish}>
+          <span className="bp__fbtn-label">Read my blueprint</span>
+          <span className="bp__fbtn-mini">Blueprint</span>
+          <Icon name="arrow-right" size={14} />
+        </button>
       </footer>
     </main>
   );

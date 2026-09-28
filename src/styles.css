@@ -445,6 +445,10 @@ button { font: inherit; cursor: pointer; }
   padding-top: 18px;
   border-top: 1px solid var(--line);
 }
+/* The share panel has no docked action bar of its own, so unlike the 0
+   above (left over from dialogs whose bar padded their own bottom), it
+   keeps a real bottom edge. */
+.export-dlg--share .export-dlg__panel { padding-bottom: 22px; }
 
 /* Titled rows inside the Downloads popup: name + one-liner on the left, its
    action docked right — a menu, not a button pile. */
@@ -471,6 +475,13 @@ button { font: inherit; cursor: pointer; }
    single action sits at its natural size; a .dlrow__btns pair spreads to
    fill the line with normal, uncramped button padding. */
 .dlrow--stack { flex-direction: column; align-items: stretch; gap: 10px; }
+/* Column axis: the horizontal-row flex values above (grow on __text and
+   __btns) turn into VERTICAL stretch here — free space lands on the buttons
+   and inflates them well past their 44px height. Every stack child is
+   content-sized; only the buttons INSIDE __btns share the line's width. */
+.dlrow--stack > .dlrow__text,
+.dlrow--stack > .dlrow__btns,
+.dlrow--stack > .btn { flex: 0 0 auto; }
 .dlrow--stack > .btn { align-self: flex-start; }
 .dlrow--stack > .dlrow__btns { display: flex; gap: 8px; }
 .dlrow--stack > .dlrow__btns .btn { flex: 1 1 0; min-width: 0; justify-content: center; }
@@ -517,6 +528,20 @@ button { font: inherit; cursor: pointer; }
   padding: 10px max(16px, calc(50vw - 380px)) calc(10px + env(safe-area-inset-bottom, 0px));
 }
 body:has(.review__footer) .screen { padding-bottom: calc(120px + env(safe-area-inset-bottom, 0px)); }
+/* Same condensation ladder as the blueprint bar: short labels on phones so
+   the fixed footer row never wraps and the two tab pills pair off side by
+   side; full text from 640px up. Every labelled button here carries BOTH
+   spans — the ladder decides which one renders. */
+.review__footer .bp__fbtn-label,
+.review__tab .bp__fbtn-label { display: none; }
+.review__footer .bp__fbtn-mini,
+.review__tab .bp__fbtn-mini { display: inline; }
+@media (min-width: 640px) {
+  .review__footer .bp__fbtn-label,
+  .review__tab .bp__fbtn-label { display: inline; }
+  .review__footer .bp__fbtn-mini,
+  .review__tab .bp__fbtn-mini { display: none; }
+}
 
 /* ─── Blueprint ──────────────────────────────────────────────────────────── */
 .bp__header { text-align: center; margin-bottom: 36px; }
@@ -794,9 +819,6 @@ body:has(.bp__footer) .screen { padding-bottom: calc(120px + env(safe-area-inset
   text-align: center;
 }
 .namegate__input:focus { outline: 2px solid var(--accent-soft); border-color: var(--accent-soft); }
-
-/* Clarifying questions close the run — a quieter note than the reassurances */
-.quiz__note--clarifier { margin-top: 10px; color: var(--accent); }
 
 /* ─── Quiz dock ──────────────────────────────────────────────────────── */
 .quizwrap {
@@ -1248,14 +1270,16 @@ body:has(.bp__footer) .screen { padding-bottom: calc(120px + env(safe-area-inset
   .export-dlg--share { padding: 0; align-items: stretch; }
   .export-dlg--share .export-dlg__panel {
     width: 100%; max-height: none; border-radius: 0; border: none;
-    padding: 18px 16px 0; display: flex; flex-direction: column;
+    padding: 18px 16px calc(20px + env(safe-area-inset-bottom, 0px));
+    display: flex; flex-direction: column;
   }
   .export-dlg--share .export-dlg__panel p { text-align: left; }
-  /* Narrow panels: the row's text and its full-text buttons stack, so the
-     buttons keep their labels at full width instead of squeezing. */
-  .dlrow { flex-wrap: wrap; }
-  .dlrow__btns { flex: 1 1 100%; }
-  .dlrow > .btn { flex: 1 1 auto; justify-content: center; }
+  /* Download rows are text-first stacks at every width now; the old
+     wrap-to-the-next-line rules for side-by-side rows are gone — their
+     flex values were width-axis math and would distort the column
+     (flex-basis 100% on __btns is a HEIGHT in a column). Buttons keep
+     their natural height and share the line's width instead. */
+  .dlrow--stack > .btn { align-self: stretch; }
   .namegate__inner { padding-top: 6vh; }
   /* Dock on a phone: one row, primary stretching, quiet buttons as circles. */
   .dock__back,
@@ -1263,6 +1287,9 @@ body:has(.bp__footer) .screen { padding-bottom: calc(120px + env(safe-area-inset
   .tts-toast p { margin: 0 10px 8px; }
 
   .anscard__layer { display: none; }
+  /* Review tabs: with the short labels the two pills pair off side by side,
+     equal width — matching the quiz's stacked-choice touch targets. */
+  .review__tab { flex: 1 1 0; text-align: center; }
   .bp__sharebox { padding: 20px 18px; }
   .compare__score { padding: 20px; gap: 14px; }
   .compare__xverdict { margin-left: 0; }

@@ -316,10 +316,6 @@ function AppInner() {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [answers]);
 
-  // Where the Review screen was opened from — blueprint/compare visits read
-  // (and return where they came from), quiz visits complete the run.
-  const [stageBeforeReview, setStageBeforeReview] = useState<Stage>('quiz');
-
   const handleExport = useCallback(() => {
     const bp = blueprint ?? generateBlueprint(profile);
     const md = blueprintToMarkdown(bp, profile);
@@ -502,16 +498,15 @@ function AppInner() {
   }
 
   if (stage === 'review') {
-    // Opened from the blueprint: `back` returns there and `finish` is hidden —
-    // the blueprint already exists, this visit is for reading, not completing.
-    const fromBlueprint = blueprint !== null && (stageBeforeReview === 'blueprint' || stageBeforeReview === 'compare');
+    // One review shape everywhere: back reopens the quiz (answers stay
+    // editable — “the session is moldable”), and finishing regenerates the
+    // blueprint from the current answers, however the run was restored.
     return (
       <Review
         answers={answers}
         order={order}
-        onBack={fromBlueprint ? () => setStage(stageBeforeReview) : () => setStage('quiz')}
-        onFinish={fromBlueprint ? () => setStage('blueprint') : finish}
-        hideFinish={fromBlueprint}
+        onBack={() => setStage('quiz')}
+        onFinish={finish}
       />
     );
   }
@@ -525,10 +520,7 @@ function AppInner() {
           return decoded ? { code: p.code, name: p.name, profile: decoded } : null;
         }).filter((p): p is NonNullable<typeof p> => p !== null)}
         onBack={() => setStage('blueprint')}
-        onOpenReview={() => {
-          setStageBeforeReview('compare');
-          setStage('review');
-        }}
+        onOpenReview={() => setStage('review')}
         onRetake={startOver}
         answers={answers}
         seed={seed}
@@ -587,10 +579,7 @@ function AppInner() {
             }
           : undefined
       }
-      onOpenReview={() => {
-        setStageBeforeReview('blueprint');
-        setStage('review');
-      }}
+      onOpenReview={() => setStage('review')}
     />
   );
 }

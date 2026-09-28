@@ -202,12 +202,6 @@ export default function Quiz({ questions, answers, onAnswer, onFinish, onStartOv
           {/* The question's own note is spoken by read-aloud but not rendered:
               per-card coaching read as filler — the dock message at the bottom
               is the one place the instrument talks about itself. */}
-          {isClarifier && (
-            <p className="quiz__note quiz__note--clarifier">
-              One of the last few — a closer look at a territory your earlier answers left
-              genuinely open.
-            </p>
-          )}
           {renderOptions()}
         </section>
 

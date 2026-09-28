@@ -126,7 +126,7 @@ export const PATTERNS: DerivedPattern[] = [
     priority: 95,
     frame: 'Space and certainty are different things for you.',
     narrative: [
-      'Your answers hold two things side by side that are often mistaken for a contradiction: real comfort with a partner having their own life, and a real sensitivity to not knowing what that life means while it happens. Distance itself appears to be affordable to you. It is the unexplained part that costs — the shift you can see but cannot read. This is not the pattern of someone who needs constant company; it is the pattern of someone who needs enough information to know what reality they are standing in. A partner who narrates their distance ("work is eating me, it is not you") buys enormous steadiness cheaply.',
+      'Your answers hold two things side by side that are often mistaken for a contradiction: real comfort with a partner having their own life, and a real sensitivity to not knowing what that life means while it happens. Distance itself appears to be affordable to you. It is the unexplained part that costs: the shift you can see but cannot read. This is not the pattern of someone who needs constant company; it is the pattern of someone who needs enough information to know what reality they are standing in. A partner who narrates their distance ("work is eating me, it is not you") buys enormous steadiness cheaply.',
     ],
   },
   {
@@ -142,10 +142,10 @@ export const PATTERNS: DerivedPattern[] = [
     priority: 86,
     frame: 'The want underneath: to be noticed without being managed.',
     narrative: [
-      'Three scores point at the same appetite from different directions. You can say what you need — you believe asking is how love stays honest. You also know people are not mind-readers, and you mean it. And yet the care that lands hardest in your answers is the kind that arrived before the asking. That is not a demand for telepathy. It is a demand for attentiveness: "tell me what you need" is the requirement, "I noticed before you had to" is the reward. The practical translation: a partner who asks is doing it right, and a partner who occasionally notices first is doing something extra — and you will feel the difference even if you never name it.',
+      'Three scores point at the same appetite from different directions. You can say what you need: you believe asking is how love stays honest. You also know people are not mind-readers, and you mean it. And yet the care that lands hardest in your answers is the kind that arrived before the asking. That is not a demand for telepathy. It is a demand for attentiveness: "tell me what you need" is the requirement, "I noticed before you had to" is the reward. The practical translation: a partner who asks is doing it right, and a partner who occasionally notices first is doing something extra, and you will feel the difference even if you never name it.',
     ],
     narrativeAlt: [
-      'Underneath several of your scores runs a single appetite: being seen clearly, without being handled. The asking, you can do — you believe saying what you need is how love stays honest, and you do not expect anyone to read your mind. But the care that lands hardest in your answers is the kind that arrived before the asking. That is not a contradiction and not a demand for telepathy — it is a demand for attentiveness. The requirement is "tell me what you need"; the reward is "I noticed before you had to". A partner who asks is doing it right. A partner who occasionally notices first is doing something extra — and you will feel it, even if neither of you ever names it.',
+      'Underneath several of your scores runs a single appetite: being seen clearly, without being handled. The asking, you can do, you believe saying what you need is how love stays honest, and you do not expect anyone to read your mind. But the care that lands hardest in your answers is the kind that arrived before the asking. That is not a contradiction and not a demand for telepathy, it is a demand for attentiveness. The requirement is "tell me what you need"; the reward is "I noticed before you had to". A partner who asks is doing it right. A partner who occasionally notices first is doing something extra, and you will feel it, even if neither of you ever names it.',
     ],
   },
   {
@@ -160,7 +160,7 @@ export const PATTERNS: DerivedPattern[] = [
     priority: 84,
     frame: 'Own orbits, one shared gravity.',
     narrative: [
-      'You want considerable space for your own life, and you want problems faced as a team rather than assigned to a person. Those are not in tension — together they describe a specific architecture: two whole people who deliberately operate as one unit when it matters. Your partner can have their own weekend, their own crisis, their own ambitions, without the relationship reading it as rejection. But when something genuinely touches the shared life, you want the two of you on the same side of it. The failure mode to watch is not the independence — it is the drift where separate lives stop reporting to each other.',
+      'You want considerable space for your own life, and you want problems faced as a team rather than assigned to a person. Those are not in tension, together they describe a specific architecture: two whole people who deliberately operate as one unit when it matters. Your partner can have their own weekend, their own crisis, their own ambitions, without the relationship reading it as rejection. But when something genuinely touches the shared life, you want the two of you on the same side of it. The failure mode to watch is not the independence, it is the drift where separate lives stop reporting to each other.',
     ],
   },
   {
@@ -175,7 +175,7 @@ export const PATTERNS: DerivedPattern[] = [
     priority: 82,
     frame: 'Honesty as shared reality, not as weapon or ritual.',
     narrative: [
-      'Your directness and your benefit-of-the-doubt belong to the same project: keeping the two of you standing in the same reality. You say the true thing while it is small, and you give other people room to explain themselves before you conclude — which means information stays flowing in both directions. In your model, honesty is not bluntness and charity is not denial; they are two halves of not-making-each-other-guess. The tell that this is load-bearing for you: concealment bothers you more than disagreement. A partner can fight with you and be fine; a partner who curates what you know is harder to forgive.',
+      'Your directness and your benefit-of-the-doubt belong to the same project: keeping the two of you standing in the same reality. You say the true thing while it is small, and you give other people room to explain themselves before you conclude, which means information stays flowing in both directions. In your model, honesty is not bluntness and charity is not denial; they are two halves of not-making-each-other-guess. The tell that this is load-bearing for you: concealment bothers you more than disagreement. A partner can fight with you and be fine; a partner who curates what you know is harder to forgive.',
     ],
   },
   {
@@ -192,9 +192,9 @@ export const PATTERNS: DerivedPattern[] = [
     when: both(high('care_role_flexibility'), midPlus('receiving_comfort')),
     mode: 'synthesis',
     priority: 88,
-    frame: 'The care loop runs both ways — and that is rarer than it sounds.',
+    frame: 'The care loop runs both ways, and that is rarer than it sounds.',
     narrative: [
-      'Your care-role flexibility and your receiving comfort point at the same architecture from two sides: you give gestures freely, and the same gestures arriving back land as care rather than as costume. That combination is the thing the founding document keeps calling mutual — not both people performing identical roles, but neither person\'s role being a wall. Its practical value is quiet but large: partners who feel they can take care of you actually take care of you, which means the loop feeds itself instead of running on one motor. The watch-item is the outside world: people sometimes read role-flexibility as rolelessness, and it is worth naming that the flexibility IS the commitment, not a lack of shape.',
+      'Your care-role flexibility and your receiving comfort point at the same architecture from two sides: you give gestures freely, and the same gestures arriving back land as care rather than as costume. That combination is the thing the founding document keeps calling mutual: not both people performing identical roles, but neither person\'s role being a wall. Its practical value is quiet but large: partners who feel they can take care of you actually take care of you, which means the loop feeds itself instead of running on one motor. The watch-item is the outside world: people sometimes read role-flexibility as rolelessness, and it is worth naming that the flexibility IS the commitment, not a lack of shape.',
     ],
   },
   {
@@ -209,9 +209,9 @@ export const PATTERNS: DerivedPattern[] = [
     when: both(lowish('care_role_flexibility'), midPlus('care_initiation')),
     mode: 'tension',
     priority: 80,
-    frame: 'You take care of people masterfully — and being taken care of has a locked door.',
+    frame: 'You take care of people masterfully, and being taken care of has a locked door.',
     narrative: [
-      'The giving side of your care runs freely — you anticipate, you carry, you make people feel precious. The receiving side of the SAME gestures is the locked room: being pampered, planned-for, or waited on registers as a role violation rather than as love, and you will sometimes actively reclaim the gesture by doing something for them before it settles. Often that comes from what taking care has meant, or from what receiving it once cost. The practical shape of it: a partner learns within months which door is closed, and stops offering — so the only care you get is the care you cannot receive, and the hunger goes unnamed in both directions. The unlock is small and specific rather than global: name the one or two reversals you COULD receive, and let those run first.',
+      'The giving side of your care runs freely, you anticipate, you carry, you make people feel precious. The receiving side of the SAME gestures is the locked room: being pampered, planned-for, or waited on registers as a role violation rather than as love, and you will sometimes actively reclaim the gesture by doing something for them before it settles. Often that comes from what taking care has meant, or from what receiving it once cost. The practical shape of it: a partner learns within months which door is closed, and stops offering, so the only care you get is the care you cannot receive, and the hunger goes unnamed in both directions. The unlock is small and specific rather than global: name the one or two reversals you COULD receive, and let those run first.',
     ],
     placement: { section: 'reciprocity', after: 'care_initiation' },
   },
@@ -227,9 +227,9 @@ export const PATTERNS: DerivedPattern[] = [
     when: both(lowish('desire_grace'), midPlus('desire')),
     mode: 'tension',
     priority: 76,
-    frame: 'Want runs hot in you — and every mismatch files a report.',
+    frame: 'Want runs hot in you, and every mismatch files a report.',
     narrative: [
-      'Your answers hold wanting and bookkeeping in the same hand: the desire is real and alive, but a partner\'s no, an off night, or your own deflection gets recorded somewhere — read into the relationship, weighed, kept. That combination usually means want has been tied to evidence: being wanted proved the bond, so not-being-wanted-in-this-moment started disproving it. The cost is invisible at first — a partner who has to perform availability stops telling the truth about their body, and the performance is precisely what makes their yes feel less like desire. The repair is the grace side of the same trait you already have: want allowed to exist in the room without an answer required, in both directions.',
+      'Your answers hold wanting and bookkeeping in the same hand: the desire is real and alive, but a partner\'s no, an off night, or your own deflection gets recorded somewhere, read into the relationship, weighed, kept. That combination usually means want has been tied to evidence: being wanted proved the bond, so not-being-wanted-in-this-moment started disproving it. The cost is invisible at first, a partner who has to perform availability stops telling the truth about their body, and the performance is precisely what makes their yes feel less like desire. The repair is the grace side of the same trait you already have: want allowed to exist in the room without an answer required, in both directions.',
     ],
     placement: { section: 'closeness', after: 'desire' },
   },
@@ -245,9 +245,9 @@ export const PATTERNS: DerivedPattern[] = [
     when: both(high('desire_grace'), midPlus('intimacy_attunement')),
     mode: 'synthesis',
     priority: 84,
-    frame: 'Mismatch does not become a story in your answers — that is an architecture.',
+    frame: 'Mismatch does not become a story in your answers, that is an architecture.',
     narrative: [
-      'Two scores describe the same room from different corners: your attunement catches the drift and your grace lets it pass without a verdict. Together they mean a partner\'s no can be a plain no, an off night can be an off night, and want can exist in the room without either person being put on trial for it. This is the specific trait the research ties to desire surviving the years — not constant appetite, but the absence of a performance review. The watch-item is your own no: people this graceful about receiving a refusal are sometimes terrible at voicing one, and the grace has to run both directions or it curdles into self-erasure.',
+      'Two scores describe the same room from different corners: your attunement catches the drift and your grace lets it pass without a verdict. Together they mean a partner\'s no can be a plain no, an off night can be an off night, and want can exist in the room without either person being put on trial for it. This is the specific trait the research ties to desire surviving the years: not constant appetite, but the absence of a performance review. The watch-item is your own no: people this graceful about receiving a refusal are sometimes terrible at voicing one, and the grace has to run both directions or it curdles into self-erasure.',
     ],
   },
   {
@@ -262,7 +262,7 @@ export const PATTERNS: DerivedPattern[] = [
     priority: 78,
     frame: 'Compatibility through curiosity, not sameness.',
     narrative: [
-      'You do not appear to want the same life as your person — you want to be interested in each other\'s lives. Wide personal space on one side, genuine appetite for their inner world on the other: the combination reads less like "couple" and more like two people who keep choosing to visit each other. This is a different compatibility model from shared-everything, and it fails differently: not from merging, but from drifting into polite strangers who no longer tour each other\'s worlds. The maintenance is small and specific — keep being invited in, keep inviting.',
+      'You do not appear to want the same life as your person: you want to be interested in each other\'s lives. Wide personal space on one side, genuine appetite for their inner world on the other: the combination reads less like "couple" and more like two people who keep choosing to visit each other. This is a different compatibility model from shared-everything, and it fails differently: not from merging, but from drifting into polite strangers who no longer tour each other\'s worlds. The maintenance is small and specific: keep being invited in, keep inviting.',
     ],
   },
 
@@ -280,7 +280,7 @@ export const PATTERNS: DerivedPattern[] = [
     priority: 90,
     frame: 'You give interpretive room easily; patience for not-knowing is thinner.',
     narrative: [
-      'But patience for interpreting people is not the same as comfort with not-knowing. What you are generous with is interpretation; what you find hard is the interval where there is nothing yet to interpret. Space with a story attached is fine. Silence with no story is where your imagination starts filling the blank. The distinction matters, because the fix is not reassurance — it is information, delivered before you have to ask.',
+      'But patience for interpreting people is not the same as comfort with not-knowing. What you are generous with is interpretation; what you find hard is the interval where there is nothing yet to interpret. Space with a story attached is fine. Silence with no story is where your imagination starts filling the blank. The distinction matters, because the fix is not reassurance: it is information, delivered before you have to ask.',
     ],
     placement: { section: 'understanding', after: 'perspective_taking' },
   },
@@ -294,9 +294,9 @@ export const PATTERNS: DerivedPattern[] = [
     when: both(high('listening_first'), midPlus('shared_home_effort')),
     mode: 'reinterpret',
     priority: 76,
-    frame: 'You witness first, then lighten the load — in that order.',
+    frame: 'You witness first, then lighten the load: in that order.',
     narrative: [
-      'Your support has two stages, and the order is the finding: first you hear the story out, then you take something off the plate. You are not the fixer who interrupts with solutions, and not the pure witness who leaves the burden untouched — the listening is real AND the load gets lighter. For you, support appears to work best in that order: understand what someone is carrying first, then help make the load lighter.',
+      'Your support has two stages, and the order is the finding: first you hear the story out, then you take something off the plate. You are not the fixer who interrupts with solutions, and not the pure witness who leaves the burden untouched: the listening is real AND the load gets lighter. For you, support appears to work best in that order: understand what someone is carrying first, then help make the load lighter.',
     ],
     placement: { section: 'understanding', after: 'listening_first' },
   },
@@ -312,7 +312,7 @@ export const PATTERNS: DerivedPattern[] = [
     priority: 76,
     frame: 'Direct about problems; less direct about exposure.',
     narrative: [
-      'Your directness has a shape worth naming precisely. Problems, logistics, dissatisfaction — you will say those plainly, and sooner than most. What costs more is the sentence that exposes you: the "I was hurt because I wanted to matter to you" kind. So the useful dimension is not direct versus indirect — it is problem-directness versus vulnerability-directness, and yours are not the same size. A partner should know the plain feedback is safe to receive; the quieter work is making it safe for you to be the one exposed.',
+      'Your directness has a shape worth naming precisely. Problems, logistics, dissatisfaction: you will say those plainly, and sooner than most. What costs more is the sentence that exposes you: the "I was hurt because I wanted to matter to you" kind. So the useful dimension is not direct versus indirect: it is problem-directness versus vulnerability-directness, and yours are not the same size. A partner should know the plain feedback is safe to receive; the quieter work is making it safe for you to be the one exposed.',
     ],
     placement: { section: 'communication', after: 'direct_communication' },
   },
@@ -328,7 +328,7 @@ export const PATTERNS: DerivedPattern[] = [
     priority: 78,
     frame: 'Sealed from the world, wide open inside it.',
     narrative: [
-      'Your openness and your privacy are not opposites — they are the same boundary drawn correctly. Inside the two-person room you are unusually willing to be seen; outside it, the relationship\'s contents are not public property. The failure mode is only one: when the person inside the room stops knowing they are the only one in it. As long as that is clear, this is one of the more protective architectures a relationship can have.',
+      'Your openness and your privacy are not opposites: they are the same boundary drawn correctly. Inside the two-person room you are unusually willing to be seen; outside it, the relationship\'s contents are not public property. The failure mode is only one: when the person inside the room stops knowing they are the only one in it. As long as that is clear, this is one of the more protective architectures a relationship can have.',
     ],
     placement: { section: 'safety', after: 'vulnerability_safety' },
   },
@@ -344,7 +344,7 @@ export const PATTERNS: DerivedPattern[] = [
     priority: 82,
     frame: 'Ambient affection is fluent; the explicit conversation stays quiet.',
     narrative: [
-      'Your touch runs as ambient weather — constant, unforced, its own language. But the everyday fluency and the explicit fluency are different channels, and your answers say the second one carries less traffic. Lots of physical affection can coexist with a mostly-undrawn map of desire. That is a coherent combination, not a contradiction — but it means a partner may assume the touch is the whole conversation. Worth telling them it is the greeting, not the agenda.',
+      'Your touch runs as ambient weather, constant, unforced, its own language. But the everyday fluency and the explicit fluency are different channels, and your answers say the second one carries less traffic. Lots of physical affection can coexist with a mostly-undrawn map of desire. That is a coherent combination, not a contradiction, but it means a partner may assume the touch is the whole conversation. Worth telling them it is the greeting, not the agenda.',
     ],
     placement: { section: 'closeness', after: 'affection_daily' },
   },
@@ -360,10 +360,10 @@ export const PATTERNS: DerivedPattern[] = [
     priority: 92,
     frame: 'The invisible load and the want to be seen carrying it are the same subject.',
     narrative: [
-      'Two strong scores point at one quiet risk. You notice what needs doing, and you do it — much of it before anyone knows it was done. That competence is a gift, but it has a known cost: work that goes unseen reads, to the person doing it, as work that does not count. People who carry this way usually also want the carrying to be seen — worth checking whether that is true of you. If it is, the warning is not "carry less": self-sufficiency can mute the very recognition you want. "I\'ve got this" is true, and it can still cost you the acknowledgment that would make the having-it worth more.',
+      'Two strong scores point at one quiet risk. You notice what needs doing, and you do it, much of it before anyone knows it was done. That competence is a gift, but it has a known cost: work that goes unseen reads, to the person doing it, as work that does not count. People who carry this way usually also want the carrying to be seen, worth checking whether that is true of you. If it is, the warning is not "carry less": self-sufficiency can mute the very recognition you want. "I\'ve got this" is true, and it can still cost you the acknowledgment that would make the having-it worth more.',
     ],
     narrativeAlt: [
-      'Two strong scores point at one quiet risk: the competence you carry, and the recognition you want, can quietly cancel each other. You notice what needs doing and you do it — much of it before anyone knows it was done — and people who carry this way usually also want the carrying to be seen. Worth checking whether that is true of you. If it is, the warning is not "carry less"; it is that "I\'ve got this" is a sentence that can cost you the very acknowledgment that would make the having-it worth more.',
+      'Two strong scores point at one quiet risk: the competence you carry, and the recognition you want, can quietly cancel each other. You notice what needs doing and you do it, much of it before anyone knows it was done, and people who carry this way usually also want the carrying to be seen. Worth checking whether that is true of you. If it is, the warning is not "carry less"; it is that "I\'ve got this" is a sentence that can cost you the very acknowledgment that would make the having-it worth more.',
     ],
     placement: { section: 'hard_days', after: 'shared_home_effort' },
   },
@@ -378,9 +378,9 @@ export const PATTERNS: DerivedPattern[] = [
     when: both(high('autonomy_connection'), high('affection_daily')),
     mode: 'synthesis',
     priority: 84,
-    frame: "Independence here doesn't mean distance — the touch points the other way.",
+    frame: "Independence here doesn't mean distance: the touch points the other way.",
     narrative: [
-      "Read together, your independence and your affection change each other's meaning: you want wide personal space AND frequent physical closeness, which means the independence was never a request for distance. The combination works when closeness is dense in the time you are together rather than constant across the week — separate orbits, high contact. The risk is only when a partner reads your space as cooling; your touch says otherwise, and it is worth saying out loud that both are true at once.",
+      "Read together, your independence and your affection change each other's meaning: you want wide personal space AND frequent physical closeness, which means the independence was never a request for distance. The combination works when closeness is dense in the time you are together rather than constant across the week: separate orbits, high contact. The risk is only when a partner reads your space as cooling; your touch says otherwise, and it is worth saying out loud that both are true at once.",
     ],
     placement: { section: 'independence', after: 'autonomy_connection' },
   },
@@ -397,9 +397,9 @@ export const PATTERNS: DerivedPattern[] = [
     when: (p) => midPlus('desire')(p) && gapCond('listening_first', 'desire', 1, 55).cond(p),
     mode: 'augment',
     priority: 82,
-    frame: 'Wanting matters to you — but forced to choose, you kept being understood.',
+    frame: 'Wanting matters to you, but forced to choose, you kept being understood.',
     narrative: [
-      'One forced choice in your answers settles the hierarchy: offered understanding or being deeply wanted, you kept being understood — even though wanting to be wanted runs hot in everything else you chose. That ordering matters. Physical affection and desire are your ambient languages, but the definition of being known, for you, is someone who gets how your mind works. A relationship high on touch and low on understanding would starve you differently than the reverse.',
+      'One forced choice in your answers settles the hierarchy: offered understanding or being deeply wanted, you kept being understood: even though wanting to be wanted runs hot in everything else you chose. That ordering matters. Physical affection and desire are your ambient languages, but the definition of being known, for you, is someone who gets how your mind works. A relationship high on touch and low on understanding would starve you differently than the reverse.',
     ],
     placement: { section: 'closeness', after: 'desire' },
   },
@@ -413,12 +413,12 @@ export const PATTERNS: DerivedPattern[] = [
     when: both(midPlus('reassurance_security'), midPlus('direct_communication')),
     mode: 'reinterpret',
     priority: 86,
-    frame: 'Not more reassurance — better information.',
+    frame: 'Not more reassurance: better information.',
     narrative: [
-      'Your reassurance need is real, and your answers are precise about what would actually meet it: not repeated comforting, but proportionate, reality-based information — "I\'m having a bad day; it isn\'t about you" lands where ten "are we sure?"s would not. You even ask what reassurance looks like for someone rather than guessing, which is exactly the right instinct. And you know the flip side from the inside: a partner who needs constant reassuring would exhaust you — which is why what you want to be met with is information, not volume. Clarity, not more.',
+      'Your reassurance need is real, and your answers are precise about what would actually meet it: not repeated comforting, but proportionate, reality-based information: "I\'m having a bad day; it isn\'t about you" lands where ten "are we sure?"s would not. You even ask what reassurance looks like for someone rather than guessing, which is exactly the right instinct. And you know the flip side from the inside: a partner who needs constant reassuring would exhaust you, which is why what you want to be met with is information, not volume. Clarity, not more.',
     ],
     narrativeAlt: [
-      'When your steadiness is threatened, what meets it is not comfort — it is information. Your answers are precise about the difference: repeated reassuring does little for you, while one proportionate, reality-based sentence — "I am having a bad day; it is not about you" — lands where ten "are we sure?"s would not. You even ask people what reassurance looks like for them rather than guessing, which is the right instinct turned outward. And you know the exhaustion side from the inside: a partner who needs constant steadying would drain you — which is why you want clarity, not volume.',
+      'When your steadiness is threatened, what meets it is not comfort, it is information. Your answers are precise about the difference: repeated reassuring does little for you, while one proportionate, reality-based sentence, "I am having a bad day; it is not about you": lands where ten "are we sure?"s would not. You even ask people what reassurance looks like for them rather than guessing, which is the right instinct turned outward. And you know the exhaustion side from the inside: a partner who needs constant steadying would drain you, which is why you want clarity, not volume.',
     ],
     placement: { section: 'safety', after: 'reassurance_security' },
   },
@@ -432,9 +432,9 @@ export const PATTERNS: DerivedPattern[] = [
     when: both(lowish('sexual_communication'), midPlus('direct_communication')),
     mode: 'reinterpret',
     priority: 84,
-    frame: 'Direct in every other room — which is what makes the quiet here meaningful.',
+    frame: 'Direct in every other room, which is what makes the quiet here meaningful.',
     narrative: [
-      'Your plain speech is structural everywhere else, so the quieter register in this one is not a communication deficit — it is a vulnerability cost specific to desire. The words exist; the risk is what they reveal. That makes this the one channel where a partner\'s patience is worth more than their questions: the map gets drawn when drawing it feels safe, not when it is requested.',
+      'Your plain speech is structural everywhere else, so the quieter register in this one is not a communication deficit: it is a vulnerability cost specific to desire. The words exist; the risk is what they reveal. That makes this the one channel where a partner\'s patience is worth more than their questions: the map gets drawn when drawing it feels safe, not when it is requested.',
     ],
     placement: { section: 'closeness', after: 'sexual_communication' },
   },
@@ -451,9 +451,9 @@ export const PATTERNS: DerivedPattern[] = [
     when: both(midPlus('care_initiation'), lowish('scorekeeping')),
     mode: 'tension',
     priority: 88,
-    frame: 'You give readily — and your fairness clock runs on weeks, not years.',
+    frame: 'You give readily, and your fairness clock runs on weeks, not years.',
     narrative: [
-      'You move first for people, and your fairness tracking runs close to the surface: an unreciprocated stretch registers within weeks, not months. That pairing has a real upside — imbalance rarely compounds on you silently, because you surface it while it is still small. The watch-item is how the tracking reads from the outside: a partner on a longer horizon can experience quick noticing as an invoice. Tell them your clock runs on weeks because you would rather name a small thing than bank a resentment — that reframe turns the audit into care.',
+      'You move first for people, and your fairness tracking runs close to the surface: an unreciprocated stretch registers within weeks, not months. That pairing has a real upside, imbalance rarely compounds on you silently, because you surface it while it is still small. The watch-item is how the tracking reads from the outside: a partner on a longer horizon can experience quick noticing as an invoice. Tell them your clock runs on weeks because you would rather name a small thing than bank a resentment, that reframe turns the audit into care.',
     ],
     placement: { section: 'reciprocity', after: 'scorekeeping' },
   },
@@ -469,7 +469,7 @@ export const PATTERNS: DerivedPattern[] = [
     priority: 80,
     frame: 'The giver\'s asymmetry: moving first is easy; letting care land is not.',
     narrative: [
-      'You move first for everyone, and wave off the same when it is offered back. The imbalance is not generosity running out — it is the receiving half still practicing. Left alone, this pattern quietly starves the people around you: they cannot feed you, so they learn you do not need feeding, and the relationship tilts. Letting care land is a skill, and it is the one your people are most quietly asking you to learn.',
+      'You move first for everyone, and wave off the same when it is offered back. The imbalance is not generosity running out: it is the receiving half still practicing. Left alone, this pattern quietly starves the people around you: they cannot feed you, so they learn you do not need feeding, and the relationship tilts. Letting care land is a skill, and it is the one your people are most quietly asking you to learn.',
     ],
     placement: { section: 'reciprocity', after: 'receiving_comfort' },
   },
@@ -485,7 +485,7 @@ export const PATTERNS: DerivedPattern[] = [
     priority: 70,
     frame: 'The conclusion arrives faster than the clarity does.',
     narrative: [
-      'Two scores compound in a way worth knowing about. Ambiguity already sits uncomfortably with you — and your interpretation engine moves fast, which means the blank gets filled quickly, and the fill is not always charitable. Unexplained distance tends to become a story before anyone has told you the true one. The lever is small: build the habit of asking one question before believing the first conclusion. Not because the conclusions are always wrong — because they arrive too early to be checked.',
+      'Two scores compound in a way worth knowing about. Ambiguity already sits uncomfortably with you, and your interpretation engine moves fast, which means the blank gets filled quickly, and the fill is not always charitable. Unexplained distance tends to become a story before anyone has told you the true one. The lever is small: build the habit of asking one question before believing the first conclusion. Not because the conclusions are always wrong, because they arrive too early to be checked.',
     ],
     placement: { section: 'understanding', after: 'perspective_taking' },
   },
@@ -499,9 +499,9 @@ export const PATTERNS: DerivedPattern[] = [
     when: both(midPlus('repair_orientation'), lowish('vulnerability_safety')),
     mode: 'tension',
     priority: 68,
-    frame: 'You return quickly — the why sometimes stays home.',
+    frame: 'You return quickly: the why sometimes stays home.',
     narrative: [
-      'The return is fast: you come back after conflict, reliably, before things set. But your answers hint the return can outrun the accounting — repair covers the distance without always naming the cause. "We\'re okay" is real, and it can also be a door closing gently on a subject that still had weight. The upgrade is not more apology; it is letting one repair include the sentence about what actually happened, even when that sentence exposes you.',
+      'The return is fast: you come back after conflict, reliably, before things set. But your answers hint the return can outrun the accounting: repair covers the distance without always naming the cause. "We\'re okay" is real, and it can also be a door closing gently on a subject that still had weight. The upgrade is not more apology; it is letting one repair include the sentence about what actually happened, even when that sentence exposes you.',
     ],
     placement: { section: 'hard_days', after: 'repair_orientation' },
   },
@@ -517,7 +517,7 @@ export const PATTERNS: DerivedPattern[] = [
     priority: 70,
     frame: 'Storms and returns: you go quiet mid-conflict, and you always come back.',
     narrative: [
-      'Mid-argument you go somewhere quieter — heat narrows you, and the disagreement can resolve by forfeit. But you reliably return. Partners learn to read the pattern: the withdrawal is temporary, the return is certain. It is a workable architecture, with one condition — the person waiting has to know it is temporary. Telling them, once, calmly, outside of any argument, is what converts a confusing pattern into a trusted one.',
+      'Mid-argument you go somewhere quieter, heat narrows you, and the disagreement can resolve by forfeit. But you reliably return. Partners learn to read the pattern: the withdrawal is temporary, the return is certain. It is a workable architecture, with one condition, the person waiting has to know it is temporary. Telling them, once, calmly, outside of any argument, is what converts a confusing pattern into a trusted one.',
     ],
     placement: { section: 'hard_days', after: 'conflict_engagement' },
   },
@@ -531,9 +531,9 @@ export const PATTERNS: DerivedPattern[] = [
     when: both(midPlus('listening_first'), lowish('capitalization')),
     mode: 'tension',
     priority: 72,
-    frame: 'You make real room for what goes wrong — and far less for what goes right.',
+    frame: 'You make real room for what goes wrong, and far less for what goes right.',
     narrative: [
-      'There is an asymmetry worth naming: you make real room for the people you love when something goes wrong — and far less when something goes right. Both are attention; only one of them is celebration. People notice this asymmetry faster than you would think: they learn their crises have a landing place and their wins do not. The repair is small and strange: treat good news like distress, as something worth stopping for.',
+      'There is an asymmetry worth naming: you make real room for the people you love when something goes wrong, and far less when something goes right. Both are attention; only one of them is celebration. People notice this asymmetry faster than you would think: they learn their crises have a landing place and their wins do not. The repair is small and strange: treat good news like distress, as something worth stopping for.',
     ],
     placement: { section: 'understanding', after: 'capitalization' },
   },
@@ -547,9 +547,9 @@ export const PATTERNS: DerivedPattern[] = [
     when: both(lowish('scorekeeping'), lowish('money_coordination')),
     mode: 'tension',
     priority: 66,
-    frame: 'The audit shows up in two ledgers — care and money.',
+    frame: 'The audit shows up in two ledgers: care and money.',
     narrative: [
-      'The accounting reflex appears in two places at once: reciprocity and spending. When the same auditor wakes in both ledgers, it is rarely about the favor or the purchase — it is about how safe the books themselves feel. Worth asking what would have to be true for the auditing to relax, because the answer is usually about control and predictability, not arithmetic.',
+      'The accounting reflex appears in two places at once: reciprocity and spending. When the same auditor wakes in both ledgers, it is rarely about the favor or the purchase: it is about how safe the books themselves feel. Worth asking what would have to be true for the auditing to relax, because the answer is usually about control and predictability, not arithmetic.',
     ],
     placement: { section: 'independence', after: 'money_coordination' },
   },
@@ -568,10 +568,10 @@ export const PATTERNS: DerivedPattern[] = [
     priority: 74,
     frame: 'Good news has a full room in your answers.',
     narrative: [
-      'The compounding effect is worth naming on its own: because your celebrating is also curious, joy told to you tends to grow a second life — the win becomes a conversation, the conversation becomes an invitation, and the person learns their happiness has somewhere to go. That combination could make you someone people naturally want to bring their good news to.',
+      'The compounding effect is worth naming on its own: because your celebrating is also curious, joy told to you tends to grow a second life: the win becomes a conversation, the conversation becomes an invitation, and the person learns their happiness has somewhere to go. That combination could make you someone people naturally want to bring their good news to.',
     ],
     narrativeAlt: [
-      'Your celebrating is also curious, and that combination compounds: joy told to you grows a second life — the win becomes a conversation, the conversation becomes an invitation, and the person learns their happiness has somewhere to go. Over time that routing is visible: people bring you their good news first, not because you ask, but because they have learned what happens to it there. Being where joy lands is not a passive trait; in your answers it reads as something you actively hold.',
+      'Your celebrating is also curious, and that combination compounds: joy told to you grows a second life: the win becomes a conversation, the conversation becomes an invitation, and the person learns their happiness has somewhere to go. Over time that routing is visible: people bring you their good news first, not because you ask, but because they have learned what happens to it there. Being where joy lands is not a passive trait; in your answers it reads as something you actively hold.',
     ],
     placement: { section: 'understanding', after: 'capitalization' },
   },
@@ -587,7 +587,7 @@ export const PATTERNS: DerivedPattern[] = [
     priority: 68,
     frame: 'Play and want feed each other in your answers.',
     narrative: [
-      'The couple that laughs together stays charged — lightness keeps attraction unserious enough to be safe, and attraction keeps the playfulness pointed at each other. Your answers suggest you run on that loop naturally. The maintenance implication is pleasant but real: the laughter is not a luxury beside the wanting; it is one of the things feeding it.',
+      'The couple that laughs together stays charged: lightness keeps attraction unserious enough to be safe, and attraction keeps the playfulness pointed at each other. Your answers suggest you run on that loop naturally. The maintenance implication is pleasant but real: the laughter is not a luxury beside the wanting; it is one of the things feeding it.',
     ],
     placement: { section: 'closeness', after: 'positivity_play' },
   },
@@ -603,7 +603,7 @@ export const PATTERNS: DerivedPattern[] = [
     priority: 72,
     frame: 'Care that expands your life lands; care that runs it does not.',
     narrative: [
-      'You give and receive a lot of anticipatory care, and you also hold real ground for your own life — which together draw a clean line: care that expands the life is welcome; care that quietly takes over its operation is not. Planning done as affection reads as love. Planning done as management reads as removal. Most people never articulate this line even to themselves; having it crisp makes it possible to tell a partner exactly where it runs.',
+      'You give and receive a lot of anticipatory care, and you also hold real ground for your own life, which together draw a clean line: care that expands the life is welcome; care that quietly takes over its operation is not. Planning done as affection reads as love. Planning done as management reads as removal. Most people never articulate this line even to themselves; having it crisp makes it possible to tell a partner exactly where it runs.',
     ],
     placement: { section: 'independence', after: 'autonomy_connection' },
   },
@@ -617,12 +617,12 @@ export const PATTERNS: DerivedPattern[] = [
     when: both(midPlus('scorekeeping'), midPlus('care_initiation')),
     mode: 'augment',
     priority: 80,
-    frame: 'Your fairness horizon is long — the years balance, not the weeks.',
+    frame: 'Your fairness horizon is long: the years balance, not the weeks.',
     narrative: [
-      'Your generosity runs on a long ledger: individual gestures are not billed, seasons of imbalance are expected to bend back, and the accounting that matters happens at the scale of years. That is the communal form of fairness — rarer than people claim. Its one failure mode is silent: because every individual imbalance is explainable, a chronic one can normalize before you ever say it. The long horizon still needs an occasional voice — name the pattern when it becomes a season, not a history.',
+      'Your generosity runs on a long ledger: individual gestures are not billed, seasons of imbalance are expected to bend back, and the accounting that matters happens at the scale of years. That is the communal form of fairness, rarer than people claim. Its one failure mode is silent: because every individual imbalance is explainable, a chronic one can normalize before you ever say it. The long horizon still needs an occasional voice, name the pattern when it becomes a season, not a history.',
     ],
     narrativeAlt: [
-      'Your account-keeping operates on a horizon of years, not days: a single gesture is never billed, a season of imbalance is expected to bend back, and fairness is measured at the scale of the whole story. That is the communal form of generosity — rarer than people claim. Its failure mode is quiet rather than loud: because each individual imbalance has an explanation, a chronic one can become the weather before anyone names it. The long ledger still needs an occasional voice — the moment to speak is when a stretch becomes a pattern, not when it has become a history.',
+      'Your account-keeping operates on a horizon of years, not days: a single gesture is never billed, a season of imbalance is expected to bend back, and fairness is measured at the scale of the whole story. That is the communal form of generosity, rarer than people claim. Its failure mode is quiet rather than loud: because each individual imbalance has an explanation, a chronic one can become the weather before anyone names it. The long ledger still needs an occasional voice, the moment to speak is when a stretch becomes a pattern, not when it has become a history.',
     ],
     placement: { section: 'reciprocity', after: 'scorekeeping' },
   },
@@ -636,12 +636,12 @@ export const PATTERNS: DerivedPattern[] = [
     when: both(midPlus('shared_home_effort'), midPlus('care_initiation')),
     mode: 'tension',
     priority: 76,
-    frame: 'You bring plans, not problems — which protects them and excludes them at once.',
+    frame: 'You bring plans, not problems, which protects them and excludes them at once.',
     narrative: [
-      'Your instinct under load is to work it through alone first and arrive with the plan — competence offered as care, sparing them the raw worry. The cost hides inside the kindness: a partner who only ever sees the finished plan cannot participate in the decision, only ratify it. The upgrade is small: bring the fork instead of the conclusion — "here is what I found, here is where I am leaning, where do you see it differently." Letting someone into the unsolved version is its own form of intimacy.',
+      'Your instinct under load is to work it through alone first and arrive with the plan, competence offered as care, sparing them the raw worry. The cost hides inside the kindness: a partner who only ever sees the finished plan cannot participate in the decision, only ratify it. The upgrade is small: bring the fork instead of the conclusion, "here is what I found, here is where I am leaning, where do you see it differently." Letting someone into the unsolved version is its own form of intimacy.',
     ],
     narrativeAlt: [
-      'When trouble comes, your first move is to go quiet and build — you work the problem through privately and reappear holding a solution, competence offered as care so the people you love are spared the raw worry. What that kindness costs is their participation: someone handed only the finished plan is left to ratify it, not to shape it. The bridge is small and it works — arrive with the fork instead of the conclusion, and let the people who love you into the version of the problem that is still unsolved.',
+      'When trouble comes, your first move is to go quiet and build, you work the problem through privately and reappear holding a solution, competence offered as care so the people you love are spared the raw worry. What that kindness costs is their participation: someone handed only the finished plan is left to ratify it, not to shape it. The bridge is small and it works, arrive with the fork instead of the conclusion, and let the people who love you into the version of the problem that is still unsolved.',
     ],
     placement: { section: 'hard_days', after: 'shared_home_effort' },
   },
@@ -656,10 +656,10 @@ export const PATTERNS: DerivedPattern[] = [
     priority: 72,
     frame: 'Your privacy wall faces outward only.',
     narrative: [
-      'The boundary in your answers protects the two-person room from the world — it does not seal the room off from itself. The violation that stings is not a friend hearing too much; it is learning something about your person late, through someone else. Which makes the rule simple to state: a partner telling nobody is not the same as telling you first. Your privacy stance is a claim about audiences, never a license for distance inside.',
+      'The boundary in your answers protects the two-person room from the world: it does not seal the room off from itself. The violation that stings is not a friend hearing too much; it is learning something about your person late, through someone else. Which makes the rule simple to state: a partner telling nobody is not the same as telling you first. Your privacy stance is a claim about audiences, never a license for distance inside.',
     ],
     narrativeAlt: [
-      'There are two rooms in your answers, and the boundary draws them correctly. Inside the two-person room: unusually full disclosure, nothing curated. Outside it: the relationship\'s contents are not public property — a trusted voice may be consulted when counsel is genuinely needed, but there is no audience and no jury. The stinging violation is specific: not a friend hearing too much, but learning something about your person late, through someone else. A partner telling nobody is not the same as a partner telling you first. This is audience control, not avoidance — and it is why the people close to you can risk being imperfect without becoming someone else\'s story.',
+      'There are two rooms in your answers, and the boundary draws them correctly. Inside the two-person room: unusually full disclosure, nothing curated. Outside it: the relationship\'s contents are not public property, a trusted voice may be consulted when counsel is genuinely needed, but there is no audience and no jury. The stinging violation is specific: not a friend hearing too much, but learning something about your person late, through someone else. A partner telling nobody is not the same as a partner telling you first. This is audience control, not avoidance, and it is why the people close to you can risk being imperfect without becoming someone else\'s story.',
     ],
     placement: { section: 'privacy', after: 'relational_privacy' },
   },
@@ -678,7 +678,7 @@ export const PATTERNS: DerivedPattern[] = [
     supersedes: 'givers_asymmetry',
     frame: 'The daylight between your giving and your receiving is wide enough to measure.',
     narrative: [
-      'The gap is not a mood — it is a measured distance between how far your care runs out and how far it lets itself be run to. You give well past the point where you stop receiving; care offered back has to get past a debt-check your own giving never faces. This is the pattern that quietly exhausts the people who love you: they cannot feed you, so they learn to stop offering. The practice is unglamorous and specific — once a week, let something land without repaying it, and notice what the debt-check actually says.',
+      'The gap is not a mood, it is a measured distance between how far your care runs out and how far it lets itself be run to. You give well past the point where you stop receiving; care offered back has to get past a debt-check your own giving never faces. This is the pattern that quietly exhausts the people who love you: they cannot feed you, so they learn to stop offering. The practice is unglamorous and specific, once a week, let something land without repaying it, and notice what the debt-check actually says.',
     ],
     placement: { section: 'reciprocity', after: 'receiving_comfort' },
   },
@@ -690,9 +690,9 @@ export const PATTERNS: DerivedPattern[] = [
     mode: 'reinterpret',
     priority: 84,
     supersedes: 'bedroom_vulnerability_cost',
-    frame: 'Direct in every other room — which is what makes the quiet here meaningful.',
+    frame: 'Direct in every other room, which is what makes the quiet here meaningful.',
     narrative: [
-      'The distance between your plain speech everywhere else and your quieter register here is not a communication deficit — it is a vulnerability cost specific to desire. The words exist; the risk is what they reveal. That makes this the one channel where a partner\'s patience is worth more than their questions: the map gets drawn when drawing it feels safe, not when it is requested.',
+      'The distance between your plain speech everywhere else and your quieter register here is not a communication deficit: it is a vulnerability cost specific to desire. The words exist; the risk is what they reveal. That makes this the one channel where a partner\'s patience is worth more than their questions: the map gets drawn when drawing it feels safe, not when it is requested.',
     ],
     placement: { section: 'closeness', after: 'sexual_communication' },
   },
@@ -706,7 +706,7 @@ export const PATTERNS: DerivedPattern[] = [
     supersedes: 'fast_conclusions_anxious',
     frame: 'The checking runs measurably ahead of the charity.',
     narrative: [
-      'Your need for emotional information leads your benefit-of-the-doubt by a real margin — which means when ambiguity hits, the story-arriving machinery gets there before the charitable pass does. Unexplained distance tends to become a conclusion before anyone has told you the true one. The lever is small and repeatable: one question, asked before the first conclusion is believed. Not because the conclusions are always wrong — because they arrive too early to have been checked.',
+      'Your need for emotional information leads your benefit-of-the-doubt by a real margin, which means when ambiguity hits, the story-arriving machinery gets there before the charitable pass does. Unexplained distance tends to become a conclusion before anyone has told you the true one. The lever is small and repeatable: one question, asked before the first conclusion is believed. Not because the conclusions are always wrong, because they arrive too early to have been checked.',
     ],
     placement: { section: 'understanding', after: 'perspective_taking' },
   },
@@ -719,7 +719,7 @@ export const PATTERNS: DerivedPattern[] = [
     priority: 66,
     frame: 'Space leads touch by a wide margin in your answers.',
     narrative: [
-      'The distance between how much room you need and how much ambient contact you want is wide — your architecture leans deliberately toward the spacious end: closeness at chosen temperatures, contact that arrives as event rather than weather. None of that is coldness; the measurement gives the priority order, not the absence of warmth. Worth saying plainly to a high-touch partner: your quiet is design, not withdrawal.',
+      'The distance between how much room you need and how much ambient contact you want is wide: your architecture leans deliberately toward the spacious end: closeness at chosen temperatures, contact that arrives as event rather than weather. None of that is coldness; the measurement gives the priority order, not the absence of warmth. Worth saying plainly to a high-touch partner: your quiet is design, not withdrawal.',
     ],
     placement: { section: 'independence', after: 'autonomy_connection' },
   },
@@ -732,7 +732,7 @@ export const PATTERNS: DerivedPattern[] = [
     priority: 66,
     frame: 'Touch leads space by a wide margin in your answers.',
     narrative: [
-      'The distance between how much ambient contact you want and how much room you need is wide — your architecture leans toward the dense end: frequent touch, low distance, closeness as the background state rather than a scheduled event. Worth saying plainly to a space-heavy partner: your reach is design, not neediness — and their separation is likely design too, not cooling.',
+      'The distance between how much ambient contact you want and how much room you need is wide, your architecture leans toward the dense end: frequent touch, low distance, closeness as the background state rather than a scheduled event. Worth saying plainly to a space-heavy partner: your reach is design, not neediness, and their separation is likely design too, not cooling.',
     ],
     placement: { section: 'closeness', after: 'affection_daily' },
   },
@@ -745,7 +745,7 @@ export const PATTERNS: DerivedPattern[] = [
     priority: 78,
     frame: 'The way you back people extends to the ledger the two of you share.',
     narrative: [
-      'Two scores read together: the way you back people and the way shared money runs both come from the same trust. The willingness to carry is not rhetorical — it extends to the shared ledger, and that is the pairing that makes big joint gambles survivable. The watch-item is the reverse door: make sure the same lack of arithmetic applies to what a partner wants to carry for you.',
+      'Two scores read together: the way you back people and the way shared money runs both come from the same trust. The willingness to carry is not rhetorical: it extends to the shared ledger, and that is the pairing that makes big joint gambles survivable. The watch-item is the reverse door: make sure the same lack of arithmetic applies to what a partner wants to carry for you.',
     ],
     placement: { section: 'independence', after: 'commitment_sacrifice' },
   },
@@ -779,9 +779,9 @@ export const PATTERNS: DerivedPattern[] = [
       rawOf(p, 'care_initiation') >= 55,
     mode: 'tension',
     priority: 78,
-    frame: 'Verbal appreciation is not a preference for you — it is identifying.',
+    frame: 'Verbal appreciation is not a preference for you: it is identifying.',
     narrative: [
-      'There is a specific hunger the receiving scores cannot see, because it is not about volume: praise lands somewhere deeper in you than merely pleasant. A compliment is not just a nice moment — it is someone saying they see who you actually are, and its absence can read the way being misread does. This coexists happily with a wide receiving dictionary: the care lands in every register, and the words still matter on their own channel. Most people can run months on scarcity of this; the ones for whom appreciation is identity cannot, and they rarely announce it. The practical upshot is small and load-bearing: telling you what someone admires about you is not a courtesy you enjoy — it is maintenance you need, and going long without it will not show up as missing it. It will show up as something quieter.',
+      'There is a specific hunger the receiving scores cannot see, because it is not about volume: praise lands somewhere deeper in you than merely pleasant. A compliment is not just a nice moment, it is someone saying they see who you actually are, and its absence can read the way being misread does. This coexists happily with a wide receiving dictionary: the care lands in every register, and the words still matter on their own channel. Most people can run months on scarcity of this; the ones for whom appreciation is identity cannot, and they rarely announce it. The practical upshot is small and load-bearing: telling you what someone admires about you is not a courtesy you enjoy, it is maintenance you need, and going long without it will not show up as missing it. It will show up as something quieter.',
     ],
     placement: { section: 'reciprocity', after: 'receiving_comfort' },
   },
@@ -801,7 +801,7 @@ export const PATTERNS: DerivedPattern[] = [
     priority: 82,
     frame: 'You have a gear most couples never name: both engines down at once.',
     narrative: [
-      'One skill your answers circle without quite naming: on the days both of you are depleted, the right move reads to you as a deliberate mutual downshift — not one person carrying at twenty percent while the other runs at full, but both engines consciously cut to match, the shared life idling in low gear without either of you filing it as failure. That is rarer than the crisis reflex, because it asks something harder than teamwork: agreeing together that today is an easy day, on purpose, with nobody owing anybody. Your same-side instinct supplies the we; the way you back people supplies the absence of arithmetic. What is left is only to say it out loud on the day — "we are both at twenty today; let\'s make it easy" — because the pact only works when both people know it is one.',
+      'One skill your answers circle without quite naming: on the days both of you are depleted, the right move reads to you as a deliberate mutual downshift, not one person carrying at twenty percent while the other runs at full, but both engines consciously cut to match, the shared life idling in low gear without either of you filing it as failure. That is rarer than the crisis reflex, because it asks something harder than teamwork: agreeing together that today is an easy day, on purpose, with nobody owing anybody. Your same-side instinct supplies the we; the way you back people supplies the absence of arithmetic. What is left is only to say it out loud on the day, "we are both at twenty today; let\'s make it easy", because the pact only works when both people know it is one.',
     ],
     placement: { section: 'hard_days', after: 'same_side_problems' },
   },
@@ -1027,9 +1027,9 @@ export function renderPattern(hit: PatternHit, context: 'headline' | 'section', 
   const alt = pat.narrativeAlt;
   const narrative = alt ? seededPick([pat.narrative, alt], hash(pat.id) + runSeed) : pat.narrative;
   if (context === 'headline') {
-    const lead = soft ? 'This reads as a lean, not a verdict — ' : '';
+    const lead = soft ? 'This reads as a lean, not a verdict: ' : '';
     return [`**${pat.frame}** ${lead}${narrative.join(' ')}`];
   }
-  if (soft) return [`Hold this one lightly — it is a lean, not a verdict. ${narrative[0]}`, ...narrative.slice(1)];
+  if (soft) return [`Hold this one lightly: it is a lean, not a verdict. ${narrative[0]}`, ...narrative.slice(1)];
   return [...narrative];
 }
